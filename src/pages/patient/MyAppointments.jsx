@@ -1,0 +1,277 @@
+import { useEffect, useState } from "react";
+import axios from "axios";
+import useBackRedirect from "../../hooks/useBackRedirect";
+import { toast } from "react-toastify"; // ✅ ADDED
+
+function MyAppointments() {
+  useBackRedirect("/patient/profile");
+  const token = localStorage.getItem("patientToken");
+
+  const [accepted, setAccepted] = useState([]);
+  const [pending, setPending] = useState([]);
+  const [rejected, setRejected] = useState([]);
+  const [history, setHistory] = useState([]);
+
+  const [rating, setRating] = useState({});
+  const [review, setReview] = useState({});
+
+  // ✅ NEW: active tab
+  const [activeTab, setActiveTab] = useState("accepted");
+
+  useEffect(() => {
+    fetchAppointments();
+  }, []);
+
+  const fetchAppointments = async () => {
+    try {
+
+      const res = await axios.get(
+        "http://localhost:5000/api/appointments/my",
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+
+      const acceptedList = [];
+      const pendingList = [];
+      const rejectedList = [];
+      const historyList = [];
+
+      res.data.appointments.forEach(app => {
+
+        if (app.status === "accepted") acceptedList.push(app);
+        else if (app.status === "pending") pendingList.push(app);
+        else if (app.status === "rejected") rejectedList.push(app);
+        else historyList.push(app);
+
+      });
+
+      setAccepted(acceptedList);
+      setPending(pendingList);
+      setRejected(rejectedList);
+      setHistory(historyList);
+
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const submitRating = async (appointmentId) => {
+
+    if (!rating[appointmentId]) {
+      alert("Please select a rating");
+      return;
+    }
+
+    try {
+
+      await axios.post(
+        `http://localhost:5000/api/appointments/${appointmentId}/rate`,
+        {
+          rating: Number(rating[appointmentId]),
+          review: review[appointmentId] || ""
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+
+      toast.success("Rating submitted successfully!");
+      fetchAppointments();
+
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to submit rating");
+    }
+  };
+
+  const formatDate = (date) => {
+    return new Date(date).toLocaleDateString();
+  };
+
+  /* ================= TAB CONTENT ================= */
+
+  const renderAppointments = (list, type) => {
+    if (list.length === 0) {
+      return <p style={{ opacity: 0.6 }}>No appointments</p>;
+    }
+
+    return list.map(app => (
+      <div key={app._id} style={cardStyle}>
+
+        <p><strong>{app.doctor?.name}</strong></p>
+        <p>{formatDate(app.date)} • {app.slotTime}</p>
+
+        {type === "accepted" && (
+          <>
+            <p style={{ color: "green" }}>✔ Confirmed</p>
+            <p>{app.doctor?.email}</p>
+            <p>{app.doctor?.phone}</p>
+          </>
+        )}
+
+        {type === "pending" && (
+          <p style={{ color: "orange" }}>⏳ Waiting for approval</p>
+        )}
+
+        {type === "rejected" && (
+          <p style={{ color: "red" }}>✖ Rejected</p>
+        )}
+
+        {type === "history" && (
+          <>
+            <p>Status: {app.status}</p>
+
+            {app.rated && (
+              <div style={{ marginTop: "10px" }}>
+                <p>⭐ {app.rating}</p>
+                {app.review && <p>📝 {app.review}</p>}
+              </div>
+            )}
+
+            {app.status === "completed" && !app.rated && (
+              <div style={{ marginTop: "10px" }}>
+
+                <select
+                  value={rating[app._id] || ""}
+                  onChange={(e) =>
+                    setRating(prev => ({
+                      ...prev,
+                      [app._id]: e.target.value
+                    }))
+                  }
+                >
+                  <option value="">Rate Doctor</option>
+                  <option value="1">1 ⭐</option>
+                  <option value="2">2 ⭐</option>
+                  <option value="3">3 ⭐</option>
+                  <option value="4">4 ⭐</option>
+                  <option value="5">5 ⭐</option>
+                </select>
+
+                <textarea
+                  placeholder="Write a review..."
+                  style={textarea}
+                  value={review[app._id] || ""}
+                  onChange={(e) =>
+                    setReview(prev => ({
+                      ...prev,
+                      [app._id]: e.target.value
+                    }))
+                  }
+                />
+
+                <button
+                  style={rateButton}
+                  onClick={() => submitRating(app._id)}
+                >
+                  Submit
+                </button>
+
+              </div>
+            )}
+          </>
+        )}
+
+      </div>
+    ));
+  };
+
+  return (
+
+    <div style={{ padding: "30px", maxWidth: "900px", margin: "auto" }}>
+
+      <h2>My Appointments</h2>
+
+      {/* ✅ TABS */}
+      <div style={tabContainer}>
+        <button
+          style={activeTab === "accepted" ? activeTabStyle : tabStyle}
+          onClick={() => setActiveTab("accepted")}
+        >
+          Accepted ({accepted.length})
+        </button>
+
+        <button
+          style={activeTab === "pending" ? activeTabStyle : tabStyle}
+          onClick={() => setActiveTab("pending")}
+        >
+          Pending ({pending.length})
+        </button>
+
+        <button
+          style={activeTab === "rejected" ? activeTabStyle : tabStyle}
+          onClick={() => setActiveTab("rejected")}
+        >
+          Rejected ({rejected.length})
+        </button>
+
+        <button
+          style={activeTab === "history" ? activeTabStyle : tabStyle}
+          onClick={() => setActiveTab("history")}
+        >
+          History ({history.length})
+        </button>
+      </div>
+
+      {/* ✅ CONTENT */}
+      <div style={{ marginTop: "20px" }}>
+        {activeTab === "accepted" && renderAppointments(accepted, "accepted")}
+        {activeTab === "pending" && renderAppointments(pending, "pending")}
+        {activeTab === "rejected" && renderAppointments(rejected, "rejected")}
+        {activeTab === "history" && renderAppointments(history, "history")}
+      </div>
+
+    </div>
+  );
+}
+
+/* ================= STYLES ================= */
+
+const tabContainer = {
+  display: "flex",
+  gap: "10px",
+  marginTop: "20px",
+  flexWrap: "wrap"
+};
+
+const tabStyle = {
+  padding: "8px 15px",
+  border: "1px solid #ccc",
+  borderRadius: "6px",
+  background: "white",
+  cursor: "pointer"
+};
+
+const activeTabStyle = {
+  ...tabStyle,
+  background: "#2563eb",
+  color: "white",
+  border: "none"
+};
+
+const cardStyle = {
+  background: "white",
+  padding: "15px",
+  marginTop: "10px",
+  borderRadius: "8px",
+  boxShadow: "0 2px 6px rgba(0,0,0,0.1)"
+};
+
+const textarea = {
+  display: "block",
+  marginTop: "10px",
+  width: "100%",
+  height: "60px"
+};
+
+const rateButton = {
+  marginTop: "10px",
+  padding: "8px 15px",
+  background: "#2563eb",
+  color: "white",
+  border: "none",
+  borderRadius: "5px",
+  cursor: "pointer"
+};
+
+export default MyAppointments;

@@ -1,0 +1,349 @@
+import React, { useEffect, useState } from "react";
+  import axios from "axios";
+  import { useLocation, useNavigate, useSearchParams } from "react-router-dom"; // ✅ added
+  import useBackRedirect from "../../hooks/useBackRedirect";
+  import { toast } from "react-toastify"; // ✅ ADDED
+
+  const specialties = [
+    "General Physician",
+    "Cardiologist",
+    "Neurologist",
+    "ENT Specialist",
+    "Pulmonologist",
+    "Allergist",
+    "Vascular Specialist",
+    "Gastroenterologist",
+    "Endocrinologist",
+    "Orthopedic",
+    "Dermatologist",
+    "Psychiatrist",
+    "Nephrologist",
+    "Gynecologist",
+    "Pediatrician"
+  ];
+
+  const container = {
+    display: "flex",
+    gap: "30px",
+    background: "#f8fafc",
+    padding: "30px",
+    minHeight: "100vh",
+    alignItems: "flex-start"
+  };
+
+  const sidebar = {
+    width: "260px",
+    background: "white",
+    padding: "20px",
+    borderRadius: "10px",
+    boxShadow: "0 2px 10px rgba(0,0,0,0.05)",
+    height: "fit-content",
+    position: "sticky",
+    top: "30px",
+    flexShrink: 0
+  };
+
+  const results = {
+    flex: 1
+  };
+
+  const inputStyle = {
+    width: "100%",
+    padding: "8px",
+    marginBottom: "15px",
+    borderRadius: "6px",
+    border: "1px solid #ddd"
+  };
+
+  const doctorCard = {
+    display: "flex",
+    gap: "20px",
+    background: "white",
+    padding: "15px",
+    borderRadius: "10px",
+    marginBottom: "15px",
+    boxShadow: "0 2px 10px rgba(0,0,0,0.05)"
+  };
+
+  const imgStyle = {
+    width: "90px",
+    height: "90px",
+    borderRadius: "50%",
+    objectFit: "cover"
+  };
+
+  const cardContent = {
+    flex: 1
+  };
+
+  const topRow = {
+    display: "flex",
+    alignItems: "center",
+    gap: "15px",
+    flexWrap: "wrap"
+  };
+
+  const nameStyle = {
+    fontSize: "18px",
+    fontWeight: "600"
+  };
+
+  const ratingStyle = {
+    fontWeight: "500",
+    color: "#f59e0b"
+  };
+
+  const feeStyle = {
+    fontWeight: "600",
+    color: "#2563eb"
+  };
+
+  const addressStyle = {
+    marginTop: "5px",
+    color: "#555"
+  };
+
+  const slotStyle = {
+    marginTop: "5px",
+    color: "#16a34a",
+    fontSize: "14px"
+  };
+
+  const buttonStyle = {
+    marginTop: "10px",
+    padding: "8px 12px",
+    border: "none",
+    borderRadius: "6px",
+    background: "#2563eb",
+    color: "white",
+    cursor: "pointer"
+  };
+
+  const SearchDoctors = () => {
+    useBackRedirect("/patient/profile");
+
+    const location = useLocation();
+    const navigate = useNavigate();
+
+    const [searchParams, setSearchParams] = useSearchParams(); // ✅ added
+
+    const predictedSpecialties = location.state?.specialties || [];
+
+    const [doctors, setDoctors] = useState([]);
+    const [areas, setAreas] = useState([]);
+
+    // ✅ INITIALIZE FILTERS FROM URL
+    const [filters, setFilters] = useState({
+      area: searchParams.get("area") || "",
+      specialty: searchParams.get("specialty") || "",
+      maxFee: searchParams.get("maxFee") || "",
+      rating: searchParams.get("rating") || "",
+      experience: searchParams.get("experience") || "",
+      mode: searchParams.get("mode") || "",
+      gender: searchParams.get("gender") || "",
+      startTime: searchParams.get("startTime") || "",
+      endTime: searchParams.get("endTime") || ""
+    });
+
+    // ✅ SYNC FILTERS → URL
+    useEffect(() => {
+      const params = {};
+
+      Object.keys(filters).forEach((key) => {
+        if (filters[key]) {
+          params[key] = filters[key];
+        }
+      });
+
+      setSearchParams(params);
+    }, [filters, setSearchParams]);
+
+    useEffect(() => {
+      const fetchAreas = async () => {
+        try {
+          const res = await axios.get(
+            "http://localhost:5000/api/doctors/filters",
+            {
+              params: {
+                specialties: predictedSpecialties.join(",")
+              }
+            }
+          );
+
+          setAreas(res.data.areas || []);
+
+        } catch (err) {
+          toast.error("Failed to fetch areas");
+          console.log(err);
+        }
+      };
+
+      fetchAreas();
+
+    }, [predictedSpecialties]);
+
+    useEffect(() => {
+      fetchDoctors();
+    }, [filters, predictedSpecialties]);
+
+    const fetchDoctors = async () => {
+      try {
+        const res = await axios.post(
+          "http://localhost:5000/api/doctors/search",
+          {
+            specialties: predictedSpecialties,
+            ...filters
+          }
+        );
+
+        setDoctors(res.data.doctors);
+
+      } catch (err) {
+        toast.error("Failed to fetch doctors");
+        console.log(err);
+      }
+    };
+
+    const handleChange = (e) => {
+      setFilters({
+        ...filters,
+        [e.target.name]: e.target.value
+      });
+    };
+
+    const viewProfile = (doctorId) => {
+      navigate(`/patient/doctor/${doctorId}`);
+    };
+
+    return (
+      <div style={container}>
+
+        {/* FILTER SIDEBAR */}
+        <div style={sidebar}>
+          <h3 style={{ marginBottom: "20px" }}>Filters</h3>
+
+          <label>Area</label>
+          <select name="area" style={inputStyle} onChange={handleChange} value={filters.area}>
+            <option value="">All Areas</option>
+            {areas.map((area) => (
+              <option key={area} value={area}>{area}</option>
+            ))}
+          </select>
+
+          <label>Specialty</label>
+          <select name="specialty" style={inputStyle} onChange={handleChange} value={filters.specialty}>
+            <option value="">All Specialties</option>
+            {specialties.map((spec) => (
+              <option key={spec} value={spec}>{spec}</option>
+            ))}
+          </select>
+
+          <label>Max Consultation Fee</label>
+          <input
+            type="number"
+            name="maxFee"
+            style={inputStyle}
+            placeholder="₹ Max Fee"
+            onChange={handleChange}
+            value={filters.maxFee}
+          />
+
+          <label>Minimum Rating</label>
+          <select name="rating" style={inputStyle} onChange={handleChange} value={filters.rating}>
+            <option value="">Any</option>
+            <option value="4">4+</option>
+            <option value="3">3+</option>
+          </select>
+
+          <label>Consultation Mode</label>
+          <select name="mode" style={inputStyle} onChange={handleChange} value={filters.mode}>
+            <option value="">Any</option>
+            <option value="online">Online</option>
+            <option value="offline">Offline</option>
+            <option value="both">Both</option>
+          </select>
+
+          <label>Gender</label>
+          <select name="gender" style={inputStyle} onChange={handleChange} value={filters.gender}>
+            <option value="">Any</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+          </select>
+
+          <label>Start Time</label>
+          <input
+            type="time"
+            name="startTime"
+            style={inputStyle}
+            onChange={handleChange}
+            value={filters.startTime}
+          />
+
+          <label>End Time</label>
+          <input
+            type="time"
+            name="endTime"
+            style={inputStyle}
+            onChange={handleChange}
+            value={filters.endTime}
+          />
+        </div>
+
+        {/* DOCTOR RESULTS */}
+        <div style={results}>
+          <h2 style={{ marginBottom: "20px" }}>Available Doctors</h2>
+
+          {doctors.length === 0 && <p>No doctors found.</p>}
+
+          {doctors.map((doc) => (
+            <div key={doc._id} style={doctorCard}>
+
+              <img
+                src={
+                  doc.photo
+                    ? `http://localhost:5000${doc.photo}`
+                    : "https://via.placeholder.com/90"
+                }
+                alt="doctor"
+                style={imgStyle}
+              />
+
+              <div style={cardContent}>
+                <div style={topRow}>
+                  <div style={nameStyle}>{doc.name}</div>
+                  <div style={ratingStyle}>⭐ {doc.rating || 4}</div>
+                  <div style={feeStyle}>₹ {doc.consultationFee}</div>
+                </div>
+
+                <div style={addressStyle}>
+                  {doc.address?.street || ""} {doc.address?.area || ""}
+                </div>
+
+                <div style={addressStyle}>
+                  Gender: {doc.gender || "N/A"}
+                </div>
+
+                {doc.availableDays && (
+                  <div style={slotStyle}>
+                    Available: {doc.availableDays.join(", ")}
+                  </div>
+                )}
+
+                <button
+                  style={buttonStyle}
+                  onClick={() => viewProfile(doc._id)}
+                >
+                  View Profile
+                </button>
+
+              </div>
+
+            </div>
+          ))}
+        </div>
+
+      </div>
+    );
+  };
+
+  export default SearchDoctors;

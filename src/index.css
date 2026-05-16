@@ -1,0 +1,21 @@
+/* Reset default browser spacing */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden; /* prevents outer page scrollbar */
+  font-family: Arial, sans-serif;
+}
+
+/* Make root element fill screen */
+#root {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+/* Ensure all elements calculate size properly */
+* {
+  box-sizing: border-box;
+}
