@@ -1,9 +1,8 @@
-import React, { useState, useContext } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { AuthContext } from "../../context/AuthContext";
 import useBackRedirect from "../../hooks/useBackRedirect";
-import { toast } from "react-toastify"; // ✅ ADDED
+import { toast } from "react-toastify";
 
 const PatientRegister = () => {
   useBackRedirect("/");
@@ -15,21 +14,18 @@ const PatientRegister = () => {
   const [contactNumber, setContactNumber] = useState("");
   const [countryCode, setCountryCode] = useState("+91");
 
+  const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
-  const { login } = useContext(AuthContext);
 
   /* ================= VALIDATIONS ================= */
 
-  // ✅ STRICT EMAIL (FIXED)
   const emailRegex =
     /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
   const isEmailValid = emailRegex.test(email);
-
-  // ✅ PASSWORD
   const isPasswordValid = password.length >= 6;
 
-  // ✅ COUNTRY-BASED PHONE VALIDATION
   const getPhoneValidation = () => {
     if (countryCode === "+91") return /^\d{10}$/.test(contactNumber);
     if (countryCode === "+1") return /^\d{10}$/.test(contactNumber);
@@ -56,9 +52,11 @@ const PatientRegister = () => {
     }
 
     try {
+      setLoading(true);
+
       const fullPhone = `${countryCode}${contactNumber}`;
 
-      const response = await axios.post(
+      await axios.post(
         "http://localhost:5000/api/auth/register",
         {
           name,
@@ -68,19 +66,27 @@ const PatientRegister = () => {
         }
       );
 
-      login(response.data.token, "patient");
-      navigate("/patient/profile");
+      // ✅ OTP SENT
+      toast.success("OTP sent to your email");
+
+      // ✅ REDIRECT TO OTP PAGE
+      navigate("/patient/verify", {
+        state: { email, type: "register" }
+      });
 
     } catch (err) {
       toast.error(err.response?.data?.message || "Registration failed");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-
     <div style={{ maxWidth: "400px", margin: "auto", marginTop: "80px" }}>
-      <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-        
+      <form
+        onSubmit={handleSubmit}
+        style={{ display: "flex", flexDirection: "column", gap: "10px" }}
+      >
         <h2>Patient Register</h2>
 
         {/* NAME */}
@@ -139,7 +145,6 @@ const PatientRegister = () => {
             placeholder="Phone Number"
             value={contactNumber}
             onChange={(e) => {
-              // ✅ ONLY DIGITS ALLOWED
               const value = e.target.value.replace(/\D/g, "");
               setContactNumber(value);
             }}
@@ -150,16 +155,15 @@ const PatientRegister = () => {
         {/* BUTTON */}
         <button
           type="submit"
-          disabled={!isFormValid}
+          disabled={!isFormValid || loading}
           style={{
             ...buttonStyle,
             opacity: isFormValid ? 1 : 0.6,
             cursor: isFormValid ? "pointer" : "not-allowed"
           }}
         >
-          Register
+          {loading ? "Sending OTP..." : "Register & Verify"}
         </button>
-
       </form>
 
       {/* LOGIN */}
@@ -172,7 +176,6 @@ const PatientRegister = () => {
           Login here
         </span>
       </p>
-
     </div>
   );
 };

@@ -2,8 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import useBackRedirect from "../../hooks/useBackRedirect";
-import { toast } from "react-toastify"; // ✅ ADDED
-
+import { toast } from "react-toastify";
 
 const DoctorRegister = () => {
   useBackRedirect("/");
@@ -24,8 +23,6 @@ const DoctorRegister = () => {
     gender: "",
     about: "",
     photo: null,
-
-    // ✅ VERIFICATION FIELDS
     registrationNumber: "",
     councilName: "",
     degree: ""
@@ -73,7 +70,7 @@ const DoctorRegister = () => {
     e.preventDefault();
 
     if (!isFormValid) {
-      return alert("Please fill all fields correctly");
+      return toast.error("Please fill all fields correctly");
     }
 
     try {
@@ -100,18 +97,17 @@ const DoctorRegister = () => {
         }
       );
 
-      // ✅ FINAL MESSAGE
-      toast.success(
-        "Your registration request is currently under consideration and is awaiting admin approval.\n\n" +
-        "NO NEED TO REGISTER AGAIN. LOG IN AFTER SOME TIME USING THE SAME CREDENTIALS."
-      );
+      // ✅ CORRECT FLOW MESSAGE
+      toast.success("OTP sent to your email");
 
-      // ✅ REDIRECT TO LANDING PAGE
-      navigate("/");
+      // ✅ REDIRECT TO OTP PAGE
+      navigate("/doctor/verify", {
+        state: { email: form.email, type: "register" } // 🔥 PASS TYPE
+      });
 
     } catch (error) {
       console.error(error.response?.data || error);
-      alert(error.response?.data?.message || "Registration failed");
+      toast.error(error.response?.data?.message || "Registration failed");
     } finally {
       setLoading(false);
     }
@@ -229,7 +225,7 @@ const DoctorRegister = () => {
               cursor: isFormValid ? "pointer" : "not-allowed"
             }}
           >
-            {loading ? "Registering..." : "Register"}
+            {loading ? "Sending OTP..." : "Register & Verify"}
           </button>
 
         </form>
@@ -251,7 +247,6 @@ const DoctorRegister = () => {
 const pageContainer = {
   height: "100vh",
   overflowY: "scroll",
-  display: "block",
   padding: "20px",
   background: "#f1f5f9"
 };

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import useBackRedirect from "../../hooks/useBackRedirect";
-import { toast } from "react-toastify"; // ✅ ADDED
+import { toast } from "react-toastify";
 
 const DoctorLogin = () => {
   useBackRedirect("/");
@@ -38,7 +38,7 @@ const DoctorLogin = () => {
     try {
       setLoading(true);
 
-      const res = await axios.post(
+      await axios.post(
         "http://localhost:5000/api/doctor-auth/login",
         {
           email: form.email.trim(),
@@ -46,27 +46,27 @@ const DoctorLogin = () => {
         }
       );
 
-      localStorage.setItem("doctorToken", res.data.token);
-      localStorage.setItem("doctorData", JSON.stringify(res.data.doctor));
+      // ✅ OTP SENT MESSAGE
+      toast.success("OTP sent to your email");
 
-      toast.success("Login successful!"); // ✅ ADDED
-
-      navigate("/doctor/profile");
+      // ✅ REDIRECT TO OTP PAGE
+      navigate("/doctor/verify", {
+        state: { email: form.email, type: "login" }
+      });
 
     } catch (err) {
       console.error(err.response?.data || err);
 
       const message = err.response?.data?.message;
 
-      // ✅ HANDLE ALL CASES WITH TOAST
-      if (message === "Your account has been rejected by admin") {
+      if (message === "Your account has been rejected") {
         toast.error(
-          "Your registration request has been rejected by the admin. Please register again with correct details."
+          "Your account has been rejected. Please register again."
         );
       }
-      else if (message === "Your account is under admin verification") {
+      else if (message === "Account not approved yet") {
         toast.warning(
-          "Your account is still under verification. Please try again later."
+          "Your account is under admin verification."
         );
       }
       else {
@@ -109,11 +109,10 @@ const DoctorLogin = () => {
           disabled={loading}
           style={buttonStyle}
         >
-          {loading ? "Logging in..." : "Login"}
+          {loading ? "Sending OTP..." : "Login & Verify"}
         </button>
       </form>
 
-      {/* ✅ REGISTER OPTION */}
       <p style={{ marginTop: "15px", textAlign: "center" }}>
         Not registered?{" "}
         <span
@@ -122,6 +121,18 @@ const DoctorLogin = () => {
         >
           Register here
         </span>
+      </p>
+
+      <p
+        onClick={() => navigate("/forgot-password")}
+        style={{
+          marginTop: "10px",
+          color: "#2563eb",
+          cursor: "pointer",
+          textAlign: "center"
+        }}
+      >
+        Forgot Password?
       </p>
 
     </div>

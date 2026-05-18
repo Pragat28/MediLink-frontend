@@ -12,6 +12,7 @@ import SearchDoctors from "./pages/patient/SearchDoctors";
 import MyAppointments from "./pages/patient/MyAppointments";
 import DoctorProfile from "./pages/patient/DoctorProfile";
 import PatientProfile from "./pages/patient/Profile";
+import PatientVerifyOtp from "./pages/patient/VerifyOtp"; // ✅ ADD THIS
 
 /* Doctor */
 import DoctorRegister from "./pages/doctor/Register";
@@ -19,33 +20,55 @@ import DoctorLogin from "./pages/doctor/Login";
 import DoctorProfilePanel from "./pages/doctor/Profile";
 import DoctorAppointments from "./pages/doctor/Appointments";
 import DoctorCalendar from "./pages/doctor/Calendar";
+import DoctorVerifyOtp from "./pages/doctor/VerifyOtp";
 
 /* Layouts */
 import DoctorLayout from "./layouts/DoctorLayout";
 import PatientLayout from "./layouts/PatientLayout";
 
-/* ✅ PROTECTED ROUTE */
+/* Protected */
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminDashboard from "./pages/admin/AdminDashboard";
+
+import ForgotPassword from "./pages/auth/ForgotPassword";
+import VerifyForgotOtp from "./pages/auth/VerifyForgotOtp";
+import ResetPassword from "./pages/auth/ResetPassword";
+
+/* Toast */
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function App() {
   return (
     <BrowserRouter>
+
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        pauseOnHover
+        theme="colored"
+      />
+
       <Routes>
 
-        {/* ✅ LANDING PAGE */}
+        {/* LANDING */}
         <Route path="/" element={<LandingPage />} />
 
+        {/* ADMIN */}
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/admin/login" element={<AdminLogin />} />
 
-        {/* ================= PATIENT AUTH ================= */}
-
+        {/* PATIENT AUTH */}
         <Route path="/patient/register" element={<PatientRegister />} />
         <Route path="/patient/login" element={<PatientLogin />} />
 
-        {/* ================= PATIENT PANEL (PROTECTED) ================= */}
+        {/* ✅ PATIENT OTP ROUTE */}
+        <Route path="/patient/verify" element={<PatientVerifyOtp />} />
 
+        {/* PATIENT PANEL */}
         <Route
           path="/patient"
           element={
@@ -62,13 +85,14 @@ function App() {
           <Route path="doctor/:id" element={<DoctorProfile />} />
         </Route>
 
-        {/* ================= DOCTOR AUTH ================= */}
-
+        {/* DOCTOR AUTH */}
         <Route path="/doctor/register" element={<DoctorRegister />} />
         <Route path="/doctor/login" element={<DoctorLogin />} />
 
-        {/* ================= DOCTOR PANEL (PROTECTED) ================= */}
+        {/* ✅ FIXED DOCTOR OTP ROUTE */}
+        <Route path="/doctor/verify" element={<DoctorVerifyOtp />} />
 
+        {/* DOCTOR PANEL */}
         <Route
           path="/doctor"
           element={
@@ -81,6 +105,11 @@ function App() {
           <Route path="calendar" element={<DoctorCalendar />} />
           <Route path="profile" element={<DoctorProfilePanel />} />
         </Route>
+
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/verify-forgot-otp" element={<VerifyForgotOtp />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+
 
       </Routes>
     </BrowserRouter>
