@@ -195,7 +195,7 @@ const SearchDoctors = () => {
         {doctors.map((doc) => (
           <div key={doc._id} style={doctorCard}>
             <img
-              src={doc.photo ? `http://localhost:5000${doc.photo}` : "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90'%3E%3Crect width='90' height='90' fill='%23e2e8f0'/%3E%3Ccircle cx='45' cy='35' r='16' fill='%2394a3b8'/%3E%3Cellipse cx='45' cy='75' rx='24' ry='18' fill='%2394a3b8'/%3E%3C/svg%3E"}
+              src={doc.photo ? `https://medilink-j44r.onrender.com${doc.photo}` : "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90'%3E%3Crect width='90' height='90' fill='%23e2e8f0'/%3E%3Ccircle cx='45' cy='35' r='16' fill='%2394a3b8'/%3E%3Cellipse cx='45' cy='75' rx='24' ry='18' fill='%2394a3b8'/%3E%3C/svg%3E"}
               alt="doctor"
               style={imgStyle}
             />

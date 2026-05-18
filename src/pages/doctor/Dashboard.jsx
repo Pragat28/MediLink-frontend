@@ -30,7 +30,7 @@ const Dashboard = () => {
         }
 
         const res = await axios.get(
-          "http://localhost:5000/api/doctor-profile/appointments",
+          "https://medilink-j44r.onrender.com/api/doctor-profile/appointments",
           {
             headers: { Authorization: `Bearer ${token}` }
           }

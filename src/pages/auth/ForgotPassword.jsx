@@ -21,7 +21,7 @@ const ForgotPassword = () => {
       setLoading(true);
 
       await axios.post(
-        "http://localhost:5000/api/forgot-password/forgot-password",
+        "https://medilink-j44r.onrender.com/api/forgot-password/forgot-password",
         { email, role }
       );
 

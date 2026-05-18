@@ -59,7 +59,7 @@ const Profile = () => {
         const token = localStorage.getItem("doctorToken");
 
         const res = await axios.get(
-          "http://localhost:5000/api/doctor-profile/me",
+          "https://medilink-j44r.onrender.com/api/doctor-profile/me",
           { headers:{ Authorization:`Bearer ${token}` } }
         );
 
@@ -258,7 +258,7 @@ const Profile = () => {
     };
 
     const res = await axios.put(
-      "http://localhost:5000/api/doctor-profile/me",
+      "https://medilink-j44r.onrender.com/api/doctor-profile/me",
       cleanedDoctor,
       { headers:{ Authorization:`Bearer ${token}` } }
     );

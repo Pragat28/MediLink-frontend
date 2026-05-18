@@ -23,7 +23,7 @@ const ResetPassword = () => {
       setLoading(true);
 
       await axios.post(
-        "http://localhost:5000/api/forgot-password/reset-password",
+        "https://medilink-j44r.onrender.com/api/forgot-password/reset-password",
         {
           email,
           newPassword: password,

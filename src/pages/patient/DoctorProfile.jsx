@@ -93,7 +93,7 @@ const DoctorProfile = () => {
     const fetchDoctor = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:5000/api/doctors/${id}`
+          `https://medilink-j44r.onrender.com/api/doctors/${id}`
         );
         setDoctor(res.data);
       } catch (err) {
@@ -177,7 +177,7 @@ const DoctorProfile = () => {
       const token = localStorage.getItem("patientToken");
 
       await axios.post(
-        "http://localhost:5000/api/appointments/request",
+        "https://medilink-j44r.onrender.com/api/appointments/request",
         {
           doctorId: doctor._id,
           date: selectedDate,
@@ -217,7 +217,7 @@ const DoctorProfile = () => {
             <img
               src={
                 doctor.photo
-                  ? `http://localhost:5000${doctor.photo}`
+                  ? `https://medilink-j44r.onrender.com${doctor.photo}`
                   : "https://via.placeholder.com/120"
               }
               alt="doctor"

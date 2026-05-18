@@ -36,7 +36,7 @@ function PatientProfile() {
     try {
 
       const res = await axios.get(
-        "http://localhost:5000/api/patient/profile",
+        "https://medilink-j44r.onrender.com/api/patient/profile",
         {
           headers: { Authorization: `Bearer ${token}` }
         }
@@ -111,7 +111,7 @@ function PatientProfile() {
       };
 
       await axios.put(
-        "http://localhost:5000/api/patient/profile",
+        "https://medilink-j44r.onrender.com/api/patient/profile",
         dataToSend,
         {
           headers: { Authorization: `Bearer ${token}` }

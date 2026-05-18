@@ -39,7 +39,7 @@ const DoctorLogin = () => {
       setLoading(true);
 
       await axios.post(
-        "http://localhost:5000/api/doctor-auth/login",
+        "https://medilink-j44r.onrender.com/api/doctor-auth/login",
         {
           email: form.email.trim(),
           password: form.password

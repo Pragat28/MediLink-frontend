@@ -24,7 +24,7 @@ const VerifyForgotOtp = () => {
       setLoading(true);
 
       await axios.post(
-        "http://localhost:5000/api/forgot-password/verify-otp",
+        "https://medilink-j44r.onrender.com/api/forgot-password/verify-otp",
         { email, otp, role }
       );
 
@@ -47,7 +47,7 @@ const VerifyForgotOtp = () => {
       setResendLoading(true);
 
       await axios.post(
-        "http://localhost:5000/api/forgot-password/forgot-password",
+        "https://medilink-j44r.onrender.com/api/forgot-password/forgot-password",
         { email, role }
       );
 
