@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "https://medilink-j44r.onrender.com", // ✅ FIXED
+  baseURL: "https://medilink-j44r.onrender.com/api", // ✅ FIXED
 });
 
 api.interceptors.request.use(config => {
