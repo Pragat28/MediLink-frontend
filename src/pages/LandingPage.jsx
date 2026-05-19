@@ -1,9 +1,9 @@
 import { useNavigate } from "react-router-dom";
 import useBackRedirect from "../hooks/useBackRedirect";
-import { toast } from "react-toastify"; // ✅ ADDED
+import { toast } from "react-toastify";
 
 function LandingPage() {
-  useBackRedirect(null, true); // Disable back button on landing page
+  useBackRedirect(null, true);
 
   const navigate = useNavigate();
 
@@ -18,7 +18,7 @@ function LandingPage() {
 
       {/* HEADER */}
       <div style={{
-        padding: "30px",
+        padding: "20px", // reduced
         textAlign: "center",
         background: "white",
         boxShadow: "0 2px 10px rgba(0,0,0,0.05)"
@@ -31,9 +31,9 @@ function LandingPage() {
 
       {/* HERO */}
       <div style={{
-        flex: 1,
+        flex: "0 1 auto", // 🔥 key fix
         textAlign: "center",
-        padding: "50px 20px"
+        padding: "30px 20px 20px 20px" // reduced top spacing
       }}>
         <h2 style={{ fontSize: "32px", color: "#0f172a" }}>
           Your Health, Simplified
@@ -41,7 +41,7 @@ function LandingPage() {
 
         <p style={{
           maxWidth: "600px",
-          margin: "15px auto",
+          margin: "10px auto",
           color: "#475569",
           lineHeight: "1.6"
         }}>
@@ -54,7 +54,7 @@ function LandingPage() {
           display: "flex",
           justifyContent: "center",
           gap: "30px",
-          marginTop: "40px",
+          marginTop: "20px", // 🔥 reduced
           flexWrap: "wrap"
         }}>
 
@@ -64,8 +64,7 @@ function LandingPage() {
             padding: "30px",
             borderRadius: "15px",
             width: "280px",
-            boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
-            transition: "0.3s"
+            boxShadow: "0 10px 25px rgba(0,0,0,0.1)"
           }}>
             <h3 style={{ color: "#2563eb" }}>Patient</h3>
             <p style={{ color: "#475569" }}>
@@ -158,7 +157,8 @@ function LandingPage() {
         padding: "15px",
         background: "white",
         fontSize: "13px",
-        color: "#64748b"
+        color: "#64748b",
+        marginTop: "auto"
       }}>
         © 2026 MediCo
       </div>
