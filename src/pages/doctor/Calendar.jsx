@@ -19,7 +19,7 @@ function DoctorCalendar() {
       try {
 
         const res = await axios.get(
-          "http://localhost:5000/api/doctor-appointments/appointments/calendar",
+          "https://medilink-j44r.onrender.com/api/doctor-appointments/appointments/calendar",
           {
             headers: { Authorization: `Bearer ${token}` },
           }
