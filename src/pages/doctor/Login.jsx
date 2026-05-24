@@ -6,6 +6,7 @@ import { toast } from "react-toastify";
 
 const DoctorLogin = () => {
   useBackRedirect("/");
+
   const navigate = useNavigate();
 
   const [form, setForm] = useState({
@@ -38,38 +39,32 @@ const DoctorLogin = () => {
     try {
       setLoading(true);
 
-      await axios.post(
-        "http://localhost:5000/api/doctor-auth/login",
+      const res = await axios.post(
+        "https://medilink-j44r.onrender.com/api/doctor/login", // ✅ FIXED ROUTE
         {
           email: form.email.trim(),
           password: form.password
         }
       );
 
-      // ✅ OTP SENT MESSAGE
-      toast.success("OTP sent to your email");
+      // ✅ STORE TOKEN
+      localStorage.setItem("doctorToken", res.data.token);
 
-      // ✅ REDIRECT TO OTP PAGE
-      navigate("/doctor/verify", {
-        state: { email: form.email, type: "login" }
-      });
+      toast.success("Login successful");
+
+      // ✅ DIRECT REDIRECT
+      navigate("/doctor");
 
     } catch (err) {
       console.error(err.response?.data || err);
 
       const message = err.response?.data?.message;
 
-      if (message === "Your account has been rejected") {
-        toast.error(
-          "Your account has been rejected. Please register again."
-        );
-      }
-      else if (message === "Account not approved yet") {
-        toast.warning(
-          "Your account is under admin verification."
-        );
-      }
-      else {
+      if (message === "Account not approved yet") {
+        toast.warning("Your account is under admin verification.");
+      } else if (message === "Invalid credentials") {
+        toast.error("Invalid email or password");
+      } else {
         toast.error(message || "Login failed");
       }
 
@@ -83,7 +78,10 @@ const DoctorLogin = () => {
     <div style={{ maxWidth: "400px", margin: "auto", marginTop: "80px" }}>
       <h2>Doctor Login</h2>
 
-      <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+      <form
+        onSubmit={handleSubmit}
+        style={{ display: "flex", flexDirection: "column", gap: "10px" }}
+      >
         <input
           type="email"
           name="email"
@@ -109,7 +107,7 @@ const DoctorLogin = () => {
           disabled={loading}
           style={buttonStyle}
         >
-          {loading ? "Sending OTP..." : "Login & Verify"}
+          {loading ? "Logging in..." : "Login"}
         </button>
       </form>
 
@@ -134,7 +132,6 @@ const DoctorLogin = () => {
       >
         Forgot Password?
       </p>
-
     </div>
   );
 };
