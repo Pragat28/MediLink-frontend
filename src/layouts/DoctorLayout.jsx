@@ -75,7 +75,7 @@ function DoctorLayout() {
           <img
             src={
               doctorData?.photo
-                ? `http://localhost:5000${doctorData.photo}`
+                ? `https://medilink-j44r.onrender.com${doctorData.photo}`
                 : "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
             }
             alt="Doctor"
