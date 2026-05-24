@@ -21,7 +21,7 @@ const Appointments = () => {
       setLoading(true);
 
       const res = await axios.get(
-        "http://localhost:5000/api/doctor-appointments/appointments",
+        "https://medilink-j44r.onrender.com/api/doctor-appointments/appointments",
         {
           headers: {
             Authorization: `Bearer ${token}`
@@ -49,7 +49,7 @@ const Appointments = () => {
     try {
 
       await axios.put(
-        `http://localhost:5000/api/doctor-appointments/appointments/${id}/${action}`,
+        `https://medilink-j44r.onrender.com/api/doctor-appointments/appointments/${id}/${action}`,
         {},
         {
           headers: {
@@ -71,7 +71,7 @@ const Appointments = () => {
     try {
 
       await axios.put(
-        "http://localhost:5000/api/doctor-appointments/verify",
+        "https://medilink-j44r.onrender.com/api/doctor-appointments/verify",
         {
           appointmentId,
           code: enteredCode
