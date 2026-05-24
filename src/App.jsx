@@ -28,9 +28,7 @@ import PatientLayout from "./layouts/PatientLayout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 
-/* Auth */
-import ForgotPassword from "./pages/auth/ForgotPassword";
-import ResetPassword from "./pages/auth/ResetPassword";
+
 
 /* Toast */
 import { ToastContainer } from "react-toastify";
