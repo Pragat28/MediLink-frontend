@@ -88,7 +88,7 @@ const DoctorRegister = () => {
       formData.set("phone", fullPhone);
 
       await axios.post(
-        "http://localhost:5000/api/doctor-auth/register",
+        "https://medilink-j44r.onrender.com/api/doctor-auth/register",
         formData,
         {
           headers: {
