@@ -100,11 +100,6 @@ const DoctorRegister = () => {
       // ✅ CORRECT FLOW MESSAGE
       toast.success("OTP sent to your email");
 
-      // ✅ REDIRECT TO OTP PAGE
-      navigate("/doctor/verify", {
-        state: { email: form.email, type: "register" } // 🔥 PASS TYPE
-      });
-
     } catch (error) {
       console.error(error.response?.data || error);
       toast.error(error.response?.data?.message || "Registration failed");
@@ -225,7 +220,7 @@ const DoctorRegister = () => {
               cursor: isFormValid ? "pointer" : "not-allowed"
             }}
           >
-            {loading ? "Sending OTP..." : "Register & Verify"}
+            {loading ? "Registering" : "Register"}
           </button>
 
         </form>
