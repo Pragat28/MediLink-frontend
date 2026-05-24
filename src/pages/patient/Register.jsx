@@ -56,7 +56,7 @@ const PatientRegister = () => {
 
       const fullPhone = `${countryCode}${contactNumber}`;
 
-      await axios.post(
+     const res= await axios.post(
         "https://medilink-j44r.onrender.com/api/auth/register",
         {
           name,
