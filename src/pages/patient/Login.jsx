@@ -35,9 +35,13 @@ const PatientLogin = () => {
 
       console.log("LOGIN RESPONSE:", res.data);
 
+      // ✅ STORE TOKEN (THIS IS THE KEY FIX)
+      localStorage.setItem("patientToken", res.data.token);
+
       // ✅ OTP SENT
       toast.success(res.data.message || "Logged in successfully");
 
+      navigate("/patient/profile");
 
     } catch (err) {
       console.log("FULL ERROR:", err);
