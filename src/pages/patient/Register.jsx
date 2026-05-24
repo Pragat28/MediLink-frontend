@@ -67,12 +67,10 @@ const PatientRegister = () => {
       );
 
       // ✅ OTP SENT
-      toast.success("OTP sent to your email");
+      toast.success("Registered successfully");
 
       // ✅ REDIRECT TO OTP PAGE
-      navigate("/patient/verify", {
-        state: { email, type: "register" }
-      });
+      navigate("/patient/profile");
 
     } catch (err) {
       toast.error(err.response?.data?.message || "Registration failed");
@@ -162,7 +160,7 @@ const PatientRegister = () => {
             cursor: isFormValid ? "pointer" : "not-allowed"
           }}
         >
-          {loading ? "Sending OTP..." : "Register & Verify"}
+          {loading ? "Registering" : "Register"}
         </button>
       </form>
 
