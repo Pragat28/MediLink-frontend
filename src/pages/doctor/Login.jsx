@@ -120,18 +120,6 @@ const DoctorLogin = () => {
           Register here
         </span>
       </p>
-
-      <p
-        onClick={() => navigate("/forgot-password")}
-        style={{
-          marginTop: "10px",
-          color: "#2563eb",
-          cursor: "pointer",
-          textAlign: "center"
-        }}
-      >
-        Forgot Password?
-      </p>
     </div>
   );
 };
