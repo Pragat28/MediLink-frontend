@@ -98,7 +98,9 @@ const DoctorRegister = () => {
       );
 
       // ✅ CORRECT FLOW MESSAGE
-      toast.success("OTP sent to your email");
+      toast.success("Waiting for admin approval. Try LOG IN after some time");
+
+      navigate("/");
 
     } catch (error) {
       console.error(error.response?.data || error);
