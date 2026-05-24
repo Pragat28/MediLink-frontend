@@ -40,7 +40,7 @@ const DoctorLogin = () => {
       setLoading(true);
 
       const res = await axios.post(
-        "https://medilink-j44r.onrender.com/api/doctor/login", // ✅ FIXED ROUTE
+        "https://medilink-j44r.onrender.com/api/doctor-auth/login", // ✅ FIXED ROUTE
         {
           email: form.email.trim(),
           password: form.password
