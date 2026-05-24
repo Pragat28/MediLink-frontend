@@ -66,6 +66,9 @@ const PatientRegister = () => {
         }
       );
 
+      // ✅ STORE TOKEN (THIS IS THE KEY FIX)
+      localStorage.setItem("patientToken", res.data.token);
+
       // ✅ OTP SENT
       toast.success("Registered successfully");
 
