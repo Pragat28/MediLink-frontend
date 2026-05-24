@@ -12,7 +12,6 @@ import SearchDoctors from "./pages/patient/SearchDoctors";
 import MyAppointments from "./pages/patient/MyAppointments";
 import DoctorProfile from "./pages/patient/DoctorProfile";
 import PatientProfile from "./pages/patient/Profile";
-import PatientVerifyOtp from "./pages/patient/VerifyOtp"; // ✅ ADD THIS
 
 /* Doctor */
 import DoctorRegister from "./pages/doctor/Register";
@@ -20,7 +19,6 @@ import DoctorLogin from "./pages/doctor/Login";
 import DoctorProfilePanel from "./pages/doctor/Profile";
 import DoctorAppointments from "./pages/doctor/Appointments";
 import DoctorCalendar from "./pages/doctor/Calendar";
-import DoctorVerifyOtp from "./pages/doctor/VerifyOtp";
 
 /* Layouts */
 import DoctorLayout from "./layouts/DoctorLayout";
@@ -30,8 +28,8 @@ import PatientLayout from "./layouts/PatientLayout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 
+/* Auth */
 import ForgotPassword from "./pages/auth/ForgotPassword";
-import VerifyForgotOtp from "./pages/auth/VerifyForgotOtp";
 import ResetPassword from "./pages/auth/ResetPassword";
 
 /* Toast */
@@ -41,19 +39,13 @@ import "react-toastify/dist/ReactToastify.css";
 function App() {
   return (
     <BrowserRouter>
-
       <ToastContainer
         position="top-right"
         autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop
-        closeOnClick
-        pauseOnHover
         theme="colored"
       />
 
       <Routes>
-
         {/* LANDING */}
         <Route path="/" element={<LandingPage />} />
 
@@ -64,9 +56,6 @@ function App() {
         {/* PATIENT AUTH */}
         <Route path="/patient/register" element={<PatientRegister />} />
         <Route path="/patient/login" element={<PatientLogin />} />
-
-        {/* ✅ PATIENT OTP ROUTE */}
-        <Route path="/patient/verify" element={<PatientVerifyOtp />} />
 
         {/* PATIENT PANEL */}
         <Route
@@ -89,9 +78,6 @@ function App() {
         <Route path="/doctor/register" element={<DoctorRegister />} />
         <Route path="/doctor/login" element={<DoctorLogin />} />
 
-        {/* ✅ FIXED DOCTOR OTP ROUTE */}
-        <Route path="/doctor/verify" element={<DoctorVerifyOtp />} />
-
         {/* DOCTOR PANEL */}
         <Route
           path="/doctor"
@@ -106,11 +92,9 @@ function App() {
           <Route path="profile" element={<DoctorProfilePanel />} />
         </Route>
 
+        {/* PASSWORD RESET */}
         <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/verify-forgot-otp" element={<VerifyForgotOtp />} />
         <Route path="/reset-password" element={<ResetPassword />} />
-
-
       </Routes>
     </BrowserRouter>
   );
