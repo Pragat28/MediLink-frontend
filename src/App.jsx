@@ -91,10 +91,6 @@ function App() {
           <Route path="calendar" element={<DoctorCalendar />} />
           <Route path="profile" element={<DoctorProfilePanel />} />
         </Route>
-
-        {/* PASSWORD RESET */}
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/reset-password" element={<ResetPassword />} />
       </Routes>
     </BrowserRouter>
   );
