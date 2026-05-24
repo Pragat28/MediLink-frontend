@@ -19,7 +19,7 @@ function PatientLayout() {
     const fetchProfile = async () => {
       try {
         const res = await axios.get(
-          "http://localhost:5000/api/patient/profile",
+          "https://medilink-j44r.onrender.com/api/patient/profile",
           {
             headers: {
               Authorization: `Bearer ${token}`
