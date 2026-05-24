@@ -14,7 +14,7 @@ function AdminDashboard() {
   const fetchDoctors = async () => {
     try {
       const res = await axios.get(
-        "http://localhost:5000/api/admin/pending-doctors",
+        "https://medilink-j44r.onrender.com/api/admin/pending-doctors",
         {
           headers: {
             Authorization: `Bearer ${token}` // ✅ FIX
@@ -38,7 +38,7 @@ function AdminDashboard() {
   const verifyDoctor = async (id) => {
     try {
       await axios.put(
-        `http://localhost:5000/api/admin/verify-doctor/${id}`,
+        `https://medilink-j44r.onrender.com/api/admin/verify-doctor/${id}`,
         {},
         {
           headers: {
@@ -56,7 +56,7 @@ function AdminDashboard() {
   const rejectDoctor = async (id) => {
     try {
       await axios.put(
-        `http://localhost:5000/api/admin/reject-doctor/${id}`,
+        `https://medilink-j44r.onrender.com/api/admin/reject-doctor/${id}`,
         {},
         {
           headers: {
