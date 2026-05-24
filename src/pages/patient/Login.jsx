@@ -36,11 +36,8 @@ const PatientLogin = () => {
       console.log("LOGIN RESPONSE:", res.data);
 
       // ✅ OTP SENT
-      toast.success(res.data.message || "OTP sent to your email");
+      toast.success(res.data.message || "Logged in successfully");
 
-      navigate("/patient/verify", {
-        state: { email, type: "login" }
-      });
 
     } catch (err) {
       console.log("FULL ERROR:", err);
@@ -83,7 +80,7 @@ const PatientLogin = () => {
             disabled={loading}
             style={button}
           >
-            {loading ? "Sending OTP..." : "Login & Verify"}
+            {loading ? "Logging in" : "Login"}
           </button>
         </form>
 
@@ -96,14 +93,6 @@ const PatientLogin = () => {
           >
             Register here
           </span>
-        </p>
-
-        {/* FORGOT PASSWORD */}
-        <p
-          onClick={() => navigate("/forgot-password")}
-          style={linkText}
-        >
-          Forgot Password?
         </p>
       </div>
     </div>
