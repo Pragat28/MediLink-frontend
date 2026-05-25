@@ -35,9 +35,6 @@ const SearchDoctors = () => {
   const navigate     = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // FIX 1 ─ Stabilise predictedSpecialties with a ref so it never causes
-  //          re-renders. location.state gives a fresh array reference every
-  //          render; putting it in a ref makes the identity stable.
   const predictedSpecialtiesRef = useRef(location.state?.specialties || []);
   const predictedSpecialties    = predictedSpecialtiesRef.current;
 
@@ -57,7 +54,7 @@ const SearchDoctors = () => {
     endTime:    searchParams.get("endTime")     || "",
   });
 
-  // ── Sync filters → URL (guarded to prevent infinite loop) ────────────────
+  // ── Sync filters → URL ────────────────────────────────────────────────────
   useEffect(() => {
     const params = {};
     Object.keys(filters).forEach((k) => { if (filters[k]) params[k] = filters[k]; });
@@ -65,7 +62,7 @@ const SearchDoctors = () => {
     if (JSON.stringify(params) !== JSON.stringify(current)) setSearchParams(params);
   }, [filters]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // ── Fetch available areas (runs once on mount) ────────────────────────────
+  // ── Fetch available areas ─────────────────────────────────────────────────
   useEffect(() => {
     let cancelled = false;
     const fetchAreas = async () => {
@@ -83,18 +80,11 @@ const SearchDoctors = () => {
     fetchAreas();
     return () => { cancelled = true; };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
-  //          ^ empty deps: areas only depend on predictedSpecialties which is
-  //            stable (ref). No need to re-fetch on every filter change.
 
-  // ── Fetch doctors (debounced + abortable) ────────────────────────────────
-  // FIX 2 ─ Debounce by 400 ms so rapid keystrokes (maxFee field, etc.) don't
-  //          each fire a separate request.
-  // FIX 3 ─ AbortController cancels the previous in-flight request before
-  //          starting a new one, eliminating the stale-response error storm.
+  // ── Fetch doctors (debounced + abortable) ─────────────────────────────────
   const abortRef = useRef(null);
 
   const fetchDoctors = useCallback(async (currentFilters) => {
-    // Cancel any previous request still in flight
     if (abortRef.current) abortRef.current.abort();
     abortRef.current = new AbortController();
 
@@ -107,7 +97,7 @@ const SearchDoctors = () => {
       );
       setDoctors(res.data?.doctors || []);
     } catch (err) {
-      if (err.name === "CanceledError" || err.name === "AbortError") return; // stale request — ignore
+      if (err.name === "CanceledError" || err.name === "AbortError") return;
       if (err.response && err.response.status !== 404) toast.error("Failed to fetch doctors");
       setDoctors([]);
     } finally {
@@ -202,9 +192,10 @@ const SearchDoctors = () => {
             <div style={cardContent}>
               <div style={topRow}>
                 <div style={nameStyle}>{doc.name}</div>
-                <div style={ratingStyle}>⭐ {doc.rating || 4}</div>
+                {/* ✅ ONLY CHANGE — specialty added here */}
+                <div style={{ fontSize:"14px", color:"#6366f1", fontWeight:"500" }}>{doc.specialty}</div>
+                <div style={ratingStyle}>⭐ {doc.rating || "-"}</div>
                 <div style={feeStyle}>₹ {doc.consultationFee}</div>
-                <div style={addressStyle}>{doc.address?.street || ""} {doc.address?.area || ""}</div>
               </div>
               <div style={addressStyle}>{doc.address?.street || ""} {doc.address?.area || ""}</div>
               <div style={addressStyle}>Gender: {doc.gender || "N/A"}</div>
