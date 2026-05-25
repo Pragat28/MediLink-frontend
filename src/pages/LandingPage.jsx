@@ -8,23 +8,23 @@ function LandingPage() {
 
   return (
     <div style={{
-      minHeight: "100vh",
+      height: "100vh",
       fontFamily: "Arial, sans-serif",
-      background: "linear-gradient(to right, #e0f2fe, #f8fafc)",
+      background: "linear-gradient(135deg, #e0f2fe 0%, #f0fdf4 100%)",
       display: "flex",
       flexDirection: "column",
-      overflowY: "auto" // ✅ FIX — allows page to scroll
+      overflow: "hidden"
     }}>
 
       {/* HEADER */}
       <div style={{
-        padding: "30px",
+        padding: "16px 30px",
         textAlign: "center",
         background: "white",
-        boxShadow: "0 2px 10px rgba(0,0,0,0.05)"
+        boxShadow: "0 2px 10px rgba(0,0,0,0.07)"
       }}>
-        <h1 style={{ margin: 0, color: "#1e3a8a" }}>MediCo</h1>
-        <p style={{ color: "#64748b" }}>
+        <h1 style={{ margin: 0, color: "#1e3a8a", fontSize: "26px" }}>MediCo</h1>
+        <p style={{ color: "#64748b", margin: "4px 0 0", fontSize: "13px" }}>
           Smart Healthcare Appointment & Prediction System
         </p>
       </div>
@@ -33,19 +33,23 @@ function LandingPage() {
       <div style={{
         flex: 1,
         textAlign: "center",
-        padding: "50px 20px 80px 20px" // ✅ FIX — added bottom padding so cards aren't cut off
+        padding: "20px 20px 10px",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center"
       }}>
-        <h2 style={{ fontSize: "32px", color: "#0f172a" }}>
+        <h2 style={{ fontSize: "26px", color: "#0f172a", margin: "0 0 8px" }}>
           Your Health, Simplified
         </h2>
 
         <p style={{
-          maxWidth: "600px",
-          margin: "15px auto",
+          maxWidth: "520px",
+          margin: "0 auto 24px",
           color: "#475569",
-          lineHeight: "1.6"
+          lineHeight: "1.5",
+          fontSize: "14px"
         }}>
-          Book appointments, consult doctors-
+          Book appointments, consult doctors, and get AI-powered health insights —
           all in one place.
         </p>
 
@@ -53,36 +57,44 @@ function LandingPage() {
         <div style={{
           display: "flex",
           justifyContent: "center",
-          gap: "30px",
-          marginTop: "40px",
+          gap: "24px",
           flexWrap: "wrap",
-          alignItems: "flex-start" // ✅ FIX — cards size to their own content
+          alignItems: "flex-start"
         }}>
 
           {/* PATIENT CARD */}
           <div style={{
             background: "white",
-            padding: "30px",
-            borderRadius: "15px",
-            width: "280px",
-            boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
-            boxSizing: "border-box"
+            padding: "24px",
+            borderRadius: "16px",
+            width: "260px",
+            boxShadow: "0 8px 24px rgba(37,99,235,0.12)",
+            boxSizing: "border-box",
+            border: "1.5px solid #bfdbfe"
           }}>
-            <h3 style={{ color: "#2563eb" }}>Patient</h3>
-            <p style={{ color: "#475569" }}>
+            <div style={{
+              background: "linear-gradient(135deg, #2563eb, #3b82f6)",
+              borderRadius: "10px",
+              padding: "10px",
+              marginBottom: "12px"
+            }}>
+              <h3 style={{ color: "white", margin: 0, fontSize: "18px" }}>🧑‍⚕️ Patient</h3>
+            </div>
+            <p style={{ color: "#475569", fontSize: "13px", margin: "0 0 14px" }}>
               Book appointments, predict conditions, and manage your health.
             </p>
 
             <button
               style={{
                 width: "100%",
-                padding: "10px",
-                marginTop: "15px",
-                background: "#2563eb",
+                padding: "9px",
+                background: "linear-gradient(135deg, #2563eb, #3b82f6)",
                 color: "white",
                 border: "none",
                 borderRadius: "8px",
-                cursor: "pointer"
+                cursor: "pointer",
+                fontWeight: "600",
+                fontSize: "14px"
               }}
               onClick={() => navigate("/patient/login")}
             >
@@ -92,12 +104,15 @@ function LandingPage() {
             <button
               style={{
                 width: "100%",
-                padding: "10px",
-                marginTop: "10px",
-                background: "#e2e8f0",
-                border: "none",
+                padding: "9px",
+                marginTop: "8px",
+                background: "#eff6ff",
+                color: "#2563eb",
+                border: "1.5px solid #bfdbfe",
                 borderRadius: "8px",
-                cursor: "pointer"
+                cursor: "pointer",
+                fontWeight: "600",
+                fontSize: "14px"
               }}
               onClick={() => navigate("/patient/register")}
             >
@@ -108,27 +123,36 @@ function LandingPage() {
           {/* DOCTOR CARD */}
           <div style={{
             background: "white",
-            padding: "30px",
-            borderRadius: "15px",
-            width: "280px",
-            boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
-            boxSizing: "border-box"
+            padding: "24px",
+            borderRadius: "16px",
+            width: "260px",
+            boxShadow: "0 8px 24px rgba(22,163,74,0.12)",
+            boxSizing: "border-box",
+            border: "1.5px solid #bbf7d0"
           }}>
-            <h3 style={{ color: "#16a34a" }}>Doctor</h3>
-            <p style={{ color: "#475569" }}>
+            <div style={{
+              background: "linear-gradient(135deg, #16a34a, #22c55e)",
+              borderRadius: "10px",
+              padding: "10px",
+              marginBottom: "12px"
+            }}>
+              <h3 style={{ color: "white", margin: 0, fontSize: "18px" }}>👨‍⚕️ Doctor</h3>
+            </div>
+            <p style={{ color: "#475569", fontSize: "13px", margin: "0 0 14px" }}>
               Manage patients, appointments, and availability easily.
             </p>
 
             <button
               style={{
                 width: "100%",
-                padding: "10px",
-                marginTop: "15px",
-                background: "#16a34a",
+                padding: "9px",
+                background: "linear-gradient(135deg, #16a34a, #22c55e)",
                 color: "white",
                 border: "none",
                 borderRadius: "8px",
-                cursor: "pointer"
+                cursor: "pointer",
+                fontWeight: "600",
+                fontSize: "14px"
               }}
               onClick={() => navigate("/doctor/login")}
             >
@@ -138,12 +162,15 @@ function LandingPage() {
             <button
               style={{
                 width: "100%",
-                padding: "10px",
-                marginTop: "10px",
-                background: "#e2e8f0",
-                border: "none",
+                padding: "9px",
+                marginTop: "8px",
+                background: "#f0fdf4",
+                color: "#16a34a",
+                border: "1.5px solid #bbf7d0",
                 borderRadius: "8px",
-                cursor: "pointer"
+                cursor: "pointer",
+                fontWeight: "600",
+                fontSize: "14px"
               }}
               onClick={() => navigate("/doctor/register")}
             >
@@ -157,12 +184,12 @@ function LandingPage() {
       {/* FOOTER */}
       <div style={{
         textAlign: "center",
-        padding: "15px",
+        padding: "10px",
         background: "white",
-        fontSize: "13px",
-        color: "#64748b"
+        fontSize: "12px",
+        color: "#94a3b8"
       }}>
-        © 2026 MediCo
+        © 2026 MediCo — Smart Healthcare
       </div>
 
     </div>
