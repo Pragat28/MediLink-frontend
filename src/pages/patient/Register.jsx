@@ -56,7 +56,7 @@ const PatientRegister = () => {
 
       const fullPhone = `${countryCode}${contactNumber}`;
 
-     const res= await axios.post(
+      const res = await axios.post(
         "https://medilink-j44r.onrender.com/api/auth/register",
         {
           name,
@@ -66,13 +66,11 @@ const PatientRegister = () => {
         }
       );
 
-      localStorage.setItem("pateintToken",res.data.token);
-      // ✅ OTP SENT
-      toast.success("Registered successfully");
+      localStorage.setItem("patientToken", res.data.token); // ✅ FIXED typo
 
+      toast.success("Registered successfully");
       navigate("/patient/profile");
 
-     
     } catch (err) {
       toast.error(err.response?.data?.message || "Registration failed");
     } finally {
