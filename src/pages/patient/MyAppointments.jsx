@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import useBackRedirect from "../../hooks/useBackRedirect";
-import { toast } from "react-toastify"; // ✅ ADDED
+import { toast } from "react-toastify";
 
 function MyAppointments() {
   useBackRedirect("/patient/profile");
@@ -15,7 +15,6 @@ function MyAppointments() {
   const [rating, setRating] = useState({});
   const [review, setReview] = useState({});
 
-  // ✅ NEW: active tab
   const [activeTab, setActiveTab] = useState("accepted");
 
   useEffect(() => {
@@ -24,7 +23,6 @@ function MyAppointments() {
 
   const fetchAppointments = async () => {
     try {
-
       const res = await axios.get(
         "https://medilink-j44r.onrender.com/api/appointments/my",
         {
@@ -38,12 +36,10 @@ function MyAppointments() {
       const historyList = [];
 
       res.data.appointments.forEach(app => {
-
         if (app.status === "accepted") acceptedList.push(app);
         else if (app.status === "pending") pendingList.push(app);
         else if (app.status === "rejected") rejectedList.push(app);
         else historyList.push(app);
-
       });
 
       setAccepted(acceptedList);
@@ -57,14 +53,12 @@ function MyAppointments() {
   };
 
   const submitRating = async (appointmentId) => {
-
     if (!rating[appointmentId]) {
       alert("Please select a rating");
       return;
     }
 
     try {
-
       await axios.post(
         `https://medilink-j44r.onrender.com/api/appointments/${appointmentId}/rate`,
         {
@@ -88,8 +82,6 @@ function MyAppointments() {
     return new Date(date).toLocaleDateString();
   };
 
-  /* ================= TAB CONTENT ================= */
-
   const renderAppointments = (list, type) => {
     if (list.length === 0) {
       return <p style={{ opacity: 0.6 }}>No appointments</p>;
@@ -106,6 +98,14 @@ function MyAppointments() {
             <p style={{ color: "green" }}>✔ Confirmed</p>
             <p>{app.doctor?.email}</p>
             <p>{app.doctor?.phone}</p>
+            {/* ✅ ONLY CHANGE — doctor address shown after acceptance */}
+            {(app.doctor?.address?.street || app.doctor?.address?.area || app.doctor?.address?.city) && (
+              <p style={{ marginTop: "6px", color: "#374151" }}>
+                📍 {[app.doctor?.address?.street, app.doctor?.address?.area, app.doctor?.address?.city]
+                  .filter(Boolean)
+                  .join(", ")}
+              </p>
+            )}
           </>
         )}
 
@@ -177,12 +177,10 @@ function MyAppointments() {
   };
 
   return (
-
     <div style={{ padding: "30px", maxWidth: "900px", margin: "auto" }}>
 
       <h2>My Appointments</h2>
 
-      {/* ✅ TABS */}
       <div style={tabContainer}>
         <button
           style={activeTab === "accepted" ? activeTabStyle : tabStyle}
@@ -213,7 +211,6 @@ function MyAppointments() {
         </button>
       </div>
 
-      {/* ✅ CONTENT */}
       <div style={{ marginTop: "20px" }}>
         {activeTab === "accepted" && renderAppointments(accepted, "accepted")}
         {activeTab === "pending" && renderAppointments(pending, "pending")}
