@@ -46,7 +46,7 @@ const DoctorLogin = () => {
       localStorage.setItem("doctorData", JSON.stringify(res.data.doctor)); // ✅ ADDED
 
       toast.success("Login successful");
-      navigate("/doctor");
+      navigate("/doctor/profile");
 
     } catch (err) {
       console.error(err.response?.data || err);
