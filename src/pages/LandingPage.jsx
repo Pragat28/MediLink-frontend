@@ -1,6 +1,5 @@
 import { useNavigate } from "react-router-dom";
 import useBackRedirect from "../hooks/useBackRedirect";
-import { toast } from "react-toastify";
 
 function LandingPage() {
   useBackRedirect(null, true);
@@ -13,7 +12,8 @@ function LandingPage() {
       fontFamily: "Arial, sans-serif",
       background: "linear-gradient(to right, #e0f2fe, #f8fafc)",
       display: "flex",
-      flexDirection: "column"
+      flexDirection: "column",
+      overflowY: "auto" // ✅ FIX — allows page to scroll
     }}>
 
       {/* HEADER */}
@@ -33,7 +33,7 @@ function LandingPage() {
       <div style={{
         flex: 1,
         textAlign: "center",
-        padding: "50px 20px"
+        padding: "50px 20px 80px 20px" // ✅ FIX — added bottom padding so cards aren't cut off
       }}>
         <h2 style={{ fontSize: "32px", color: "#0f172a" }}>
           Your Health, Simplified
@@ -45,7 +45,7 @@ function LandingPage() {
           color: "#475569",
           lineHeight: "1.6"
         }}>
-          Book appointments, consult doctors, and get AI-powered health insights —
+          Book appointments, consult doctors-
           all in one place.
         </p>
 
@@ -56,7 +56,7 @@ function LandingPage() {
           gap: "30px",
           marginTop: "40px",
           flexWrap: "wrap",
-          alignItems: "flex-start" // ✅ FIX — prevents cards from stretching to equal height and clipping content
+          alignItems: "flex-start" // ✅ FIX — cards size to their own content
         }}>
 
           {/* PATIENT CARD */}
@@ -66,8 +66,7 @@ function LandingPage() {
             borderRadius: "15px",
             width: "280px",
             boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
-            transition: "0.3s",
-            boxSizing: "border-box" // ✅ FIX
+            boxSizing: "border-box"
           }}>
             <h3 style={{ color: "#2563eb" }}>Patient</h3>
             <p style={{ color: "#475569" }}>
@@ -113,7 +112,7 @@ function LandingPage() {
             borderRadius: "15px",
             width: "280px",
             boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
-            boxSizing: "border-box" // ✅ FIX
+            boxSizing: "border-box"
           }}>
             <h3 style={{ color: "#16a34a" }}>Doctor</h3>
             <p style={{ color: "#475569" }}>
