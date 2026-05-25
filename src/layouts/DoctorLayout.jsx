@@ -5,7 +5,6 @@ function DoctorLayout() {
 
   /* SAFE LOCALSTORAGE PARSE */
   let doctorData = null;
-
   try {
     const storedData = localStorage.getItem("doctorData");
     doctorData = storedData ? JSON.parse(storedData) : null;
@@ -19,9 +18,15 @@ function DoctorLayout() {
     navigate("/doctor/login");
   };
 
+  // ✅ FIX — check for non-empty string before building URL
+  const photoUrl =
+    doctorData?.photo && doctorData.photo.trim() !== ""
+      ? `https://medilink-j44r.onrender.com${doctorData.photo}`
+      : "https://cdn-icons-png.flaticon.com/512/3135/3135715.png";
+
   return (
     <div style={{ display: "flex", height: "100vh" }}>
-      
+
       {/* SIDEBAR */}
       <div
         style={{
@@ -35,12 +40,10 @@ function DoctorLayout() {
       >
         <h3>Doctor Panel</h3>
         <hr />
-
         <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
           <Link to="/doctor/appointments" style={{ color: "white" }}>Appointments</Link>
           <Link to="/doctor/calendar" style={{ color: "white" }}>Calendar</Link>
           <Link to="/doctor/profile" style={{ color: "white" }}>Profile</Link>
-
           <button
             onClick={handleLogout}
             style={{
@@ -71,13 +74,8 @@ function DoctorLayout() {
           }}
         >
           <span>{doctorData?.name || "Doctor"}</span>
-
           <img
-            src={
-              doctorData?.photo
-                ? `https://medilink-j44r.onrender.com${doctorData.photo}`
-                : "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
-            }
+            src={photoUrl} // ✅ FIX
             alt="Doctor"
             style={{
               width: "40px",
@@ -99,7 +97,6 @@ function DoctorLayout() {
         >
           <Outlet />
         </div>
-
       </div>
     </div>
   );
