@@ -6,14 +6,11 @@ import { toast } from "react-toastify";
 
 const DoctorLogin = () => {
   useBackRedirect("/");
-
   const navigate = useNavigate();
-
   const [form, setForm] = useState({
     email: "",
     password: ""
   });
-
   const [loading, setLoading] = useState(false);
 
   /* ================= AUTO REDIRECT ================= */
@@ -35,31 +32,25 @@ const DoctorLogin = () => {
   /* ================= LOGIN ================= */
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     try {
       setLoading(true);
-
       const res = await axios.post(
-        "https://medilink-j44r.onrender.com/api/doctor-auth/login", // ✅ FIXED ROUTE
+        "https://medilink-j44r.onrender.com/api/doctor-auth/login",
         {
           email: form.email.trim(),
           password: form.password
         }
       );
 
-      // ✅ STORE TOKEN
       localStorage.setItem("doctorToken", res.data.token);
+      localStorage.setItem("doctorData", JSON.stringify(res.data.doctor)); // ✅ ADDED
 
       toast.success("Login successful");
-
-      // ✅ DIRECT REDIRECT
       navigate("/doctor");
 
     } catch (err) {
       console.error(err.response?.data || err);
-
       const message = err.response?.data?.message;
-
       if (message === "Account not approved yet") {
         toast.warning("Your account is under admin verification.");
       } else if (message === "Invalid credentials") {
@@ -67,7 +58,6 @@ const DoctorLogin = () => {
       } else {
         toast.error(message || "Login failed");
       }
-
     } finally {
       setLoading(false);
     }
@@ -77,7 +67,6 @@ const DoctorLogin = () => {
   return (
     <div style={{ maxWidth: "400px", margin: "auto", marginTop: "80px" }}>
       <h2>Doctor Login</h2>
-
       <form
         onSubmit={handleSubmit}
         style={{ display: "flex", flexDirection: "column", gap: "10px" }}
@@ -91,7 +80,6 @@ const DoctorLogin = () => {
           required
           style={inputStyle}
         />
-
         <input
           type="password"
           name="password"
@@ -101,7 +89,6 @@ const DoctorLogin = () => {
           required
           style={inputStyle}
         />
-
         <button
           type="submit"
           disabled={loading}
@@ -110,7 +97,6 @@ const DoctorLogin = () => {
           {loading ? "Logging in..." : "Login"}
         </button>
       </form>
-
       <p style={{ marginTop: "15px", textAlign: "center" }}>
         Not registered?{" "}
         <span
