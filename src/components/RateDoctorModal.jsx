@@ -18,7 +18,7 @@ function RateDoctorModal({ appointment, closeModal }) {
     try{
 
       await axios.post(
-        `http://localhost:5000/api/appointments/${appointment._id}/rate`,
+        `https://medilink-j44r.onrender.com/api/appointments/${appointment._id}/rate`,
         { rating, review },
         {
           headers:{ Authorization:`Bearer ${token}` }
