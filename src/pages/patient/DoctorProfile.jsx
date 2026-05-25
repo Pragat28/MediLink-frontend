@@ -93,7 +93,7 @@ const DoctorProfile = () => {
     const fetchDoctor = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:5000/api/doctors/${id}`
+          `https://medilink-j44r.onrender.com/api/doctors/${id}`
         );
         setDoctor(res.data);
       } catch (err) {
