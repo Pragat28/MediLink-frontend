@@ -3,7 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import symptomsByBodyPart from "../../data/symptomsByBodyPart";
 import useBackRedirect from "../../hooks/useBackRedirect";
-import { toast } from "react-toastify"; // ✅ ADDED
+import { toast } from "react-toastify";
 
 const Predict = () => {
   useBackRedirect("/patient/profile");
@@ -17,47 +17,27 @@ const Predict = () => {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
 
-  /* --------------------
-     TOGGLE SYMPTOM
-  -------------------- */
   const toggleSymptom = (symptom) => {
-
     setResult(null);
-
     setSelectedSymptoms(prev =>
       prev.includes(symptom)
         ? prev.filter(s => s !== symptom)
         : [...prev, symptom]
     );
-
   };
 
-  /* --------------------
-     REMOVE SINGLE SYMPTOM
-  -------------------- */
   const removeSymptom = (symptom) => {
-
     setResult(null);
-
     setSelectedSymptoms(prev =>
       prev.filter(s => s !== symptom)
     );
-
   };
 
-  /* --------------------
-     CLEAR ALL SYMPTOMS
-  -------------------- */
   const clearAllSymptoms = () => {
-
     setResult(null);
     setSelectedSymptoms([]);
-
   };
 
-  /* --------------------
-     SUBMIT PREDICTION
-  -------------------- */
   const submitPrediction = async () => {
 
     if (selectedSymptoms.length === 0) {
@@ -69,7 +49,7 @@ const Predict = () => {
 
       setLoading(true);
 
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("patientToken"); // ✅ FIXED
 
       const res = await axios.post(
         "https://medilink-j44r.onrender.com/api/predict",
@@ -95,9 +75,6 @@ const Predict = () => {
 
   };
 
-  /* =========================
-     NAVIGATE TO SEARCH DOCTORS
-  ========================= */
   const goToDoctors = () => {
 
     const specialties =
@@ -130,15 +107,12 @@ const Predict = () => {
           onChange={(e) => setSelectedCategory(e.target.value)}
           style={{ width: "100%", padding: "10px" }}
         >
-
           <option value="">-- Select Body Part --</option>
-
           {Object.keys(symptomsByBodyPart).map(category => (
             <option key={category} value={category}>
               {category}
             </option>
           ))}
-
         </select>
 
         <br /><br />
@@ -150,8 +124,6 @@ const Predict = () => {
           Next
         </button>
 
-        {/* ================= SELECTED SYMPTOMS ================= */}
-
         {selectedSymptoms.length > 0 && (
           <>
             <hr />
@@ -159,13 +131,9 @@ const Predict = () => {
             <h4>Symptoms selected:</h4>
 
             <ul>
-
               {selectedSymptoms.map(s => (
-
                 <li key={s}>
-
                   {s}
-
                   <button
                     onClick={() => removeSymptom(s)}
                     style={{
@@ -179,11 +147,8 @@ const Predict = () => {
                   >
                     ❌
                   </button>
-
                 </li>
-
               ))}
-
             </ul>
 
             <button
@@ -208,10 +173,6 @@ const Predict = () => {
 
           </>
         )}
-
-        {/* =========================
-           PREDICTION RESULT
-        ========================= */}
 
         {result && (
           <>
@@ -250,8 +211,6 @@ const Predict = () => {
                   ))}
                 </ul>
 
-                {/* FIND DOCTORS BUTTON */}
-
                 <button
                   onClick={goToDoctors}
                   style={{
@@ -266,8 +225,6 @@ const Predict = () => {
                 >
                   🔎 Find Doctors
                 </button>
-
-                {/* HISTORY INSIGHTS */}
 
                 {result.historyInsights?.riskConditions?.length > 0 && (
                   <>
@@ -326,7 +283,6 @@ const Predict = () => {
       <h2>{selectedCategory}</h2>
 
       {symptomsByBodyPart[selectedCategory].map(symptom => (
-
         <label key={symptom} style={{ display: "block" }}>
           <input
             type="checkbox"
@@ -336,7 +292,6 @@ const Predict = () => {
           {" "}
           {symptom}
         </label>
-
       ))}
 
       <br />
