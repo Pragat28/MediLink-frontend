@@ -1,9 +1,9 @@
 import { useNavigate } from "react-router-dom";
 import useBackRedirect from "../hooks/useBackRedirect";
-import { toast } from "react-toastify"; // ✅ ADDED
+import { toast } from "react-toastify";
 
 function LandingPage() {
-  useBackRedirect(null, true); // Disable back button on landing page
+  useBackRedirect(null, true);
 
   const navigate = useNavigate();
 
@@ -55,7 +55,8 @@ function LandingPage() {
           justifyContent: "center",
           gap: "30px",
           marginTop: "40px",
-          flexWrap: "wrap"
+          flexWrap: "wrap",
+          alignItems: "flex-start" // ✅ FIX — prevents cards from stretching to equal height and clipping content
         }}>
 
           {/* PATIENT CARD */}
@@ -65,7 +66,8 @@ function LandingPage() {
             borderRadius: "15px",
             width: "280px",
             boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
-            transition: "0.3s"
+            transition: "0.3s",
+            boxSizing: "border-box" // ✅ FIX
           }}>
             <h3 style={{ color: "#2563eb" }}>Patient</h3>
             <p style={{ color: "#475569" }}>
@@ -110,7 +112,8 @@ function LandingPage() {
             padding: "30px",
             borderRadius: "15px",
             width: "280px",
-            boxShadow: "0 10px 25px rgba(0,0,0,0.1)"
+            boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
+            boxSizing: "border-box" // ✅ FIX
           }}>
             <h3 style={{ color: "#16a34a" }}>Doctor</h3>
             <p style={{ color: "#475569" }}>
