@@ -1,8 +1,6 @@
 import { Link, Outlet, useNavigate } from "react-router-dom";
-
 function DoctorLayout() {
   const navigate = useNavigate();
-
   /* SAFE LOCALSTORAGE PARSE */
   let doctorData = null;
   try {
@@ -11,22 +9,18 @@ function DoctorLayout() {
   } catch (err) {
     doctorData = null;
   }
-
   const handleLogout = () => {
     localStorage.removeItem("doctorToken");
     localStorage.removeItem("doctorData");
     navigate("/doctor/login");
   };
-
-  // ✅ FIX — check for non-empty string before building URL
+  // ✅ FIX — Cloudinary returns full URL, no prefix needed
   const photoUrl =
     doctorData?.photo && doctorData.photo.trim() !== ""
-      ? `https://medilink-j44r.onrender.com${doctorData.photo}`
+      ? doctorData.photo
       : "https://cdn-icons-png.flaticon.com/512/3135/3135715.png";
-
   return (
     <div style={{ display: "flex", height: "100vh" }}>
-
       {/* SIDEBAR */}
       <div
         style={{
@@ -56,10 +50,8 @@ function DoctorLayout() {
           </button>
         </div>
       </div>
-
       {/* RIGHT SIDE */}
       <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
-
         {/* HEADER */}
         <div
           style={{
@@ -75,7 +67,7 @@ function DoctorLayout() {
         >
           <span>{doctorData?.name || "Doctor"}</span>
           <img
-            src={photoUrl} // ✅ FIX
+            src={photoUrl}
             alt="Doctor"
             style={{
               width: "40px",
@@ -85,7 +77,6 @@ function DoctorLayout() {
             }}
           />
         </div>
-
         {/* PAGE CONTENT */}
         <div
           style={{
@@ -101,5 +92,4 @@ function DoctorLayout() {
     </div>
   );
 }
-
 export default DoctorLayout;
