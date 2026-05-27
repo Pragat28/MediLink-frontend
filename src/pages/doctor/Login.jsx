@@ -42,7 +42,7 @@ const DoctorLogin = () => {
         }
       );
 
-      console.log("DOCTOR DATA", res.data.doctor");
+      console.log("DOCTOR DATA", res.data.doctor);
 
       localStorage.setItem("doctorToken", res.data.token);
       localStorage.setItem("doctorData", JSON.stringify(res.data.doctor)); // ✅ ADDED
