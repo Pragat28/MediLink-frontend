@@ -217,7 +217,7 @@ const DoctorProfile = () => {
             <img
               src={
                 doctor.photo
-                  ? `https://medilink-j44r.onrender.com${doctor.photo}`
+                  ? doctor.photo
                   : "https://via.placeholder.com/120"
               }
               alt="doctor"
