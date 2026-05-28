@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import useBackRedirect from "../../hooks/useBackRedirect";
 
@@ -15,9 +15,10 @@ function MyAppointments() {
   const [review, setReview] = useState({});
 
   const [activeTab, setActiveTab] = useState("accepted");
-
-  // ✅ NEW — persistent notification modal
   const [notifications, setNotifications] = useState([]);
+
+  // ✅ Hold the latest statuses here, only flush to localStorage after patient acknowledges
+  const pendingStatusSave = useRef(null);
 
   useEffect(() => {
     fetchAppointments();
@@ -33,18 +34,24 @@ function MyAppointments() {
       );
 
       const appointments = res.data.appointments;
+      if (!appointments || !Array.isArray(appointments)) return;
 
-      // ✅ Load previously saved statuses
-      const savedMap = JSON.parse(localStorage.getItem("apptStatusMap") || "{}");
+      // ✅ Use ONE key — same key PatientLayout uses
+      const savedMap = JSON.parse(localStorage.getItem("appointmentStatuses") || "{}");
 
-      // ✅ Detect status changes and queue persistent notifications
       const newNotifs = [];
       appointments.forEach(app => {
         const prev = savedMap[app._id];
         const curr = app.status;
 
         if (prev && prev !== curr) {
-          if (curr === "rejected") {
+          if (curr === "accepted") {
+            newNotifs.push({
+              id: app._id + "_" + curr,
+              type: "accepted",
+              message: `Your appointment with Dr. ${app.doctor?.name} on ${new Date(app.date).toLocaleDateString()} has been confirmed! ✅`
+            });
+          } else if (curr === "rejected") {
             newNotifs.push({
               id: app._id + "_" + curr,
               type: "rejected",
@@ -56,26 +63,28 @@ function MyAppointments() {
               type: "cancelled",
               message: `Your appointment with Dr. ${app.doctor?.name} on ${new Date(app.date).toLocaleDateString()} was cancelled by the doctor.`
             });
-          } else if (curr === "accepted") {
-            newNotifs.push({
-              id: app._id + "_" + curr,
-              type: "accepted",
-              message: `Your appointment with Dr. ${app.doctor?.name} on ${new Date(app.date).toLocaleDateString()} has been confirmed!`
-            });
           }
         }
       });
 
-      if (newNotifs.length > 0) {
-        setNotifications(prev => [...prev, ...newNotifs]);
-      }
-
-      // ✅ Save current statuses
+      // ✅ Build new status map
       const newMap = {};
       appointments.forEach(app => { newMap[app._id] = app.status; });
-      localStorage.setItem("apptStatusMap", JSON.stringify(newMap));
-      // ✅ Also sync PatientLayout's localStorage key so dot clears properly
-      localStorage.setItem("appointmentStatuses", JSON.stringify(newMap));
+
+      if (newNotifs.length > 0) {
+        // ✅ Don't save yet — hold it until patient clicks OK
+        pendingStatusSave.current = newMap;
+        setNotifications(prev => {
+          // avoid duplicates if polling fires again before patient clicks OK
+          const existingIds = new Set(prev.map(n => n.id));
+          const fresh = newNotifs.filter(n => !existingIds.has(n.id));
+          return [...prev, ...fresh];
+        });
+      } else {
+        // ✅ No changes — safe to save immediately
+        localStorage.setItem("appointmentStatuses", JSON.stringify(newMap));
+        pendingStatusSave.current = null;
+      }
 
       const acceptedList = [];
       const pendingList = [];
@@ -99,9 +108,17 @@ function MyAppointments() {
     }
   };
 
-  // ✅ Dismiss one notification at a time
+  // ✅ Only flush saved statuses when ALL notifications are dismissed
   const dismissNotification = (id) => {
-    setNotifications(prev => prev.filter(n => n.id !== id));
+    setNotifications(prev => {
+      const remaining = prev.filter(n => n.id !== id);
+      // Last one being dismissed — now safe to save
+      if (remaining.length === 0 && pendingStatusSave.current) {
+        localStorage.setItem("appointmentStatuses", JSON.stringify(pendingStatusSave.current));
+        pendingStatusSave.current = null;
+      }
+      return remaining;
+    });
   };
 
   const submitRating = async (appointmentId) => {
@@ -217,7 +234,6 @@ function MyAppointments() {
   return (
     <div style={{ padding: "30px", maxWidth: "900px", margin: "auto" }}>
 
-      {/* ✅ PERSISTENT NOTIFICATION MODALS — stacked, one OK button each */}
       {notifications.map((notif) => (
         <div key={notif.id} style={{
           ...getNotifStyle(notif.type),
@@ -282,7 +298,6 @@ function MyAppointments() {
   );
 }
 
-/* ================= STYLES ================= */
 const tabContainer = { display: "flex", gap: "10px", marginTop: "20px", flexWrap: "wrap" };
 const tabStyle = { padding: "8px 15px", border: "1px solid #ccc", borderRadius: "6px", background: "white", cursor: "pointer" };
 const activeTabStyle = { ...tabStyle, background: "#2563eb", color: "white", border: "none" };
