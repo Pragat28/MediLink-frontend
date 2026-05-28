@@ -129,7 +129,6 @@ const DoctorProfile = () => {
 
   const next7Days = getNext7Days();
 
-  // ✅ FIXED FUNCTION (ONLY CHANGE)
   const getSlotsForDate = (dateObj) => {
     const selected = normalizeDate(dateObj.date);
 
@@ -194,7 +193,7 @@ const DoctorProfile = () => {
 
     } catch (err) {
       console.log(err);
-      toast.error("Error booking appointment");
+      toast.error(err.response?.data?.message || "Error booking appointment"); // ✅ ONLY CHANGE
     }
   };
 
