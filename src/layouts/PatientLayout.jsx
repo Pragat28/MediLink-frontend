@@ -7,7 +7,9 @@ function PatientLayout() {
   const token = localStorage.getItem("patientToken");
   const [patientCode, setPatientCode] = useState("");
   const [hasNewUpdate, setHasNewUpdate] = useState(false);
-  const lastStatusesRef = useRef(null);
+
+  // ✅ Store latest fetched statuses in memory — don't write to localStorage until patient visits
+  const latestStatusesRef = useRef(null);
 
   const handleLogout = () => {
     localStorage.removeItem("patientToken");
@@ -15,7 +17,6 @@ function PatientLayout() {
     navigate("/patient/login");
   };
 
-  // ✅ FETCH PATIENT PROFILE
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -31,7 +32,7 @@ function PatientLayout() {
     fetchProfile();
   }, []);
 
-  // ✅ POLLING LOGIC — checks every 30 seconds for status changes
+  // ✅ FIX: Empty dependency array — runs once, no re-trigger on hasNewUpdate change
   useEffect(() => {
     const checkAppointmentStatuses = async () => {
       try {
@@ -40,15 +41,16 @@ function PatientLayout() {
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
-        // ✅ FIXED — backend returns { appointments: [...] } not a direct array
         const appointments = res.data.appointments;
-
         if (!appointments || !Array.isArray(appointments)) return;
 
         const current = {};
         appointments.forEach((appt) => {
           current[appt._id] = appt.status;
         });
+
+        // ✅ Always keep latest in memory
+        latestStatusesRef.current = current;
 
         const saved = localStorage.getItem("appointmentStatuses");
 
@@ -59,12 +61,13 @@ function PatientLayout() {
           );
           if (changed) {
             setHasNewUpdate(true);
+            // ✅ FIX: DO NOT save to localStorage here — wait until patient visits the page
+            return;
           }
         }
 
-        // ✅ Always save so first load baseline is set correctly
+        // ✅ Only save when there's no pending unacknowledged change
         localStorage.setItem("appointmentStatuses", JSON.stringify(current));
-        lastStatusesRef.current = current;
 
       } catch (err) {
         console.log(err);
@@ -74,65 +77,36 @@ function PatientLayout() {
     checkAppointmentStatuses();
     const interval = setInterval(checkAppointmentStatuses, 30000);
     return () => clearInterval(interval);
-  }, [hasNewUpdate]);
+  }, []); // ✅ empty deps — critical fix
 
-  // ✅ When patient clicks Appointments tab — clear the dot and update saved statuses
-  const handleAppointmentsClick = async () => {
+  // ✅ FIX: No extra API call needed — use what we already have in memory
+  const handleAppointmentsClick = () => {
     if (hasNewUpdate) {
       setHasNewUpdate(false);
-      try {
-        const res = await axios.get(
-          "https://medilink-j44r.onrender.com/api/appointments/my",
-          { headers: { Authorization: `Bearer ${token}` } }
+      if (latestStatusesRef.current) {
+        localStorage.setItem(
+          "appointmentStatuses",
+          JSON.stringify(latestStatusesRef.current)
         );
-        // ✅ FIXED — same fix here
-        const appointments = res.data.appointments;
-        if (!appointments || !Array.isArray(appointments)) return;
-        const current = {};
-        appointments.forEach((appt) => {
-          current[appt._id] = appt.status;
-        });
-        localStorage.setItem("appointmentStatuses", JSON.stringify(current));
-      } catch (err) {
-        console.log(err);
       }
     }
   };
 
   return (
     <div style={{ display: "flex" }}>
-      {/* Sidebar */}
-      <div
-        style={{
-          width: "220px",
-          background: "#1e293b",
-          color: "white",
-          padding: "20px",
-          position: "fixed",
-          height: "100vh",
-          left: 0,
-          top: 0
-        }}
-      >
+      <div style={{
+        width: "220px", background: "#1e293b", color: "white",
+        padding: "20px", position: "fixed", height: "100vh", left: 0, top: 0
+      }}>
         <h2>Patient Panel</h2>
 
         {patientCode && (
           <div style={{
-            marginTop: "12px",
-            padding: "10px",
-            background: "#1e40af",
-            borderRadius: "8px",
-            textAlign: "center"
+            marginTop: "12px", padding: "10px", background: "#1e40af",
+            borderRadius: "8px", textAlign: "center"
           }}>
-            <p style={{ fontSize: "11px", color: "#bfdbfe", marginBottom: "3px" }}>
-              Your ID
-            </p>
-            <div style={{
-              fontSize: "20px",
-              fontWeight: "600",
-              letterSpacing: "3px",
-              color: "white"
-            }}>
+            <p style={{ fontSize: "11px", color: "#bfdbfe", marginBottom: "3px" }}>Your ID</p>
+            <div style={{ fontSize: "20px", fontWeight: "600", letterSpacing: "3px", color: "white" }}>
               {patientCode}
             </div>
             <p style={{ fontSize: "10px", marginTop: "4px", color: "#dbeafe" }}>
@@ -142,14 +116,9 @@ function PatientLayout() {
         )}
 
         <nav style={{ marginTop: "20px", display: "flex", flexDirection: "column", gap: "15px" }}>
-          <Link to="/patient/search" style={{ color: "white" }}>
-            Search Doctors
-          </Link>
-          <Link to="/patient/predict" style={{ color: "white" }}>
-            Diagnose
-          </Link>
+          <Link to="/patient/search" style={{ color: "white" }}>Search Doctors</Link>
+          <Link to="/patient/predict" style={{ color: "white" }}>Diagnose</Link>
 
-          {/* ✅ My Appointments with badge dot */}
           <Link
             to="/patient/appointments"
             onClick={handleAppointmentsClick}
@@ -158,46 +127,28 @@ function PatientLayout() {
             My Appointments
             {hasNewUpdate && (
               <span style={{
-                width: "9px",
-                height: "9px",
-                borderRadius: "50%",
-                background: "#ef4444",
-                display: "inline-block",
-                flexShrink: 0
+                width: "9px", height: "9px", borderRadius: "50%",
+                background: "#ef4444", display: "inline-block", flexShrink: 0
               }} />
             )}
           </Link>
 
-          <Link to="/patient/profile" style={{ color: "white" }}>
-            Profile
-          </Link>
+          <Link to="/patient/profile" style={{ color: "white" }}>Profile</Link>
         </nav>
 
         <button
           onClick={handleLogout}
           style={{
-            marginTop: "30px",
-            padding: "10px",
-            width: "100%",
-            background: "#ef4444",
-            border: "none",
-            color: "white",
-            borderRadius: "5px",
-            cursor: "pointer"
+            marginTop: "30px", padding: "10px", width: "100%",
+            background: "#ef4444", border: "none", color: "white",
+            borderRadius: "5px", cursor: "pointer"
           }}
         >
           Logout
         </button>
       </div>
 
-      {/* Main Content */}
-      <div style={{
-        marginLeft: "220px",
-        width: "100%",
-        height: "100vh",
-        overflowY: "auto",
-        padding: "30px"
-      }}>
+      <div style={{ marginLeft: "220px", width: "100%", height: "100vh", overflowY: "auto", padding: "30px" }}>
         <Outlet />
       </div>
     </div>
