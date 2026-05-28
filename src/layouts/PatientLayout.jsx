@@ -40,8 +40,13 @@ function PatientLayout() {
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
+        // ✅ FIXED — backend returns { appointments: [...] } not a direct array
+        const appointments = res.data.appointments;
+
+        if (!appointments || !Array.isArray(appointments)) return;
+
         const current = {};
-        res.data.forEach((appt) => {
+        appointments.forEach((appt) => {
           current[appt._id] = appt.status;
         });
 
@@ -57,7 +62,7 @@ function PatientLayout() {
           }
         }
 
-        // ✅ FIXED — always save statuses so first load works correctly
+        // ✅ Always save so first load baseline is set correctly
         localStorage.setItem("appointmentStatuses", JSON.stringify(current));
         lastStatusesRef.current = current;
 
@@ -66,7 +71,6 @@ function PatientLayout() {
       }
     };
 
-    // Run once immediately, then every 30 seconds
     checkAppointmentStatuses();
     const interval = setInterval(checkAppointmentStatuses, 30000);
     return () => clearInterval(interval);
@@ -81,8 +85,11 @@ function PatientLayout() {
           "https://medilink-j44r.onrender.com/api/appointments/my",
           { headers: { Authorization: `Bearer ${token}` } }
         );
+        // ✅ FIXED — same fix here
+        const appointments = res.data.appointments;
+        if (!appointments || !Array.isArray(appointments)) return;
         const current = {};
-        res.data.forEach((appt) => {
+        appointments.forEach((appt) => {
           current[appt._id] = appt.status;
         });
         localStorage.setItem("appointmentStatuses", JSON.stringify(current));
