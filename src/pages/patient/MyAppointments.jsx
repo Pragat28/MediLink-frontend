@@ -98,7 +98,7 @@ function MyAppointments() {
             <p style={{ color: "green" }}>✔ Confirmed</p>
             <p>{app.doctor?.email}</p>
             <p>{app.doctor?.phone}</p>
-            {/* ✅ ONLY CHANGE — doctor address shown after acceptance */}
+
             {(app.doctor?.address?.street || app.doctor?.address?.area || app.doctor?.address?.city) && (
               <p style={{ marginTop: "6px", color: "#374151" }}>
                 📍 {[app.doctor?.address?.street, app.doctor?.address?.area, app.doctor?.address?.city]
@@ -106,6 +106,22 @@ function MyAppointments() {
                   .join(", ")}
               </p>
             )}
+
+            {/* ✅ ONLY CHANGE — meeting link info box */}
+            <div style={{
+              background: "#eff6ff",
+              border: "1.5px solid #bfdbfe",
+              borderRadius: "8px",
+              padding: "12px",
+              marginTop: "10px"
+            }}>
+              <p style={{ margin: 0, color: "#1e40af", fontWeight: "600" }}>
+                📩 Meeting Link Info
+              </p>
+              <p style={{ margin: "6px 0 0", color: "#1d4ed8", fontSize: "14px" }}>
+                Your doctor will send you the meeting link on your registered email before the appointment time.
+              </p>
+            </div>
           </>
         )}
 
