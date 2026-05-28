@@ -17,7 +17,6 @@ function MyAppointments() {
   const [activeTab, setActiveTab] = useState("accepted");
   const [notifications, setNotifications] = useState([]);
 
-  // ✅ Hold the latest statuses here, only flush to localStorage after patient acknowledges
   const pendingStatusSave = useRef(null);
 
   useEffect(() => {
@@ -36,7 +35,7 @@ function MyAppointments() {
       const appointments = res.data.appointments;
       if (!appointments || !Array.isArray(appointments)) return;
 
-      // ✅ Use ONE key — same key PatientLayout uses
+      // ✅ Read the saved baseline — written by PatientLayout only when safe
       const savedMap = JSON.parse(localStorage.getItem("appointmentStatuses") || "{}");
 
       const newNotifs = [];
@@ -67,24 +66,21 @@ function MyAppointments() {
         }
       });
 
-      // ✅ Build new status map
       const newMap = {};
       appointments.forEach(app => { newMap[app._id] = app.status; });
 
       if (newNotifs.length > 0) {
-        // ✅ Don't save yet — hold it until patient clicks OK
+        // ✅ Hold the new map — only flush after patient dismisses all notifications
         pendingStatusSave.current = newMap;
         setNotifications(prev => {
-          // avoid duplicates if polling fires again before patient clicks OK
           const existingIds = new Set(prev.map(n => n.id));
           const fresh = newNotifs.filter(n => !existingIds.has(n.id));
           return [...prev, ...fresh];
         });
-      } else {
-        // ✅ No changes — safe to save immediately
-        localStorage.setItem("appointmentStatuses", JSON.stringify(newMap));
-        pendingStatusSave.current = null;
       }
+      // ✅ FIXED: Removed the else branch that saved to localStorage here.
+      // PatientLayout already saved the baseline when patient clicked the link.
+      // Writing here again would reset the baseline and break future change detection.
 
       const acceptedList = [];
       const pendingList = [];
@@ -112,7 +108,6 @@ function MyAppointments() {
   const dismissNotification = (id) => {
     setNotifications(prev => {
       const remaining = prev.filter(n => n.id !== id);
-      // Last one being dismissed — now safe to save
       if (remaining.length === 0 && pendingStatusSave.current) {
         localStorage.setItem("appointmentStatuses", JSON.stringify(pendingStatusSave.current));
         pendingStatusSave.current = null;
