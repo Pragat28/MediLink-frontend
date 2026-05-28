@@ -46,7 +46,7 @@ const Appointments = () => {
       if (action === "approve") {
         // ✅ compact toast for doctor only
         toast.info(
-          `📩 Send meeting link to: ${res.data.patientEmail}`,
+          `📩 Kindly send meeting link to: ${res.data.patientEmail} before the appointment`,
           { autoClose: 8000 }
         );
       } else {
