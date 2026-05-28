@@ -57,12 +57,10 @@ function PatientLayout() {
           }
         }
 
-        // Only update stored statuses if no unacknowledged dot is showing
-        // so the dot persists until patient visits the tab
-        if (!hasNewUpdate) {
-          localStorage.setItem("appointmentStatuses", JSON.stringify(current));
-          lastStatusesRef.current = current;
-        }
+        // ✅ FIXED — always save statuses so first load works correctly
+        localStorage.setItem("appointmentStatuses", JSON.stringify(current));
+        lastStatusesRef.current = current;
+
       } catch (err) {
         console.log(err);
       }
@@ -78,7 +76,6 @@ function PatientLayout() {
   const handleAppointmentsClick = async () => {
     if (hasNewUpdate) {
       setHasNewUpdate(false);
-      // Refresh saved statuses so next poll compares from current state
       try {
         const res = await axios.get(
           "https://medilink-j44r.onrender.com/api/appointments/my",
