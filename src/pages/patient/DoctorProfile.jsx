@@ -86,6 +86,7 @@ const DoctorProfile = () => {
   const [doctor, setDoctor] = useState(null);
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedTime, setSelectedTime] = useState("");
+  const [selectedMode, setSelectedMode] = useState("online"); // ✅ mode state
 
   const today = new Date().toISOString().split("T")[0];
 
@@ -129,6 +130,7 @@ const DoctorProfile = () => {
 
   const next7Days = getNext7Days();
 
+  // ✅ Filter slots by selected mode
   const getSlotsForDate = (dateObj) => {
     const selected = normalizeDate(dateObj.date);
 
@@ -137,15 +139,12 @@ const DoctorProfile = () => {
 
     const matchedOverrides = overrides.filter(o => {
       if (!o.from || !o.to) return false;
-
       const start = normalizeDate(o.from);
       const end = normalizeDate(o.to);
-
       return selected >= start && selected <= end;
     });
 
     let overrideSlots = [];
-
     matchedOverrides.forEach(o => {
       overrideSlots = [...overrideSlots, ...(o.slots || [])];
     });
@@ -163,7 +162,8 @@ const DoctorProfile = () => {
       }
     });
 
-    return uniqueSlots;
+    // ✅ Filter by selected mode
+    return uniqueSlots.filter(s => !s.mode || s.mode === selectedMode);
   };
 
   const bookAppointment = async () => {
@@ -180,7 +180,8 @@ const DoctorProfile = () => {
         {
           doctorId: doctor._id,
           date: selectedDate,
-          slotTime: selectedTime
+          slotTime: selectedTime,
+          mode: selectedMode // ✅ pass mode automatically
         },
         {
           headers: {
@@ -193,7 +194,7 @@ const DoctorProfile = () => {
 
     } catch (err) {
       console.log(err);
-      toast.error(err.response?.data?.message || "Error booking appointment"); // ✅ ONLY CHANGE
+      toast.error(err.response?.data?.message || "Error booking appointment");
     }
   };
 
@@ -214,11 +215,7 @@ const DoctorProfile = () => {
 
           <div style={header}>
             <img
-              src={
-                doctor.photo
-                  ? doctor.photo
-                  : "https://via.placeholder.com/120"
-              }
+              src={doctor.photo ? doctor.photo : "https://via.placeholder.com/120"}
               alt="doctor"
               style={imgStyle}
             />
@@ -231,12 +228,35 @@ const DoctorProfile = () => {
               <div style={infoRow}>
                 📍 {doctor.address?.street}, {doctor.address?.area}, {doctor.address?.city}
               </div>
-              <div style={infoRow}>💻 Mode: {doctor.mode}</div>
               <div style={infoRow}>👤 Gender: {doctor.gender}</div>
             </div>
           </div>
 
           <div style={{ width: "320px" }}>
+
+            {/* ✅ Mode selector */}
+            <div style={{ marginBottom: "15px" }}>
+              <label style={{ fontWeight: "600", marginRight: "10px" }}>
+                Consultation Mode:
+              </label>
+              <select
+                value={selectedMode}
+                onChange={(e) => {
+                  setSelectedMode(e.target.value);
+                  setSelectedTime(""); // reset slot on mode change
+                }}
+                style={{
+                  padding: "6px 10px",
+                  borderRadius: "6px",
+                  border: "1px solid #ddd",
+                  cursor: "pointer"
+                }}
+              >
+                <option value="online">Online</option>
+                <option value="offline">Offline</option>
+              </select>
+            </div>
+
             <h3>Availability This Week</h3>
 
             {next7Days.map((d, idx) => {
@@ -295,32 +315,35 @@ const DoctorProfile = () => {
 
         {selectedDate && (
           <div style={{ marginTop: "25px" }}>
-            <h3>Select Slot</h3>
+            <h3>Select Slot ({selectedMode})</h3>
 
             {getSlotsForDate({
               date: new Date(selectedDate),
-              dayName: new Date(selectedDate).toLocaleDateString("en-US",{weekday:"long"})
-            }).map((s, i) => {
-
-              const slotValue = `${s.start}-${s.end}`;
-
-              return (
-                <span
-                  key={i}
-                  style={{
-                    ...slot,
-                    cursor: "pointer",
-                    background:
-                      selectedTime === slotValue ? "#2563eb" : "#e0f2fe",
-                    color:
-                      selectedTime === slotValue ? "white" : "black"
-                  }}
-                  onClick={() => setSelectedTime(slotValue)}
-                >
-                  {s.start} - {s.end}
-                </span>
-              );
-            })}
+              dayName: new Date(selectedDate).toLocaleDateString("en-US", { weekday: "long" })
+            }).length === 0 ? (
+              <p style={{ color: "#999" }}>No {selectedMode} slots available on this date.</p>
+            ) : (
+              getSlotsForDate({
+                date: new Date(selectedDate),
+                dayName: new Date(selectedDate).toLocaleDateString("en-US", { weekday: "long" })
+              }).map((s, i) => {
+                const slotValue = `${s.start}-${s.end}`;
+                return (
+                  <span
+                    key={i}
+                    style={{
+                      ...slot,
+                      cursor: "pointer",
+                      background: selectedTime === slotValue ? "#2563eb" : "#e0f2fe",
+                      color: selectedTime === slotValue ? "white" : "black"
+                    }}
+                    onClick={() => setSelectedTime(slotValue)}
+                  >
+                    {s.start} - {s.end}
+                  </span>
+                );
+              })
+            )}
           </div>
         )}
 
