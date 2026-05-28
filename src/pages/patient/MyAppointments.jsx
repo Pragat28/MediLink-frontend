@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import useBackRedirect from "../../hooks/useBackRedirect";
 import { toast } from "react-toastify";
@@ -17,17 +17,23 @@ function MyAppointments() {
 
   const [activeTab, setActiveTab] = useState("accepted");
 
+  // ✅ track previous appointment statuses
+  const prevStatusMap = useRef({});
+  const isFirstLoad = useRef(true);
+
   useEffect(() => {
     fetchAppointments();
+
+    // ✅ poll every 30 seconds to catch doctor's actions
+    const interval = setInterval(fetchAppointments, 30000);
+    return () => clearInterval(interval);
   }, []);
 
   const fetchAppointments = async () => {
     try {
       const res = await axios.get(
         "https://medilink-j44r.onrender.com/api/appointments/my",
-        {
-          headers: { Authorization: `Bearer ${token}` }
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
 
       const acceptedList = [];
@@ -41,6 +47,41 @@ function MyAppointments() {
         else if (app.status === "rejected") rejectedList.push(app);
         else historyList.push(app);
       });
+
+      // ✅ detect status changes after first load
+      if (!isFirstLoad.current) {
+        res.data.appointments.forEach(app => {
+          const prev = prevStatusMap.current[app._id];
+          const curr = app.status;
+
+          if (prev && prev !== curr) {
+            if (curr === "rejected") {
+              toast.error(
+                `❌ Your appointment with Dr. ${app.doctor?.name} on ${new Date(app.date).toLocaleDateString()} has been rejected.`,
+                { autoClose: 8000 }
+              );
+            } else if (curr === "cancelled") {
+              toast.warning(
+                `⚠️ Your appointment with Dr. ${app.doctor?.name} on ${new Date(app.date).toLocaleDateString()} has been cancelled by the doctor.`,
+                { autoClose: 8000 }
+              );
+            } else if (curr === "accepted") {
+              toast.success(
+                `✅ Your appointment with Dr. ${app.doctor?.name} on ${new Date(app.date).toLocaleDateString()} has been confirmed!`,
+                { autoClose: 8000 }
+              );
+            }
+          }
+        });
+      }
+
+      // ✅ update status map
+      const newMap = {};
+      res.data.appointments.forEach(app => {
+        newMap[app._id] = app.status;
+      });
+      prevStatusMap.current = newMap;
+      isFirstLoad.current = false;
 
       setAccepted(acceptedList);
       setPending(pendingList);
@@ -65,9 +106,7 @@ function MyAppointments() {
           rating: Number(rating[appointmentId]),
           review: review[appointmentId] || ""
         },
-        {
-          headers: { Authorization: `Bearer ${token}` }
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
 
       toast.success("Rating submitted successfully!");
@@ -78,9 +117,7 @@ function MyAppointments() {
     }
   };
 
-  const formatDate = (date) => {
-    return new Date(date).toLocaleDateString();
-  };
+  const formatDate = (date) => new Date(date).toLocaleDateString();
 
   const renderAppointments = (list, type) => {
     if (list.length === 0) {
@@ -107,7 +144,6 @@ function MyAppointments() {
               </p>
             )}
 
-            {/* ✅ ONLY CHANGE — meeting link info box */}
             <div style={{
               background: "#eff6ff",
               border: "1.5px solid #bfdbfe",
@@ -130,7 +166,7 @@ function MyAppointments() {
         )}
 
         {type === "rejected" && (
-          <p style={{ color: "red" }}>✖ Rejected</p>
+          <p style={{ color: "red" }}>✖ Rejected by doctor</p>
         )}
 
         {type === "history" && (
@@ -150,10 +186,7 @@ function MyAppointments() {
                 <select
                   value={rating[app._id] || ""}
                   onChange={(e) =>
-                    setRating(prev => ({
-                      ...prev,
-                      [app._id]: e.target.value
-                    }))
+                    setRating(prev => ({ ...prev, [app._id]: e.target.value }))
                   }
                 >
                   <option value="">Rate Doctor</option>
@@ -169,17 +202,11 @@ function MyAppointments() {
                   style={textarea}
                   value={review[app._id] || ""}
                   onChange={(e) =>
-                    setReview(prev => ({
-                      ...prev,
-                      [app._id]: e.target.value
-                    }))
+                    setReview(prev => ({ ...prev, [app._id]: e.target.value }))
                   }
                 />
 
-                <button
-                  style={rateButton}
-                  onClick={() => submitRating(app._id)}
-                >
+                <button style={rateButton} onClick={() => submitRating(app._id)}>
                   Submit
                 </button>
 
