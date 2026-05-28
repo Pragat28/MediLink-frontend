@@ -127,8 +127,7 @@ const Profile = () => {
 
     if(!updated[day]) updated[day] = [];
 
-    // ✅ ADDED maxPatients default
-    updated[day].push({ start:"",end:"", maxPatients:1 });
+    updated[day].push({ start:"", end:"", maxPatients:1, mode:"online" });
 
     setDoctor({
       ...doctor,
@@ -160,7 +159,7 @@ const Profile = () => {
     ranges.push({
       from:"",
       to:"",
-      slots:[{start:"",end:"", maxPatients:1}]
+      slots:[{start:"", end:"", maxPatients:1, mode:"online"}]
     });
 
     setDoctor({
@@ -200,7 +199,7 @@ const Profile = () => {
 
   const addRangeSlot = (rIndex)=>{
     const ranges = [...doctor.availability.overrides];
-    ranges[rIndex].slots.push({start:"",end:"", maxPatients:1});
+    ranges[rIndex].slots.push({start:"", end:"", maxPatients:1, mode:"online"});
 
     setDoctor({
       ...doctor,
@@ -238,43 +237,43 @@ const Profile = () => {
   };
 
   const handleSave = async()=>{
-  setLoading(true);
+    setLoading(true);
 
-  const token = localStorage.getItem("doctorToken");
+    const token = localStorage.getItem("doctorToken");
 
-  try {
+    try {
 
-    const cleanedDoctor = {
-      ...doctor,
-      availability: {
-        ...doctor.availability,
-        overrides: (doctor.availability.overrides || []).map(r => ({
-          ...r,
-          from: r.from || null,
-          to: r.to || null,
-          slots: (r.slots || []).filter(s => s.start && s.end)
-        }))
-      }
-    };
+      const cleanedDoctor = {
+        ...doctor,
+        availability: {
+          ...doctor.availability,
+          overrides: (doctor.availability.overrides || []).map(r => ({
+            ...r,
+            from: r.from || null,
+            to: r.to || null,
+            slots: (r.slots || []).filter(s => s.start && s.end)
+          }))
+        }
+      };
 
-    const res = await axios.put(
-      "https://medilink-j44r.onrender.com/api/doctor-profile/me",
-      cleanedDoctor,
-      { headers:{ Authorization:`Bearer ${token}` } }
-    );
+      const res = await axios.put(
+        "https://medilink-j44r.onrender.com/api/doctor-profile/me",
+        cleanedDoctor,
+        { headers:{ Authorization:`Bearer ${token}` } }
+      );
 
-    setDoctor(res.data.doctor);
-    toast.success("Profile updated successfully");
+      setDoctor(res.data.doctor);
+      toast.success("Profile updated successfully");
 
-  } catch (err) {
+    } catch (err) {
 
-    console.error("SAVE ERROR:", err.response?.data || err);
-    toast.error(err.response?.data?.message || "Failed to save profile");
+      console.error("SAVE ERROR:", err.response?.data || err);
+      toast.error(err.response?.data?.message || "Failed to save profile");
 
-  } finally {
-    setLoading(false);
-  }
-};
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if(!doctor) return <p style={{padding:"30px"}}>Loading...</p>;
 
@@ -359,44 +358,56 @@ const Profile = () => {
           <b>{day}</b>
 
           {(doctor.availability.weekly?.[day] || []).map((slot,index)=>(
-            <div key={index} style={{ display: "flex", gap: "12px", alignItems: "flex-end" }}>
+            <div key={index} style={{ display: "flex", gap: "12px", alignItems: "flex-end", flexWrap: "wrap" }}>
 
-            <div>
-              <label style={{ fontSize: "12px", color: "#6b7280" }}>Start Time</label>
-              <input
-                type="time"
-                style={inputStyle}
-                value={slot.start}
-                onChange={(e)=>handleSlotChange(day,index,"start",e.target.value)}
-              />
+              <div>
+                <label style={{ fontSize: "12px", color: "#6b7280" }}>Start Time</label>
+                <input
+                  type="time"
+                  style={inputStyle}
+                  value={slot.start}
+                  onChange={(e)=>handleSlotChange(day,index,"start",e.target.value)}
+                />
+              </div>
+
+              <div>
+                <label style={{ fontSize: "12px", color: "#6b7280" }}>End Time</label>
+                <input
+                  type="time"
+                  style={inputStyle}
+                  value={slot.end}
+                  onChange={(e)=>handleSlotChange(day,index,"end",e.target.value)}
+                />
+              </div>
+
+              <div>
+                <label style={{ fontSize: "12px", color: "#6b7280" }}>Max Patients</label>
+                <input
+                  type="number"
+                  min="1"
+                  style={inputStyle}
+                  value={slot.maxPatients || 1}
+                  onChange={(e)=>handleSlotChange(day,index,"maxPatients",e.target.value)}
+                />
+              </div>
+
+              <div>
+                <label style={{ fontSize: "12px", color: "#6b7280" }}>Mode</label>
+                <select
+                  style={inputStyle}
+                  value={slot.mode || "online"}
+                  onChange={(e)=>handleSlotChange(day,index,"mode",e.target.value)}
+                >
+                  <option value="online">Online</option>
+                  <option value="offline">Offline</option>
+                </select>
+              </div>
+
+              <button style={dangerButton} onClick={()=>removeSlot(day,index)}>
+                Remove
+              </button>
+
             </div>
-
-            <div>
-              <label style={{ fontSize: "12px", color: "#6b7280" }}>End Time</label>
-              <input
-                type="time"
-                style={inputStyle}
-                value={slot.end}
-                onChange={(e)=>handleSlotChange(day,index,"end",e.target.value)}
-              />
-            </div>
-
-            <div>
-              <label style={{ fontSize: "12px", color: "#6b7280" }}>Max Patients</label>
-              <input
-                type="number"
-                min="1"
-                style={inputStyle}
-                value={slot.maxPatients || 1}
-                onChange={(e)=>handleSlotChange(day,index,"maxPatients",e.target.value)}
-              />
-            </div>
-
-            <button style={dangerButton} onClick={()=>removeSlot(day,index)}>
-              Remove
-            </button>
-
-          </div>
           ))}
 
           <button style={primaryButton} onClick={()=>addSlot(day)}>Add Slot</button>
@@ -419,13 +430,12 @@ const Profile = () => {
           />
 
           {(range.slots || []).map((slot,sIndex)=>(
-            <div key={sIndex}>
+            <div key={sIndex} style={{ display: "flex", gap: "12px", alignItems: "flex-end", flexWrap: "wrap" }}>
               <input type="time" style={inputStyle} value={slot.start}
                 onChange={(e)=>handleRangeSlotChange(index,sIndex,"start",e.target.value)}/>
               <input type="time" style={inputStyle} value={slot.end}
                 onChange={(e)=>handleRangeSlotChange(index,sIndex,"end",e.target.value)}/>
 
-              {/* ✅ NEW FIELD */}
               <input
                 type="number"
                 min="1"
@@ -434,6 +444,15 @@ const Profile = () => {
                 onChange={(e)=>handleRangeSlotChange(index,sIndex,"maxPatients",e.target.value)}
                 placeholder="Max Patients"
               />
+
+              <select
+                style={inputStyle}
+                value={slot.mode || "online"}
+                onChange={(e)=>handleRangeSlotChange(index,sIndex,"mode",e.target.value)}
+              >
+                <option value="online">Online</option>
+                <option value="offline">Offline</option>
+              </select>
 
               <button style={dangerButton} onClick={()=>removeRangeSlot(index,sIndex)}>Remove Slot</button>
             </div>
