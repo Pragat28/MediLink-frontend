@@ -17,14 +17,8 @@ function MyAppointments() {
 
   const [activeTab, setActiveTab] = useState("accepted");
 
-  // ✅ track previous appointment statuses
-  const prevStatusMap = useRef({});
-  const isFirstLoad = useRef(true);
-
   useEffect(() => {
     fetchAppointments();
-
-    // ✅ poll every 30 seconds to catch doctor's actions
     const interval = setInterval(fetchAppointments, 30000);
     return () => clearInterval(interval);
   }, []);
@@ -36,52 +30,52 @@ function MyAppointments() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
+      const appointments = res.data.appointments;
+
+      // ✅ Load previously saved statuses from localStorage
+      const savedMap = JSON.parse(localStorage.getItem("apptStatusMap") || "{}");
+
+      // ✅ Detect status changes and show toasts
+      appointments.forEach(app => {
+        const prev = savedMap[app._id];
+        const curr = app.status;
+
+        if (prev && prev !== curr) {
+          if (curr === "rejected") {
+            toast.error(
+              `❌ Your appointment with Dr. ${app.doctor?.name} on ${new Date(app.date).toLocaleDateString()} was rejected.`,
+              { autoClose: 8000 }
+            );
+          } else if (curr === "cancelled") {
+            toast.warning(
+              `⚠️ Your appointment with Dr. ${app.doctor?.name} on ${new Date(app.date).toLocaleDateString()} was cancelled by the doctor.`,
+              { autoClose: 8000 }
+            );
+          } else if (curr === "accepted") {
+            toast.success(
+              `✅ Your appointment with Dr. ${app.doctor?.name} on ${new Date(app.date).toLocaleDateString()} was confirmed!`,
+              { autoClose: 8000 }
+            );
+          }
+        }
+      });
+
+      // ✅ Save current statuses to localStorage
+      const newMap = {};
+      appointments.forEach(app => { newMap[app._id] = app.status; });
+      localStorage.setItem("apptStatusMap", JSON.stringify(newMap));
+
       const acceptedList = [];
       const pendingList = [];
       const rejectedList = [];
       const historyList = [];
 
-      res.data.appointments.forEach(app => {
+      appointments.forEach(app => {
         if (app.status === "accepted") acceptedList.push(app);
         else if (app.status === "pending") pendingList.push(app);
         else if (app.status === "rejected") rejectedList.push(app);
         else historyList.push(app);
       });
-
-      // ✅ detect status changes after first load
-      if (!isFirstLoad.current) {
-        res.data.appointments.forEach(app => {
-          const prev = prevStatusMap.current[app._id];
-          const curr = app.status;
-
-          if (prev && prev !== curr) {
-            if (curr === "rejected") {
-              toast.error(
-                `❌ Your appointment with Dr. ${app.doctor?.name} on ${new Date(app.date).toLocaleDateString()} has been rejected.`,
-                { autoClose: 8000 }
-              );
-            } else if (curr === "cancelled") {
-              toast.warning(
-                `⚠️ Your appointment with Dr. ${app.doctor?.name} on ${new Date(app.date).toLocaleDateString()} has been cancelled by the doctor.`,
-                { autoClose: 8000 }
-              );
-            } else if (curr === "accepted") {
-              toast.success(
-                `✅ Your appointment with Dr. ${app.doctor?.name} on ${new Date(app.date).toLocaleDateString()} has been confirmed!`,
-                { autoClose: 8000 }
-              );
-            }
-          }
-        });
-      }
-
-      // ✅ update status map
-      const newMap = {};
-      res.data.appointments.forEach(app => {
-        newMap[app._id] = app.status;
-      });
-      prevStatusMap.current = newMap;
-      isFirstLoad.current = false;
 
       setAccepted(acceptedList);
       setPending(pendingList);
