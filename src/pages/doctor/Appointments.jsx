@@ -11,28 +11,18 @@ const Appointments = () => {
 
   const [showVerifyBox, setShowVerifyBox] = useState(null);
   const [enteredCode, setEnteredCode] = useState("");
-
-  // ✅ NEW — stores approval info to show reminder box
   const [approvalInfo, setApprovalInfo] = useState(null);
 
   const token = localStorage.getItem("doctorToken");
 
-  /* ================= FETCH ================= */
   const fetchAppointments = async () => {
     try {
       setLoading(true);
-
       const res = await axios.get(
         "https://medilink-j44r.onrender.com/api/doctor-appointments/appointments",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
-
       setData(res.data);
-
     } catch (err) {
       console.log(err);
       toast.error("Failed to load appointments");
@@ -45,28 +35,20 @@ const Appointments = () => {
     fetchAppointments();
   }, []);
 
-  /* ================= ACTION ================= */
-
   const handleAction = async (id, action) => {
     try {
-
       const res = await axios.put(
         `https://medilink-j44r.onrender.com/api/doctor-appointments/appointments/${id}/${action}`,
         {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      // ✅ Show reminder messages on approval
       if (action === "approve") {
-        setApprovalInfo({
-          doctorReminder: res.data.doctorReminder,
-          patientMessage: res.data.patientMessage,
-          patientEmail: res.data.patientEmail
-        });
+        // ✅ compact toast for doctor only
+        toast.info(
+          `📩 Send meeting link to: ${res.data.patientEmail}`,
+          { autoClose: 8000 }
+        );
       } else {
         toast.success(`Appointment ${action}ed successfully`);
       }
@@ -78,26 +60,15 @@ const Appointments = () => {
     }
   };
 
-  /* ================= VERIFY ================= */
-
   const handleVerify = async (appointmentId) => {
     try {
-
       await axios.put(
         "https://medilink-j44r.onrender.com/api/doctor-appointments/verify",
-        {
-          appointmentId,
-          code: enteredCode
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        }
+        { appointmentId, code: enteredCode },
+        { headers: { Authorization: `Bearer ${token}` } }
       );
 
       toast.success("Appointment completed successfully!");
-
       setShowVerifyBox(null);
       setEnteredCode("");
       fetchAppointments();
@@ -107,8 +78,6 @@ const Appointments = () => {
     }
   };
 
-  /* ================= UI ================= */
-
   if (loading) return <p>Loading...</p>;
 
   return (
@@ -116,68 +85,10 @@ const Appointments = () => {
 
       <h2>Appointments</h2>
 
-      {/* ✅ APPROVAL REMINDER BOX */}
-      {approvalInfo && (
-        <div style={{
-          background: "#fffbeb",
-          border: "1.5px solid #f59e0b",
-          borderRadius: "10px",
-          padding: "20px",
-          marginBottom: "20px"
-        }}>
-          <h3 style={{ color: "#b45309", marginTop: 0 }}>✅ Appointment Approved</h3>
-
-          <div style={{
-            background: "#fef3c7",
-            borderRadius: "8px",
-            padding: "12px",
-            marginBottom: "12px"
-          }}>
-            <p style={{ margin: 0, fontWeight: "600", color: "#92400e" }}>
-              📋 Reminder for you (Doctor):
-            </p>
-            <p style={{ margin: "6px 0 0", color: "#78350f" }}>
-              {approvalInfo.doctorReminder}
-            </p>
-          </div>
-
-          <div style={{
-            background: "#ecfdf5",
-            borderRadius: "8px",
-            padding: "12px",
-            marginBottom: "12px"
-          }}>
-            <p style={{ margin: 0, fontWeight: "600", color: "#065f46" }}>
-              💬 Message sent to patient:
-            </p>
-            <p style={{ margin: "6px 0 0", color: "#064e3b" }}>
-              {approvalInfo.patientMessage}
-            </p>
-          </div>
-
-          <button
-            onClick={() => setApprovalInfo(null)}
-            style={{
-              padding: "8px 16px",
-              background: "#f59e0b",
-              color: "white",
-              border: "none",
-              borderRadius: "6px",
-              cursor: "pointer",
-              fontWeight: "600"
-            }}
-          >
-            Got it ✓
-          </button>
-        </div>
-      )}
-
       {data.length === 0 ? (
         <p>No appointments found</p>
       ) : (
-
         data.map((group, index) => (
-
           <div key={index} style={{
             background: "white",
             padding: "15px",
@@ -189,7 +100,6 @@ const Appointments = () => {
             <p>{group.patient?.email}</p>
 
             {group.requests.map(req => (
-
               <div key={req.appointmentId} style={{
                 marginTop: "10px",
                 borderTop: "1px solid #ddd",
@@ -212,9 +122,7 @@ const Appointments = () => {
                   }}>
                     <p>⭐ <b>{req.rating}/5</b></p>
                     {req.review && (
-                      <p style={{ fontStyle: "italic" }}>
-                        "{req.review}"
-                      </p>
+                      <p style={{ fontStyle: "italic" }}>"{req.review}"</p>
                     )}
                   </div>
                 )}
@@ -227,7 +135,6 @@ const Appointments = () => {
                     >
                       Accept
                     </button>
-
                     <button
                       onClick={() => handleAction(req.appointmentId, "reject")}
                       style={{ background: "red", color: "white" }}
@@ -245,7 +152,6 @@ const Appointments = () => {
                     >
                       Verify & Complete
                     </button>
-
                     <button
                       onClick={() => handleAction(req.appointmentId, "cancel")}
                       style={{ background: "gray", color: "white" }}
@@ -262,19 +168,11 @@ const Appointments = () => {
                       placeholder="Enter patient code"
                       value={enteredCode}
                       onChange={(e) => setEnteredCode(e.target.value)}
-                      style={{
-                        padding: "6px",
-                        marginRight: "5px"
-                      }}
+                      style={{ padding: "6px", marginRight: "5px" }}
                     />
-
                     <button
                       onClick={() => handleVerify(req.appointmentId)}
-                      style={{
-                        background: "#2563eb",
-                        color: "white",
-                        padding: "6px 10px"
-                      }}
+                      style={{ background: "#2563eb", color: "white", padding: "6px 10px" }}
                     >
                       Verify
                     </button>
@@ -282,13 +180,10 @@ const Appointments = () => {
                 )}
 
               </div>
-
             ))}
 
           </div>
-
         ))
-
       )}
 
     </div>
