@@ -1,7 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import useBackRedirect from "../../hooks/useBackRedirect";
-import { toast } from "react-toastify";
 
 function MyAppointments() {
   useBackRedirect("/patient/profile");
@@ -16,6 +15,9 @@ function MyAppointments() {
   const [review, setReview] = useState({});
 
   const [activeTab, setActiveTab] = useState("accepted");
+
+  // ✅ NEW — persistent notification modal
+  const [notifications, setNotifications] = useState([]);
 
   useEffect(() => {
     fetchAppointments();
@@ -32,38 +34,48 @@ function MyAppointments() {
 
       const appointments = res.data.appointments;
 
-      // ✅ Load previously saved statuses from localStorage
+      // ✅ Load previously saved statuses
       const savedMap = JSON.parse(localStorage.getItem("apptStatusMap") || "{}");
 
-      // ✅ Detect status changes and show toasts
+      // ✅ Detect status changes and queue persistent notifications
+      const newNotifs = [];
       appointments.forEach(app => {
         const prev = savedMap[app._id];
         const curr = app.status;
 
         if (prev && prev !== curr) {
           if (curr === "rejected") {
-            toast.error(
-              `❌ Your appointment with Dr. ${app.doctor?.name} on ${new Date(app.date).toLocaleDateString()} was rejected.`,
-              { autoClose: 8000 }
-            );
+            newNotifs.push({
+              id: app._id + "_" + curr,
+              type: "rejected",
+              message: `Your appointment with Dr. ${app.doctor?.name} on ${new Date(app.date).toLocaleDateString()} was rejected by the doctor.`
+            });
           } else if (curr === "cancelled") {
-            toast.warning(
-              `⚠️ Your appointment with Dr. ${app.doctor?.name} on ${new Date(app.date).toLocaleDateString()} was cancelled by the doctor.`,
-              { autoClose: 8000 }
-            );
+            newNotifs.push({
+              id: app._id + "_" + curr,
+              type: "cancelled",
+              message: `Your appointment with Dr. ${app.doctor?.name} on ${new Date(app.date).toLocaleDateString()} was cancelled by the doctor.`
+            });
           } else if (curr === "accepted") {
-            toast.success(
-              `✅ Your appointment with Dr. ${app.doctor?.name} on ${new Date(app.date).toLocaleDateString()} was confirmed!`,
-              { autoClose: 8000 }
-            );
+            newNotifs.push({
+              id: app._id + "_" + curr,
+              type: "accepted",
+              message: `Your appointment with Dr. ${app.doctor?.name} on ${new Date(app.date).toLocaleDateString()} has been confirmed!`
+            });
           }
         }
       });
 
-      // ✅ Save current statuses to localStorage
+      if (newNotifs.length > 0) {
+        setNotifications(prev => [...prev, ...newNotifs]);
+      }
+
+      // ✅ Save current statuses
       const newMap = {};
       appointments.forEach(app => { newMap[app._id] = app.status; });
       localStorage.setItem("apptStatusMap", JSON.stringify(newMap));
+      // ✅ Also sync PatientLayout's localStorage key so dot clears properly
+      localStorage.setItem("appointmentStatuses", JSON.stringify(newMap));
 
       const acceptedList = [];
       const pendingList = [];
@@ -87,12 +99,16 @@ function MyAppointments() {
     }
   };
 
+  // ✅ Dismiss one notification at a time
+  const dismissNotification = (id) => {
+    setNotifications(prev => prev.filter(n => n.id !== id));
+  };
+
   const submitRating = async (appointmentId) => {
     if (!rating[appointmentId]) {
       alert("Please select a rating");
       return;
     }
-
     try {
       await axios.post(
         `https://medilink-j44r.onrender.com/api/appointments/${appointmentId}/rate`,
@@ -102,16 +118,28 @@ function MyAppointments() {
         },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-
-      toast.success("Rating submitted successfully!");
+      alert("Rating submitted successfully!");
       fetchAppointments();
-
     } catch (err) {
-      toast.error(err.response?.data?.message || "Failed to submit rating");
+      alert(err.response?.data?.message || "Failed to submit rating");
     }
   };
 
   const formatDate = (date) => new Date(date).toLocaleDateString();
+
+  const getNotifStyle = (type) => {
+    if (type === "accepted") return { background: "#f0fdf4", border: "1.5px solid #86efac", color: "#166534" };
+    if (type === "rejected") return { background: "#fef2f2", border: "1.5px solid #fca5a5", color: "#991b1b" };
+    if (type === "cancelled") return { background: "#fffbeb", border: "1.5px solid #fcd34d", color: "#92400e" };
+    return {};
+  };
+
+  const getNotifIcon = (type) => {
+    if (type === "accepted") return "✅";
+    if (type === "rejected") return "❌";
+    if (type === "cancelled") return "⚠️";
+    return "ℹ️";
+  };
 
   const renderAppointments = (list, type) => {
     if (list.length === 0) {
@@ -120,7 +148,6 @@ function MyAppointments() {
 
     return list.map(app => (
       <div key={app._id} style={cardStyle}>
-
         <p><strong>{app.doctor?.name}</strong></p>
         <p>{formatDate(app.date)} • {app.slotTime}</p>
 
@@ -129,25 +156,17 @@ function MyAppointments() {
             <p style={{ color: "green" }}>✔ Confirmed</p>
             <p>{app.doctor?.email}</p>
             <p>{app.doctor?.phone}</p>
-
             {(app.doctor?.address?.street || app.doctor?.address?.area || app.doctor?.address?.city) && (
               <p style={{ marginTop: "6px", color: "#374151" }}>
                 📍 {[app.doctor?.address?.street, app.doctor?.address?.area, app.doctor?.address?.city]
-                  .filter(Boolean)
-                  .join(", ")}
+                  .filter(Boolean).join(", ")}
               </p>
             )}
-
             <div style={{
-              background: "#eff6ff",
-              border: "1.5px solid #bfdbfe",
-              borderRadius: "8px",
-              padding: "12px",
-              marginTop: "10px"
+              background: "#eff6ff", border: "1.5px solid #bfdbfe",
+              borderRadius: "8px", padding: "12px", marginTop: "10px"
             }}>
-              <p style={{ margin: 0, color: "#1e40af", fontWeight: "600" }}>
-                📩 Meeting Link Info
-              </p>
+              <p style={{ margin: 0, color: "#1e40af", fontWeight: "600" }}>📩 Meeting Link Info</p>
               <p style={{ margin: "6px 0 0", color: "#1d4ed8", fontSize: "14px" }}>
                 Your doctor will send you the meeting link on your registered email before the appointment time.
               </p>
@@ -155,33 +174,23 @@ function MyAppointments() {
           </>
         )}
 
-        {type === "pending" && (
-          <p style={{ color: "orange" }}>⏳ Waiting for approval</p>
-        )}
-
-        {type === "rejected" && (
-          <p style={{ color: "red" }}>✖ Rejected by doctor</p>
-        )}
+        {type === "pending" && <p style={{ color: "orange" }}>⏳ Waiting for approval</p>}
+        {type === "rejected" && <p style={{ color: "red" }}>✖ Rejected by doctor</p>}
 
         {type === "history" && (
           <>
             <p>Status: {app.status}</p>
-
             {app.rated && (
               <div style={{ marginTop: "10px" }}>
                 <p>⭐ {app.rating}</p>
                 {app.review && <p>📝 {app.review}</p>}
               </div>
             )}
-
             {app.status === "completed" && !app.rated && (
               <div style={{ marginTop: "10px" }}>
-
                 <select
                   value={rating[app._id] || ""}
-                  onChange={(e) =>
-                    setRating(prev => ({ ...prev, [app._id]: e.target.value }))
-                  }
+                  onChange={(e) => setRating(prev => ({ ...prev, [app._id]: e.target.value }))}
                 >
                   <option value="">Rate Doctor</option>
                   <option value="1">1 ⭐</option>
@@ -190,25 +199,17 @@ function MyAppointments() {
                   <option value="4">4 ⭐</option>
                   <option value="5">5 ⭐</option>
                 </select>
-
                 <textarea
                   placeholder="Write a review..."
                   style={textarea}
                   value={review[app._id] || ""}
-                  onChange={(e) =>
-                    setReview(prev => ({ ...prev, [app._id]: e.target.value }))
-                  }
+                  onChange={(e) => setReview(prev => ({ ...prev, [app._id]: e.target.value }))}
                 />
-
-                <button style={rateButton} onClick={() => submitRating(app._id)}>
-                  Submit
-                </button>
-
+                <button style={rateButton} onClick={() => submitRating(app._id)}>Submit</button>
               </div>
             )}
           </>
         )}
-
       </div>
     ));
   };
@@ -216,34 +217,57 @@ function MyAppointments() {
   return (
     <div style={{ padding: "30px", maxWidth: "900px", margin: "auto" }}>
 
+      {/* ✅ PERSISTENT NOTIFICATION MODALS — stacked, one OK button each */}
+      {notifications.map((notif) => (
+        <div key={notif.id} style={{
+          ...getNotifStyle(notif.type),
+          borderRadius: "10px",
+          padding: "20px 24px",
+          marginBottom: "16px",
+          display: "flex",
+          alignItems: "flex-start",
+          justifyContent: "space-between",
+          gap: "16px",
+          boxShadow: "0 4px 12px rgba(0,0,0,0.1)"
+        }}>
+          <div style={{ display: "flex", gap: "12px", alignItems: "flex-start" }}>
+            <span style={{ fontSize: "22px" }}>{getNotifIcon(notif.type)}</span>
+            <p style={{ margin: 0, fontWeight: "500", fontSize: "15px", lineHeight: "1.5" }}>
+              {notif.message}
+            </p>
+          </div>
+          <button
+            onClick={() => dismissNotification(notif.id)}
+            style={{
+              padding: "6px 18px",
+              background: notif.type === "accepted" ? "#16a34a" : notif.type === "rejected" ? "#dc2626" : "#d97706",
+              color: "white",
+              border: "none",
+              borderRadius: "6px",
+              cursor: "pointer",
+              fontWeight: "600",
+              whiteSpace: "nowrap",
+              flexShrink: 0
+            }}
+          >
+            OK
+          </button>
+        </div>
+      ))}
+
       <h2>My Appointments</h2>
 
       <div style={tabContainer}>
-        <button
-          style={activeTab === "accepted" ? activeTabStyle : tabStyle}
-          onClick={() => setActiveTab("accepted")}
-        >
+        <button style={activeTab === "accepted" ? activeTabStyle : tabStyle} onClick={() => setActiveTab("accepted")}>
           Accepted ({accepted.length})
         </button>
-
-        <button
-          style={activeTab === "pending" ? activeTabStyle : tabStyle}
-          onClick={() => setActiveTab("pending")}
-        >
+        <button style={activeTab === "pending" ? activeTabStyle : tabStyle} onClick={() => setActiveTab("pending")}>
           Pending ({pending.length})
         </button>
-
-        <button
-          style={activeTab === "rejected" ? activeTabStyle : tabStyle}
-          onClick={() => setActiveTab("rejected")}
-        >
+        <button style={activeTab === "rejected" ? activeTabStyle : tabStyle} onClick={() => setActiveTab("rejected")}>
           Rejected ({rejected.length})
         </button>
-
-        <button
-          style={activeTab === "history" ? activeTabStyle : tabStyle}
-          onClick={() => setActiveTab("history")}
-        >
+        <button style={activeTab === "history" ? activeTabStyle : tabStyle} onClick={() => setActiveTab("history")}>
           History ({history.length})
         </button>
       </div>
@@ -254,58 +278,16 @@ function MyAppointments() {
         {activeTab === "rejected" && renderAppointments(rejected, "rejected")}
         {activeTab === "history" && renderAppointments(history, "history")}
       </div>
-
     </div>
   );
 }
 
 /* ================= STYLES ================= */
-
-const tabContainer = {
-  display: "flex",
-  gap: "10px",
-  marginTop: "20px",
-  flexWrap: "wrap"
-};
-
-const tabStyle = {
-  padding: "8px 15px",
-  border: "1px solid #ccc",
-  borderRadius: "6px",
-  background: "white",
-  cursor: "pointer"
-};
-
-const activeTabStyle = {
-  ...tabStyle,
-  background: "#2563eb",
-  color: "white",
-  border: "none"
-};
-
-const cardStyle = {
-  background: "white",
-  padding: "15px",
-  marginTop: "10px",
-  borderRadius: "8px",
-  boxShadow: "0 2px 6px rgba(0,0,0,0.1)"
-};
-
-const textarea = {
-  display: "block",
-  marginTop: "10px",
-  width: "100%",
-  height: "60px"
-};
-
-const rateButton = {
-  marginTop: "10px",
-  padding: "8px 15px",
-  background: "#2563eb",
-  color: "white",
-  border: "none",
-  borderRadius: "5px",
-  cursor: "pointer"
-};
+const tabContainer = { display: "flex", gap: "10px", marginTop: "20px", flexWrap: "wrap" };
+const tabStyle = { padding: "8px 15px", border: "1px solid #ccc", borderRadius: "6px", background: "white", cursor: "pointer" };
+const activeTabStyle = { ...tabStyle, background: "#2563eb", color: "white", border: "none" };
+const cardStyle = { background: "white", padding: "15px", marginTop: "10px", borderRadius: "8px", boxShadow: "0 2px 6px rgba(0,0,0,0.1)" };
+const textarea = { display: "block", marginTop: "10px", width: "100%", height: "60px" };
+const rateButton = { marginTop: "10px", padding: "8px 15px", background: "#2563eb", color: "white", border: "none", borderRadius: "5px", cursor: "pointer" };
 
 export default MyAppointments;
