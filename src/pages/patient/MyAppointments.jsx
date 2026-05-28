@@ -5,7 +5,6 @@ import useBackRedirect from "../../hooks/useBackRedirect";
 function MyAppointments() {
   useBackRedirect("/patient/profile");
   const token = localStorage.getItem("patientToken");
-
   const [accepted, setAccepted] = useState([]);
   const [pending, setPending] = useState([]);
   const [rejected, setRejected] = useState([]);
