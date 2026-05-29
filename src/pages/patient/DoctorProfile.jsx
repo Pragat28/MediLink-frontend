@@ -84,7 +84,7 @@ const ReviewsSection = ({ doctorId, avgRating }) => {
   useEffect(() => {
     const fetchReviews = async () => {
       try {
-        const res = await axios.get(`${BASE_URL}/appointments/doctor/${doctorId}/reviews`);
+        const res = await axios.get(`${BASE_URL}/doctor/${doctorId}/reviews`);
         // Sort by newest first
         const sorted = (res.data || []).sort(
           (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
