@@ -602,7 +602,7 @@ const SearchDoctors = () => {
                 />
                 {doc.rating && (
                   <span className="sd-doc-rating-pill">
-                    ⭐ {doc.rating}
+                    ⭐ {Number(doc.rating).toFixed(2)}
                   </span>
                 )}
               </div>
