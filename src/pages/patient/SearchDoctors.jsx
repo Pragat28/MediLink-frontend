@@ -35,34 +35,43 @@ const STYLES = `
     font-size: 14px;
     color: var(--text);
     background: var(--page-bg);
-    min-height: 100vh;
-    padding: 24px 16px 60px;
+  }
+
+  /*
+   * THE FIX:
+   * Instead of relying on position:sticky (which breaks when a parent div
+   * is the scroll container), we make the layout itself fill the viewport
+   * and give each column its own independent overflow-y: auto.
+   * The sidebar never moves. Only the results column scrolls.
+   */
+  .sd-root {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
   }
 
   .sd-layout {
     max-width: 1100px;
+    width: 100%;
     margin: 0 auto;
     display: flex;
     gap: 20px;
-    align-items: flex-start;
+    flex: 1;
+    overflow: hidden;
+    padding: 24px 16px;
   }
 
-  /* ── KEY FIX: sidebar stays in viewport while list scrolls ── */
+  /* Sidebar: fixed height, scrolls only its own content if needed */
   .sd-sidebar {
     width: 236px;
     flex-shrink: 0;
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 14px;
-    overflow: hidden;
-    position: sticky;
-    top: 24px;
-    /* cap height to viewport so sticky actually kicks in */
-    max-height: calc(100vh - 48px);
-    /* allow sidebar itself to scroll if filters exceed viewport height */
     overflow-y: auto;
+    height: 100%;
     box-shadow: 0 2px 12px rgba(0,0,0,0.05);
-    /* keep the header always visible at the top when sidebar scrolls */
     scrollbar-width: thin;
     scrollbar-color: var(--accent-border) transparent;
   }
@@ -77,7 +86,6 @@ const STYLES = `
     align-items: center;
     gap: 9px;
     background: var(--neutral-bg);
-    /* keep header pinned inside the sidebar even when sidebar scrolls */
     position: sticky;
     top: 0;
     z-index: 1;
@@ -152,7 +160,19 @@ const STYLES = `
   }
   .sd-reset-btn:hover { background: #d9e5f3; }
 
-  .sd-results { flex: 1; min-width: 0; }
+  /* Results: fills remaining width, only this column scrolls */
+  .sd-results {
+    flex: 1;
+    min-width: 0;
+    overflow-y: auto;
+    height: 100%;
+    padding-right: 4px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--accent-border) transparent;
+  }
+  .sd-results::-webkit-scrollbar { width: 4px; }
+  .sd-results::-webkit-scrollbar-track { background: transparent; }
+  .sd-results::-webkit-scrollbar-thumb { background: var(--accent-border); border-radius: 4px; }
 
   .sd-results-header {
     background: var(--surface);
@@ -359,20 +379,38 @@ const STYLES = `
   .sd-view-btn:active { transform: scale(.97); }
   .sd-view-btn i { font-size: 13px; }
 
+  /* Mobile: revert to natural page scroll */
   @media (max-width: 720px) {
-    .sd-layout    { flex-direction: column; }
-    .sd-sidebar   {
+    .sd-root {
+      height: auto;
+      overflow: visible;
+    }
+    .sd-layout {
+      flex-direction: column;
+      overflow: visible;
+      height: auto;
+      padding: 14px 10px 50px;
+    }
+    .sd-sidebar {
       width: 100%;
-      position: static;
-      max-height: none;
+      height: auto;
       overflow-y: visible;
     }
+    .sd-results {
+      height: auto;
+      overflow-y: visible;
+      padding-right: 0;
+    }
     .sd-doc-card  { flex-direction: column; }
-    .sd-doc-left  { flex-direction: row; padding: 14px 16px; border-right: none; border-bottom: 1px solid var(--border); justify-content: flex-start; min-width: unset; }
+    .sd-doc-left  {
+      flex-direction: row;
+      padding: 14px 16px;
+      border-right: none;
+      border-bottom: 1px solid var(--border);
+      justify-content: flex-start;
+      min-width: unset;
+    }
     .sd-doc-avatar { width: 52px; height: 52px; }
-  }
-  @media (max-width: 480px) {
-    .sd-root { padding: 14px 10px 50px; }
   }
 `;
 
@@ -488,7 +526,7 @@ const SearchDoctors = () => {
 
       <div className="sd-layout">
 
-        {/* ── Sidebar ── */}
+        {/* ── Sidebar — stays fixed, never scrolls with the page ── */}
         <aside className="sd-sidebar">
           <div className="sd-sidebar-header">
             <div className="sd-sidebar-header-icon">
@@ -574,7 +612,7 @@ const SearchDoctors = () => {
           </div>
         </aside>
 
-        {/* ── Results ── */}
+        {/* ── Results — only this column scrolls ── */}
         <div className="sd-results">
 
           <div className="sd-results-header">
