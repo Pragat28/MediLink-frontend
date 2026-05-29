@@ -12,30 +12,19 @@ const dayLabels = {
   thursday: "Thu", friday: "Fri", saturday: "Sat", sunday: "Sun",
 };
 
-/* ─── Generic doctor SVG avatar (no external image needed) ─── */
-const DoctorAvatar = ({ size = 56 }) => (
-  <svg width={size} height={size} viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg"
-    style={{ borderRadius: "50%", flexShrink: 0 }}>
-    <circle cx="28" cy="28" r="28" fill="rgba(255,255,255,0.18)" />
-    {/* Body / coat */}
-    <path d="M10 52 C10 38 18 34 28 34 C38 34 46 38 46 52" fill="rgba(255,255,255,0.85)" />
-    {/* Stethoscope on coat */}
-    <path d="M24 36 C24 36 22 40 22 43 C22 45.2 23.8 47 26 47 C28.2 47 30 45.2 30 43"
-      stroke="rgba(45,90,78,0.7)" strokeWidth="1.8" fill="none" strokeLinecap="round" />
-    <circle cx="30" cy="43" r="2" fill="rgba(45,90,78,0.7)" />
-    {/* Head */}
-    <circle cx="28" cy="20" r="10" fill="rgba(255,255,255,0.85)" />
-    {/* Face details */}
-    <circle cx="25" cy="19" r="1.2" fill="rgba(45,90,78,0.5)" />
-    <circle cx="31" cy="19" r="1.2" fill="rgba(45,90,78,0.5)" />
-    <path d="M25 23.5 Q28 25.5 31 23.5" stroke="rgba(45,90,78,0.5)" strokeWidth="1.2" fill="none" strokeLinecap="round" />
-    {/* Cross on coat pocket */}
-    <rect x="26.5" y="37" width="3" height="0.8" rx="0.4" fill="rgba(45,90,78,0.6)" />
-    <rect x="27.6" y="35.9" width="0.8" height="3" rx="0.4" fill="rgba(45,90,78,0.6)" />
-  </svg>
-);
+// ✅ CHANGED — same as SearchDoctors.jsx
+const PLACEHOLDER = "https://cdn-icons-png.flaticon.com/512/3135/3135715.png";
 
-/* ─── Global styles injected once ─── */
+const getPhoto = (doctor) => {
+  const photo = doctor?.photo;
+  if (photo && photo.trim() !== "") {
+    return photo.startsWith("http")
+      ? photo
+      : `https://medilink-j44r.onrender.com${photo}`;
+  }
+  return PLACEHOLDER;
+};
+
 const STYLES = `
   @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display&display=swap');
 
@@ -70,7 +59,6 @@ const STYLES = `
     overflow: hidden;
   }
 
-  /* Header */
   .dp-header {
     background: var(--accent);
     padding: 32px 40px;
@@ -91,10 +79,8 @@ const STYLES = `
     font-size: 13px;
   }
 
-  /* Body */
   .dp-body { padding: 36px 40px; }
 
-  /* Alert */
   .dp-alert {
     display: flex; align-items: flex-start; gap: 12px;
     background: #fef9ec;
@@ -116,7 +102,6 @@ const STYLES = `
     line-height: 1;
   }
 
-  /* Section */
   .dp-section { margin-bottom: 36px; }
   .dp-section-title {
     font-family: 'DM Serif Display', serif;
@@ -131,7 +116,6 @@ const STYLES = `
     gap: 8px;
   }
 
-  /* Field grid */
   .dp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
   .dp-field { display: flex; flex-direction: column; gap: 5px; }
   .dp-field label {
@@ -164,7 +148,6 @@ const STYLES = `
   }
   .dp-field textarea { resize: vertical; min-height: 110px; }
 
-  /* Day availability */
   .dp-day-row {
     display: grid;
     grid-template-columns: 90px 1fr;
@@ -196,7 +179,6 @@ const STYLES = `
 
   .dp-slots-col { display: flex; flex-direction: column; gap: 10px; }
 
-  /* Single slot row */
   .dp-slot-row {
     display: flex;
     flex-direction: row;
@@ -236,7 +218,6 @@ const STYLES = `
   .dp-slot-row .slot-field input:focus,
   .dp-slot-row .slot-field select:focus { border-color: var(--accent); }
 
-  /* Buttons */
   .dp-btn {
     display: inline-flex; align-items: center; gap: 6px;
     padding: 8px 14px;
@@ -261,9 +242,7 @@ const STYLES = `
     border: 1.5px solid var(--accent);
   }
   .dp-btn-sm { padding: 6px 10px; font-size: 12px; }
-  .dp-btn-icon { padding: 6px 8px; }
 
-  /* Override card — improved layout */
   .dp-override-card {
     border: 1.5px solid var(--border);
     border-radius: var(--radius);
@@ -338,24 +317,6 @@ const STYLES = `
     margin-bottom: 10px;
   }
 
-  /* Locked first slot indicator */
-  .dp-slot-locked-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    font-size: 10px;
-    font-weight: 600;
-    letter-spacing: .04em;
-    text-transform: uppercase;
-    color: var(--accent);
-    background: var(--accent-lt);
-    border-radius: 5px;
-    padding: 3px 8px;
-    margin-top: 18px;
-    flex-shrink: 0;
-  }
-
-  /* Save bar */
   .dp-save-bar {
     position: sticky; bottom: 0;
     background: rgba(255,255,255,0.9);
@@ -366,7 +327,6 @@ const STYLES = `
     gap: 12px;
   }
 
-  /* Responsive */
   @media (max-width: 640px) {
     .dp-body { padding: 20px; }
     .dp-header { padding: 22px 20px; }
@@ -377,7 +337,6 @@ const STYLES = `
   }
 `;
 
-/* ─── Tiny sub-components ─── */
 const Field = ({ label, children }) => (
   <div className="dp-field">
     {label && <label>{label}</label>}
@@ -398,7 +357,6 @@ const Profile = () => {
   const [fetchError, setFetchError] = useState(null);
   const [showPopup, setShowPopup] = useState(false);
 
-  /* Inject CSS once */
   useEffect(() => {
     const id = "dp-styles";
     if (!document.getElementById(id)) {
@@ -441,7 +399,6 @@ const Profile = () => {
   const handleAddressChange = (field, value) =>
     setDoctor({ ...doctor, address: { ...doctor.address, [field]: value } });
 
-  /* Weekly slots */
   const handleSlotChange = (day, index, field, value) => {
     const updated = { ...doctor.availability.weekly };
     updated[day][index][field] = value;
@@ -459,10 +416,8 @@ const Profile = () => {
     setDoctor({ ...doctor, availability: { ...doctor.availability, weekly: updated } });
   };
 
-  /* Overrides */
   const addSpecialAvailability = () => {
     const ranges = [...(doctor.availability.overrides || [])];
-    // Always start with one non-removable slot
     ranges.push({ from: "", to: "", slots: [{ start: "", end: "", maxPatients: 1, mode: "online" }] });
     setDoctor({ ...doctor, availability: { ...doctor.availability, overrides: ranges } });
   };
@@ -551,7 +506,7 @@ const Profile = () => {
 
   if (fetchError) return (
     <div className="dp-root">
-      <div style={{ maxWidth: 980, margin: "0 auto", padding: "30px", color: "#c0392b", fontWeight: 500, display: "flex", gap: 8 }}>
+      <div style={{ maxWidth: 980, margin: "0 auto", padding: "30px", color: "#c0392b", fontWeight: 500 }}>
         ⚠️ {fetchError}
       </div>
     </div>
@@ -570,9 +525,14 @@ const Profile = () => {
     <div className="dp-root">
       <div className="dp-card">
 
-        {/* Header */}
+        {/* ✅ CHANGED — real photo in header */}
         <div className="dp-header">
-          <DoctorAvatar size={56} />
+          <img
+            src={getPhoto(doctor)}
+            alt="Doctor"
+            style={{ width: 56, height: 56, borderRadius: "50%", objectFit: "cover", flexShrink: 0, border: "2px solid rgba(255,255,255,0.3)" }}
+            onError={(e) => { e.target.src = PLACEHOLDER; }}
+          />
           <div>
             <h1>Doctor Profile</h1>
             <p>Manage your information and availability</p>
@@ -581,7 +541,6 @@ const Profile = () => {
 
         <div className="dp-body">
 
-          {/* Alert */}
           {showPopup && (
             <div className="dp-alert">
               <span>⚠️</span>
@@ -593,7 +552,6 @@ const Profile = () => {
             </div>
           )}
 
-          {/* Basic Information */}
           <div className="dp-section">
             <SectionTitle>Basic Information</SectionTitle>
             <div className="dp-grid">
@@ -620,7 +578,6 @@ const Profile = () => {
             </div>
           </div>
 
-          {/* About */}
           <div className="dp-section">
             <SectionTitle>About</SectionTitle>
             <Field label="Short bio visible to patients">
@@ -633,7 +590,6 @@ const Profile = () => {
             </Field>
           </div>
 
-          {/* Clinic Address */}
           <div className="dp-section">
             <SectionTitle>Clinic Address</SectionTitle>
             <div className="dp-grid">
@@ -654,51 +610,36 @@ const Profile = () => {
             </div>
           </div>
 
-          {/* Weekly Availability */}
           <div className="dp-section">
             <SectionTitle>Weekly Availability</SectionTitle>
-
             {daysOfWeek.map(day => (
               <div className="dp-day-row" key={day}>
                 <div className="dp-day-label">
                   <span className="day-full">{day}</span>
                   <span className="day-short">{dayLabels[day]}</span>
                 </div>
-
                 <div className="dp-slots-col">
                   {(doctor.availability.weekly?.[day] || []).map((slot, index) => (
                     <div className="dp-slot-row" key={index}>
                       <div className="slot-field">
                         <label>Start</label>
-                        <input
-                          type="time"
-                          value={slot.start}
-                          onChange={(e) => handleSlotChange(day, index, "start", e.target.value)}
-                        />
+                        <input type="time" value={slot.start}
+                          onChange={(e) => handleSlotChange(day, index, "start", e.target.value)} />
                       </div>
                       <div className="slot-field">
                         <label>End</label>
-                        <input
-                          type="time"
-                          value={slot.end}
-                          onChange={(e) => handleSlotChange(day, index, "end", e.target.value)}
-                        />
+                        <input type="time" value={slot.end}
+                          onChange={(e) => handleSlotChange(day, index, "end", e.target.value)} />
                       </div>
                       <div className="slot-field">
                         <label>Max Patients</label>
-                        <input
-                          type="number"
-                          min="1"
-                          value={slot.maxPatients || 1}
-                          onChange={(e) => handleSlotChange(day, index, "maxPatients", e.target.value)}
-                        />
+                        <input type="number" min="1" value={slot.maxPatients || 1}
+                          onChange={(e) => handleSlotChange(day, index, "maxPatients", e.target.value)} />
                       </div>
                       <div className="slot-field">
                         <label>Mode</label>
-                        <select
-                          value={slot.mode || "online"}
-                          onChange={(e) => handleSlotChange(day, index, "mode", e.target.value)}
-                        >
+                        <select value={slot.mode || "online"}
+                          onChange={(e) => handleSlotChange(day, index, "mode", e.target.value)}>
                           <option value="online">Online</option>
                           <option value="offline">Offline</option>
                         </select>
@@ -707,13 +648,11 @@ const Profile = () => {
                         className="dp-btn dp-btn-danger dp-btn-sm"
                         style={{ marginTop: 18, flexShrink: 0 }}
                         onClick={() => removeSlot(day, index)}
-                        title="Remove slot"
                       >
                         ✕ Remove
                       </button>
                     </div>
                   ))}
-
                   <div>
                     <button className="dp-btn dp-btn-ghost dp-btn-sm" onClick={() => addSlot(day)}>
                       + Add Slot
@@ -724,48 +663,36 @@ const Profile = () => {
             ))}
           </div>
 
-          {/* Special / Override Availability */}
           <div className="dp-section">
             <SectionTitle>Special Availability</SectionTitle>
             <p style={{ color: "#787167", marginTop: -8, marginBottom: 16, fontSize: 13 }}>
-              Use this to set different hours for specific dates — e.g. holidays, conferences, or temporary schedule changes. This overrides your regular weekly schedule for the chosen date range.
+              Use this to set different hours for specific dates — e.g. holidays, conferences, or temporary schedule changes.
             </p>
 
             {(doctor.availability.overrides || []).map((range, rIndex) => (
               <div className="dp-override-card" key={rIndex}>
 
-                {/* Date range row + delete button */}
                 <div className="dp-override-meta">
                   <div className="dp-override-dates">
                     <div className="date-field">
                       <label>Start Date</label>
-                      <input
-                        type="date"
+                      <input type="date"
                         value={range.from ? range.from.substring(0, 10) : ""}
-                        onChange={(e) => handleRangeChange(rIndex, "from", e.target.value)}
-                      />
+                        onChange={(e) => handleRangeChange(rIndex, "from", e.target.value)} />
                     </div>
                     <span className="arrow">→</span>
                     <div className="date-field">
                       <label>End Date</label>
-                      <input
-                        type="date"
+                      <input type="date"
                         value={range.to ? range.to.substring(0, 10) : ""}
-                        onChange={(e) => handleRangeChange(rIndex, "to", e.target.value)}
-                      />
+                        onChange={(e) => handleRangeChange(rIndex, "to", e.target.value)} />
                     </div>
                   </div>
-
-                  <button
-                    className="dp-delete-range-btn"
-                    onClick={() => removeRange(rIndex)}
-                    title="Delete this special availability period"
-                  >
+                  <button className="dp-delete-range-btn" onClick={() => removeRange(rIndex)}>
                     🗑 Delete This Period
                   </button>
                 </div>
 
-                {/* Slots */}
                 <div className="dp-override-slots-label">Time Slots for This Period</div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                   {(range.slots || []).map((slot, sIndex) => (
@@ -793,31 +720,20 @@ const Profile = () => {
                           <option value="offline">Offline</option>
                         </select>
                       </div>
-
-                      {/* First slot is locked — cannot be removed */}
-                      {sIndex === 0 ? (
-                        <span className="dp-slot-locked-badge" title="At least one slot is required">
-                          🔒 Required
-                        </span>
-                      ) : (
-                        <button
-                          className="dp-btn dp-btn-danger dp-btn-sm"
-                          style={{ marginTop: 18, flexShrink: 0 }}
-                          onClick={() => removeRangeSlot(rIndex, sIndex)}
-                          title="Remove this slot"
-                        >
-                          ✕ Remove
-                        </button>
-                      )}
+                      {/* ✅ CHANGED — removed 🔒 Required badge, all slots can be removed */}
+                      <button
+                        className="dp-btn dp-btn-danger dp-btn-sm"
+                        style={{ marginTop: 18, flexShrink: 0 }}
+                        onClick={() => removeRangeSlot(rIndex, sIndex)}
+                      >
+                        ✕ Remove
+                      </button>
                     </div>
                   ))}
                 </div>
 
-                <button
-                  className="dp-btn dp-btn-ghost dp-btn-sm"
-                  style={{ marginTop: 12 }}
-                  onClick={() => addRangeSlot(rIndex)}
-                >
+                <button className="dp-btn dp-btn-ghost dp-btn-sm" style={{ marginTop: 12 }}
+                  onClick={() => addRangeSlot(rIndex)}>
                   + Add Another Slot
                 </button>
               </div>
@@ -830,7 +746,6 @@ const Profile = () => {
 
         </div>
 
-        {/* Sticky save bar */}
         <div className="dp-save-bar">
           <span style={{ color: "#787167", fontSize: 13, marginRight: "auto" }}>
             All changes are saved to your profile immediately.
