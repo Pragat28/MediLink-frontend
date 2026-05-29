@@ -8,13 +8,17 @@ const STYLES = `
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+  html, body {
+    overflow-y: auto !important;
+    height: auto !important;
+  }
+
   .pl-login-root {
     min-height: 100vh;
     font-family: 'Inter', sans-serif;
     background: #0a0f1e;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
   }
 
   /* ── Orbs ── */
@@ -23,7 +27,7 @@ const STYLES = `
     inset: 0;
     pointer-events: none;
     z-index: 0;
-    overflow: hidden;
+    
   }
   .pl-login-orb {
     position: absolute;
