@@ -249,6 +249,23 @@ const STYLES = `
   }
   .pp-notice i { font-size: 15px; flex-shrink: 0; margin-top: 1px; }
 
+  /* ── Phone row ── */
+  .pp-phone-row {
+    display: flex;
+    gap: 8px;
+  }
+  .pp-phone-prefix {
+    padding: 8px 11px;
+    border: 1px solid var(--border-md);
+    border-radius: 7px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    color: var(--muted);
+    background: var(--disabled-bg);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
   /* ── Save bar ── */
   .pp-save-bar {
     display: flex;
@@ -303,12 +320,39 @@ const STYLES = `
   }
 `;
 
-/* ─── Validation ──────────────────────────────────────── */
-const validate = (profile) => {
+/* ─── Known country codes (must match PatientRegister options) ── */
+const KNOWN_CODES = ["+91", "+1", "+44", "+61"];
+
+/* digit length expected per country code */
+const PHONE_LENGTHS = {
+  "+91": 10,
+  "+1":  10,
+  "+44": 10,
+  "+61": 9,
+};
+
+/* ─── Strip country code from stored number ───────────────────── */
+const stripCountryCode = (raw = "") => {
+  const matched = KNOWN_CODES.find(code => raw.startsWith(code));
+  return {
+    code: matched || "+91",
+    number: matched ? raw.slice(matched.length) : raw,
+  };
+};
+
+/* ─── Validation ──────────────────────────────────────────────── */
+const validate = (profile, detectedCountryCode) => {
   const errors = {};
   if (!profile.name?.trim()) errors.name = "Name is required.";
-  if (profile.contactNumber && !/^\d{10}$/.test(profile.contactNumber))
-    errors.contactNumber = "Enter a valid 10-digit number.";
+
+  if (profile.contactNumber) {
+    const expectedLength = PHONE_LENGTHS[detectedCountryCode] || 10;
+    const regex = new RegExp(`^\\d{${expectedLength}}$`);
+    if (!regex.test(profile.contactNumber)) {
+      errors.contactNumber = `Enter a valid ${expectedLength}-digit number.`;
+    }
+  }
+
   if (profile.age && (isNaN(profile.age) || profile.age < 1 || profile.age > 120))
     errors.age = "Enter a valid age (1–120).";
   if (profile.height && (isNaN(profile.height) || profile.height < 50 || profile.height > 300))
@@ -347,11 +391,12 @@ function PatientProfile() {
     isPregnant: false, pregnancyMonths: "", numberOfKids: "", lastPregnancyYear: ""
   };
 
-  const [profile, setProfile]   = useState(emptyProfile);
-  const [errors, setErrors]     = useState({});
-  const [loading, setLoading]   = useState(true);
-  const [fetchErr, setFetchErr] = useState(null);
-  const [saving, setSaving]     = useState(false);
+  const [profile, setProfile]               = useState(emptyProfile);
+  const [detectedCountryCode, setDetectedCountryCode] = useState("+91");
+  const [errors, setErrors]                 = useState({});
+  const [loading, setLoading]               = useState(true);
+  const [fetchErr, setFetchErr]             = useState(null);
+  const [saving, setSaving]                 = useState(false);
 
   /* ── inject styles ── */
   useEffect(() => {
@@ -373,8 +418,14 @@ function PatientProfile() {
       const res = await axios.get(`${BASE_URL}/patient/profile`, {
         headers: { Authorization: `Bearer ${token}` }
       });
+
+      /* ── Strip country code on load ── */
+      const { code, number } = stripCountryCode(res.data.contactNumber || "");
+      setDetectedCountryCode(code);
+
       setProfile({
         ...res.data,
+        contactNumber: number,
         birthDate: res.data.birthDate ? res.data.birthDate.split("T")[0] : "",
         pastSurgeriesMedicalComplications: res.data.pastSurgeriesMedicalComplications?.join(", ") || "",
         chronicDiseases: res.data.chronicDiseases?.join(", ") || "",
@@ -407,7 +458,7 @@ function PatientProfile() {
   };
 
   const saveProfile = async () => {
-    const validationErrors = validate(profile);
+    const validationErrors = validate(profile, detectedCountryCode);
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       toast.error("Please fix the highlighted errors before saving.");
@@ -417,6 +468,10 @@ function PatientProfile() {
     try {
       const dataToSend = {
         ...profile,
+        /* ── Re-attach country code on save ── */
+        contactNumber: profile.contactNumber
+          ? `${detectedCountryCode}${profile.contactNumber}`
+          : "",
         pastSurgeriesMedicalComplications:
           profile.pastSurgeriesMedicalComplications
             ? profile.pastSurgeriesMedicalComplications.split(",").map(s => s.trim()).filter(Boolean)
@@ -487,6 +542,14 @@ function PatientProfile() {
 
   const isFemale = profile.gender === "female";
 
+  /* Label shown next to the phone input e.g. "+91 (India)" */
+  const countryCodeLabels = {
+    "+91": "+91 (India)",
+    "+1":  "+1 (USA)",
+    "+44": "+44 (UK)",
+    "+61": "+61 (Australia)",
+  };
+
   return (
     <div className="pp-root">
       <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css" />
@@ -523,9 +586,24 @@ function PatientProfile() {
 
               <div className="pp-field">
                 <label className="pp-label">Contact Number</label>
-                <input className={`pp-input${errors.contactNumber ? " error" : ""}`}
-                  name="contactNumber" value={profile.contactNumber || ""} onChange={handleChange}
-                  placeholder="10-digit mobile number" maxLength={10} />
+                <div className="pp-phone-row">
+                  {/* Show the detected country code as a read-only badge */}
+                  <span className="pp-phone-prefix">
+                    {countryCodeLabels[detectedCountryCode] || detectedCountryCode}
+                  </span>
+                  <input
+                    className={`pp-input${errors.contactNumber ? " error" : ""}`}
+                    name="contactNumber"
+                    value={profile.contactNumber || ""}
+                    onChange={(e) => {
+                      const digits = e.target.value.replace(/\D/g, "");
+                      setProfile(prev => ({ ...prev, contactNumber: digits }));
+                      if (errors.contactNumber) setErrors(prev => ({ ...prev, contactNumber: undefined }));
+                    }}
+                    placeholder={`${PHONE_LENGTHS[detectedCountryCode] || 10}-digit number`}
+                    maxLength={PHONE_LENGTHS[detectedCountryCode] || 10}
+                  />
+                </div>
                 <FieldError msg={errors.contactNumber} />
               </div>
 
