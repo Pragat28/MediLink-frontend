@@ -3,6 +3,8 @@ import axios from "axios";
 import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 
+const PLACEHOLDER = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='76' height='76'%3E%3Crect width='76' height='76' fill='%23d9e5f3'/%3E%3Ccircle cx='38' cy='30' r='13' fill='%236a94bc'/%3E%3Cellipse cx='38' cy='65' rx='20' ry='15' fill='%236a94bc'/%3E%3C/svg%3E";
+
 const BASE_URL = "https://medilink-j44r.onrender.com/api";
 const STYLES = `
   @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display&display=swap');
@@ -776,7 +778,7 @@ const DoctorProfile = () => {
         <div className="dp-hero">
           <div className="dp-hero-top">
             <div className="dp-hero-left">
-              <img src={doctor.photo || "https://via.placeholder.com/90"} alt={doctor.name} className="dp-avatar-img" />
+              <img src={doctor.photo || PLACEHOLDER} alt={doctor.name} className="dp-avatar-img" />
               <span className="dp-availability-badge">Available</span>
             </div>
             <div className="dp-hero-main">
