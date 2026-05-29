@@ -7,162 +7,289 @@ const BASE_URL = "https://medilink-j44r.onrender.com/api";
 
 /* ─── Injected Styles ─────────────────────────────────── */
 const STYLES = `
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display&display=swap');
   *, *::before, *::after { box-sizing: border-box; }
 
   .dp-root {
-    --accent:      #1d4ed8;
-    --accent-light:#1e40af;
-    --accent-bg:   #eff6ff;
-    --accent-border: rgba(29,78,216,0.18);
-    --danger:      #b91c1c;
-    --danger-bg:   #fef2f2;
-    --warn:        #92400e;
-    --warn-bg:     #fffbeb;
-    --info:        #0369a1;
-    --info-bg:     #f0f9ff;
-    --success:     #166534;
-    --success-bg:  #f0fdf4;
-    --neutral-bg:  #f8f9fb;
-    --border:      rgba(0,0,0,0.08);
-    --border-md:   rgba(0,0,0,0.13);
-    --text:        #111;
-    --muted:       #6b7280;
-    --surface:     #fff;
-    --page-bg:     #f0f4fa;
-    font-family: 'Inter', sans-serif;
+    --accent:        #3b6b9e;
+    --accent-light:  #4d7daf;
+    --accent-bg:     #eef3f9;
+    --accent-border: rgba(59,107,158,0.18);
+    --accent-muted:  #6a94bc;
+    --danger:        #a33030;
+    --danger-bg:     #fdf1f1;
+    --warn:          #7a4f1d;
+    --warn-bg:       #fdf8f0;
+    --info:          #2b6098;
+    --info-bg:       #eef4fb;
+    --success:       #1a6640;
+    --success-bg:    #eef8f2;
+    --neutral-bg:    #f4f6f9;
+    --border:        rgba(0,0,0,0.07);
+    --border-md:     rgba(0,0,0,0.11);
+    --text:          #1a1f2e;
+    --text-sec:      #3d4a5c;
+    --muted:         #697586;
+    --surface:       #fff;
+    --page-bg:       #edf0f5;
+    font-family: 'DM Sans', sans-serif;
     font-size: 14px;
     color: var(--text);
     background: var(--page-bg);
     min-height: 100vh;
-    padding: 32px 16px 80px;
+    padding: 24px 16px 60px;
   }
 
   .dp-card {
-    max-width: 960px;
+    max-width: 980px;
     margin: 0 auto;
     background: var(--surface);
     border-radius: 14px;
     border: 1px solid var(--border);
     overflow: hidden;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.06);
   }
 
   /* ── Page header ── */
   .dp-page-header {
-    padding: 22px 32px;
+    padding: 14px 28px;
     border-bottom: 1px solid var(--border);
     display: flex;
     align-items: center;
-    gap: 12px;
-    background: var(--surface);
+    gap: 10px;
+    background: var(--neutral-bg);
   }
   .dp-page-header-icon {
-    width: 36px; height: 36px;
+    width: 30px; height: 30px;
     background: var(--accent-bg);
-    border-radius: 8px;
+    border-radius: 7px;
     display: flex; align-items: center; justify-content: center;
     color: var(--accent);
-    font-size: 18px;
+    font-size: 16px;
     flex-shrink: 0;
   }
-  .dp-page-header-text h1 { font-size: 17px; font-weight: 600; margin: 0 0 2px; color: var(--text); }
-  .dp-page-header-text p  { font-size: 12.5px; color: var(--muted); margin: 0; }
+  .dp-page-header-text h1 { font-size: 15px; font-weight: 600; margin: 0; color: var(--text); }
+  .dp-page-header-text p  { font-size: 12px; color: var(--muted); margin: 0; }
 
   /* ── Doctor hero ── */
   .dp-hero {
-    display: flex;
-    gap: 20px;
-    padding: 24px 32px;
+    padding: 0;
     border-bottom: 1px solid var(--border);
-    align-items: flex-start;
-    flex-wrap: wrap;
+    background: linear-gradient(135deg, #f0f4f9 0%, #e8eef5 100%);
   }
-  .dp-avatar-wrap { position: relative; flex-shrink: 0; }
-  .dp-avatar-img  {
-    width: 100px; height: 100px;
+
+  .dp-hero-top {
+    display: flex;
+    gap: 0;
+    align-items: stretch;
+  }
+
+  .dp-hero-left {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 20px;
+    background: rgba(59,107,158,0.07);
+    border-right: 1px solid var(--border);
+    min-width: 150px;
+    gap: 10px;
+  }
+
+  .dp-avatar-img {
+    width: 90px; height: 90px;
     border-radius: 50%;
     object-fit: cover;
-    border: 3px solid var(--accent-bg);
+    border: 3px solid var(--surface);
+    box-shadow: 0 2px 10px rgba(59,107,158,0.2);
   }
-  .dp-doctor-info { flex: 1; min-width: 200px; }
-  .dp-doctor-name  { font-size: 20px; font-weight: 600; margin: 0 0 2px; color: var(--text); }
-  .dp-doctor-spec  { font-size: 13.5px; color: var(--accent); font-weight: 500; margin: 0 0 10px; }
-  .dp-pill-row     { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
-  .dp-pill {
-    display: inline-flex; align-items: center; gap: 5px;
-    font-size: 12.5px; padding: 4px 10px; border-radius: 20px;
-    background: var(--neutral-bg);
-    border: 1px solid var(--border);
-    color: var(--muted);
+
+  .dp-availability-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--success);
+    background: var(--success-bg);
+    border: 1px solid rgba(26,102,64,0.15);
+    padding: 3px 10px;
+    border-radius: 20px;
   }
-  .dp-pill strong { color: var(--text); font-weight: 500; }
-  .dp-pill i { font-size: 13px; }
-  .dp-pill-accent {
-    background: var(--accent-bg);
-    border-color: var(--accent-border);
+  .dp-availability-badge::before {
+    content: '';
+    width: 6px; height: 6px;
+    background: #22c55e;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .dp-hero-main {
+    flex: 1;
+    padding: 20px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .dp-hero-name-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .dp-doctor-name {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    font-weight: 400;
+    margin: 0;
+    color: var(--text);
+    line-height: 1.2;
+  }
+
+  .dp-doctor-spec {
+    font-size: 13px;
     color: var(--accent);
+    font-weight: 600;
+    margin: 2px 0 0;
+    letter-spacing: .01em;
+    text-transform: uppercase;
   }
-  .dp-pill-accent strong { color: var(--accent); }
+
+  .dp-fee-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 14px;
+    background: var(--accent);
+    color: #fff;
+    border-radius: 8px;
+    font-size: 13.5px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .dp-fee-badge small {
+    font-size: 10px;
+    font-weight: 400;
+    opacity: .8;
+  }
+
+  /* ── Stats strip ── */
+  .dp-stats-strip {
+    display: flex;
+    gap: 0;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    overflow: hidden;
+    background: var(--surface);
+  }
+  .dp-stat {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px 8px;
+    border-right: 1px solid var(--border);
+    gap: 1px;
+  }
+  .dp-stat:last-child { border-right: none; }
+  .dp-stat-value {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1;
+  }
+  .dp-stat-label {
+    font-size: 10.5px;
+    color: var(--muted);
+    text-align: center;
+    margin-top: 1px;
+  }
+  .dp-stat-icon {
+    font-size: 14px;
+    color: var(--accent-muted);
+    margin-bottom: 2px;
+  }
+
+  /* ── Info grid ── */
+  .dp-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px 16px;
+  }
+  .dp-info-item {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 12.5px;
+    color: var(--text-sec);
+  }
+  .dp-info-item i {
+    font-size: 14px;
+    color: var(--accent-muted);
+    flex-shrink: 0;
+    width: 16px;
+  }
+  .dp-info-item strong {
+    color: var(--text);
+    font-weight: 600;
+  }
+
+  /* ── About strip ── */
+  .dp-about-strip {
+    padding: 14px 24px;
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+  .dp-about-strip p { margin: 0; }
 
   /* ── Section layout ── */
   .dp-body { padding: 0; }
   .dp-two-col {
     display: grid;
-    grid-template-columns: 1fr 320px;
+    grid-template-columns: 1fr 300px;
     gap: 0;
     border-bottom: 1px solid var(--border);
   }
   @media (max-width: 720px) {
     .dp-two-col { grid-template-columns: 1fr; }
     .dp-avail-col { border-left: none !important; border-top: 1px solid var(--border); }
-  }
-
-  /* ── About ── */
-  .dp-about {
-    padding: 20px 32px;
-  }
-  .dp-section-label {
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: .06em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin: 0 0 10px;
-  }
-  .dp-about-text {
-    font-size: 13.5px;
-    line-height: 1.7;
-    color: var(--muted);
-    margin: 0;
+    .dp-info-grid { grid-template-columns: 1fr; }
+    .dp-hero-top { flex-direction: column; }
+    .dp-hero-left { flex-direction: row; padding: 16px; border-right: none; border-bottom: 1px solid var(--border); justify-content: flex-start; }
   }
 
   /* ── Availability column ── */
   .dp-avail-col {
     border-left: 1px solid var(--border);
-    padding: 20px 22px;
+    padding: 16px 18px;
     background: var(--neutral-bg);
   }
-  .dp-day-row { margin-bottom: 14px; }
-  .dp-day-name { font-size: 12.5px; font-weight: 600; color: var(--text); margin: 0 0 2px; }
-  .dp-day-date { font-size: 11.5px; color: var(--muted); margin: 0 0 5px; }
+  .dp-day-row { margin-bottom: 12px; }
+  .dp-day-name { font-size: 12px; font-weight: 700; color: var(--text); margin: 0 0 1px; text-transform: uppercase; letter-spacing: .03em; }
+  .dp-day-date { font-size: 11px; color: var(--muted); margin: 0 0 4px; }
   .dp-slot-tag {
     display: inline-block;
     background: var(--accent-bg);
     color: var(--accent);
     border: 1px solid var(--accent-border);
-    padding: 3px 8px;
-    border-radius: 6px;
-    font-size: 12px;
+    padding: 2px 7px;
+    border-radius: 5px;
+    font-size: 11.5px;
     font-weight: 500;
-    margin-right: 5px;
-    margin-bottom: 4px;
+    margin-right: 4px;
+    margin-bottom: 3px;
   }
-  .dp-no-slot { font-size: 12px; color: var(--muted); font-style: italic; }
+  .dp-no-slot { font-size: 11.5px; color: var(--border-md); font-style: italic; }
 
   /* ── Booking panel ── */
   .dp-booking-panel {
-    padding: 20px 32px;
-    border-bottom: 1px solid var(--border);
+    padding: 18px 24px;
     background: var(--surface);
   }
 
@@ -170,14 +297,13 @@ const STYLES = `
   .dp-mode-toggle {
     display: inline-flex;
     border: 1.5px solid var(--accent);
-    border-radius: 8px;
+    border-radius: 7px;
     overflow: hidden;
-    margin-top: 8px;
   }
   .dp-mode-btn {
     display: inline-flex; align-items: center; gap: 5px;
-    padding: 7px 16px;
-    font-family: 'Inter', sans-serif;
+    padding: 6px 14px;
+    font-family: 'DM Sans', sans-serif;
     font-size: 13px;
     font-weight: 600;
     cursor: pointer;
@@ -191,20 +317,20 @@ const STYLES = `
     background: var(--accent);
     color: #fff;
   }
-  .dp-mode-btn i { font-size: 15px; }
+  .dp-mode-btn i { font-size: 14px; }
 
   /* ── Slot picker ── */
   .dp-slot-grid {
     display: flex;
     flex-wrap: wrap;
-    gap: 7px;
-    margin-top: 10px;
+    gap: 6px;
+    margin-top: 8px;
   }
   .dp-slot-btn {
     display: inline-flex; align-items: center; gap: 4px;
-    padding: 6px 12px;
-    border-radius: 7px;
-    font-family: 'Inter', sans-serif;
+    padding: 5px 11px;
+    border-radius: 6px;
+    font-family: 'DM Sans', sans-serif;
     font-size: 12.5px;
     font-weight: 500;
     cursor: pointer;
@@ -218,34 +344,34 @@ const STYLES = `
     color: #fff;
     border-color: var(--accent);
   }
-  .dp-slot-btn:hover:not(.selected) { background: #dbeafe; }
+  .dp-slot-btn:hover:not(.selected) { background: #d9e5f3; }
 
   /* ── Date input ── */
-  .dp-date-row { display: flex; align-items: center; gap: 10px; margin-top: 0; flex-wrap: wrap; }
-  .dp-date-label { font-size: 13px; font-weight: 600; color: var(--text); white-space: nowrap; }
   .dp-date-input {
-    padding: 7px 12px;
+    padding: 7px 11px;
     border: 1px solid var(--border-md);
     border-radius: 7px;
     font-size: 13px;
-    font-family: 'Inter', sans-serif;
+    font-family: 'DM Sans', sans-serif;
     color: var(--text);
     outline: none;
     transition: border-color .15s;
     background: var(--surface);
+    width: 100%;
+    max-width: 220px;
   }
   .dp-date-input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-bg); }
 
   /* ── Book button ── */
   .dp-book-btn {
     display: inline-flex; align-items: center; gap: 6px;
-    margin-top: 16px;
+    margin-top: 14px;
     padding: 10px 22px;
     border: none;
     border-radius: 8px;
     background: var(--accent);
     color: #fff;
-    font-family: 'Inter', sans-serif;
+    font-family: 'DM Sans', sans-serif;
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
@@ -253,114 +379,134 @@ const STYLES = `
   }
   .dp-book-btn:hover  { opacity: .87; }
   .dp-book-btn:active { transform: scale(.97); }
-  .dp-book-btn i { font-size: 16px; }
+  .dp-book-btn i { font-size: 15px; }
 
   /* ── No-slot notice ── */
   .dp-no-slot-notice {
     display: flex; align-items: center; gap: 8px;
-    padding: 10px 14px;
+    padding: 9px 12px;
     background: var(--warn-bg);
-    border: 1px solid rgba(146,64,14,0.15);
-    border-radius: 8px;
+    border: 1px solid rgba(122,79,29,0.13);
+    border-radius: 7px;
     color: var(--warn);
-    font-size: 13px;
-    margin-top: 10px;
+    font-size: 12.5px;
+    margin-top: 8px;
   }
-  .dp-no-slot-notice i { font-size: 15px; flex-shrink: 0; }
+  .dp-no-slot-notice i { font-size: 14px; flex-shrink: 0; }
+
+  /* ── Section label ── */
+  .dp-section-label {
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 10px;
+  }
+
+  /* ── Sub-label ── */
+  .dp-sub-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--muted);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+  }
 
   /* ── Reviews ── */
-  .dp-reviews { padding: 20px 32px 28px; }
+  .dp-reviews { padding: 18px 24px 24px; }
   .dp-rating-summary {
-    display: flex; gap: 24px; align-items: center;
-    padding: 16px 18px;
+    display: flex; gap: 20px; align-items: center;
+    padding: 14px 16px;
     background: var(--neutral-bg);
     border: 1px solid var(--border);
-    border-radius: 10px;
-    margin-bottom: 16px;
+    border-radius: 9px;
+    margin-bottom: 14px;
     flex-wrap: wrap;
   }
-  .dp-rating-big  { font-size: 38px; font-weight: 700; color: var(--text); line-height: 1; }
-  .dp-rating-sub  { font-size: 12px; color: var(--muted); margin-top: 4px; }
-  .dp-bar-row     { display: flex; align-items: center; gap: 8px; font-size: 12.5px; margin-bottom: 4px; }
-  .dp-bar-label   { width: 24px; text-align: right; color: var(--muted); }
-  .dp-bar-track   { flex: 1; height: 5px; background: var(--border); border-radius: 3px; overflow: hidden; }
-  .dp-bar-fill    { height: 100%; background: #f59e0b; border-radius: 3px; }
-  .dp-bar-count   { width: 20px; color: var(--muted); }
+  .dp-rating-big  { font-size: 34px; font-weight: 700; color: var(--text); line-height: 1; }
+  .dp-rating-sub  { font-size: 11px; color: var(--muted); margin-top: 3px; }
+  .dp-bar-row     { display: flex; align-items: center; gap: 7px; font-size: 12px; margin-bottom: 3px; }
+  .dp-bar-label   { width: 22px; text-align: right; color: var(--muted); }
+  .dp-bar-track   { flex: 1; height: 4px; background: var(--border); border-radius: 3px; overflow: hidden; }
+  .dp-bar-fill    { height: 100%; background: #e09b20; border-radius: 3px; }
+  .dp-bar-count   { width: 18px; color: var(--muted); }
 
   .dp-review-card {
-    padding: 14px 16px;
+    padding: 12px 14px;
     border: 1px solid var(--border);
-    border-radius: 10px;
-    margin-bottom: 10px;
+    border-radius: 9px;
+    margin-bottom: 8px;
     background: var(--surface);
   }
   .dp-review-top {
     display: flex; justify-content: space-between; align-items: flex-start;
-    flex-wrap: wrap; gap: 6px; margin-bottom: 8px;
+    flex-wrap: wrap; gap: 5px; margin-bottom: 7px;
   }
   .dp-reviewer-avatar {
-    width: 34px; height: 34px; border-radius: 50%;
+    width: 30px; height: 30px; border-radius: 50%;
     background: var(--accent-bg);
     color: var(--accent);
     display: flex; align-items: center; justify-content: center;
-    font-weight: 600; font-size: 13px; flex-shrink: 0;
+    font-weight: 700; font-size: 12px; flex-shrink: 0;
   }
-  .dp-reviewer-name  { font-weight: 600; font-size: 13.5px; margin: 0 0 2px; }
-  .dp-review-date    { font-size: 12px; color: var(--muted); }
-  .dp-review-text    { font-size: 13px; color: var(--muted); line-height: 1.65; margin: 0; }
-  .dp-stars          { color: #f59e0b; font-size: 13px; letter-spacing: 1px; }
+  .dp-reviewer-name  { font-weight: 600; font-size: 13px; margin: 0 0 1px; }
+  .dp-review-date    { font-size: 11.5px; color: var(--muted); }
+  .dp-review-text    { font-size: 12.5px; color: var(--muted); line-height: 1.6; margin: 0; }
+  .dp-stars          { color: #d4901a; font-size: 12px; letter-spacing: 1px; }
   .dp-stars-empty    { color: var(--border-md); }
 
   .dp-show-more-btn {
     display: inline-flex; align-items: center; gap: 5px;
-    margin-top: 6px;
-    padding: 7px 16px;
+    margin-top: 4px;
+    padding: 6px 14px;
     border: 1px solid var(--accent-border);
     background: var(--accent-bg);
     color: var(--accent);
-    border-radius: 7px;
-    font-family: 'Inter', sans-serif;
-    font-size: 13px;
+    border-radius: 6px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12.5px;
     font-weight: 500;
     cursor: pointer;
     transition: background .15s;
   }
-  .dp-show-more-btn:hover { background: #dbeafe; }
+  .dp-show-more-btn:hover { background: #d9e5f3; }
 
-  /* ── Empty / error / loading states ── */
+  /* ── States ── */
   .dp-state-box {
     display: flex; flex-direction: column; align-items: center;
-    padding: 48px 24px;
+    padding: 40px 24px;
     text-align: center;
     color: var(--muted);
   }
   .dp-state-icon {
-    width: 48px; height: 48px;
+    width: 44px; height: 44px;
     border-radius: 50%;
     background: var(--accent-bg);
     display: flex; align-items: center; justify-content: center;
     color: var(--accent);
-    font-size: 22px;
-    margin-bottom: 14px;
+    font-size: 20px;
+    margin-bottom: 12px;
   }
   .dp-state-icon.danger { background: var(--danger-bg); color: var(--danger); }
-  .dp-state-h  { font-size: 16px; font-weight: 600; color: var(--text); margin: 0 0 4px; }
-  .dp-state-p  { font-size: 13px; margin: 0 0 14px; }
+  .dp-state-h  { font-size: 15px; font-weight: 600; color: var(--text); margin: 0 0 4px; }
+  .dp-state-p  { font-size: 12.5px; margin: 0 0 12px; }
 
   .dp-retry-btn {
     display: inline-flex; align-items: center; gap: 5px;
-    padding: 7px 16px;
+    padding: 7px 15px;
     border: 1px solid var(--accent-border);
-    border-radius: 7px;
+    border-radius: 6px;
     background: var(--accent-bg);
     color: var(--accent);
-    font-family: 'Inter', sans-serif;
+    font-family: 'DM Sans', sans-serif;
     font-size: 13px;
     font-weight: 500;
     cursor: pointer;
     transition: background .15s;
   }
-  .dp-retry-btn:hover { background: #dbeafe; }
+  .dp-retry-btn:hover { background: #d9e5f3; }
 
   .dp-loading {
     display: flex; align-items: center; justify-content: center;
@@ -370,7 +516,7 @@ const STYLES = `
     gap: 10px;
   }
   .dp-spinner {
-    width: 18px; height: 18px;
+    width: 16px; height: 16px;
     border: 2px solid var(--border);
     border-top-color: var(--accent);
     border-radius: 50%;
@@ -381,8 +527,10 @@ const STYLES = `
   .dp-divider { border: none; border-top: 1px solid var(--border); margin: 0; }
 
   @media (max-width: 600px) {
-    .dp-hero, .dp-about, .dp-booking-panel, .dp-reviews { padding-left: 16px; padding-right: 16px; }
+    .dp-hero-main, .dp-booking-panel, .dp-reviews { padding-left: 16px; padding-right: 16px; }
     .dp-page-header { padding-left: 16px; padding-right: 16px; }
+    .dp-avail-col { padding: 14px 16px; }
+    .dp-about-strip { padding: 12px 16px; }
   }
 `;
 
@@ -407,7 +555,7 @@ const ReviewCard = ({ review }) => {
   return (
     <div className="dp-review-card">
       <div className="dp-review-top">
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <div className="dp-reviewer-avatar">{initial}</div>
           <div>
             <p className="dp-reviewer-name">{review.patientName || "Patient"}</p>
@@ -430,8 +578,7 @@ const ReviewsSection = ({ doctorId, avgRating }) => {
   const PREVIEW = 3;
 
   const fetchReviews = async () => {
-    setLoading(true);
-    setError(null);
+    setLoading(true); setError(null);
     try {
       const res = await axios.get(`${BASE_URL}/doctors/${doctorId}/reviews`);
       const sorted = (res.data || []).sort(
@@ -439,13 +586,11 @@ const ReviewsSection = ({ doctorId, avgRating }) => {
       );
       setReviews(sorted);
     } catch (err) {
-      if (!err.response)
-        setError("Unable to load reviews — please check your connection.");
-      else
-        setError(err.response?.data?.message || "Reviews could not be loaded.");
-    } finally {
-      setLoading(false);
-    }
+      setError(!err.response
+        ? "Unable to load reviews — please check your connection."
+        : err.response?.data?.message || "Reviews could not be loaded."
+      );
+    } finally { setLoading(false); }
   };
 
   useEffect(() => { if (doctorId) fetchReviews(); }, [doctorId]);
@@ -461,9 +606,7 @@ const ReviewsSection = ({ doctorId, avgRating }) => {
     return (
       <div key={star} className="dp-bar-row">
         <span className="dp-bar-label">{star}★</span>
-        <div className="dp-bar-track">
-          <div className="dp-bar-fill" style={{ width: `${pct}%` }} />
-        </div>
+        <div className="dp-bar-track"><div className="dp-bar-fill" style={{ width: `${pct}%` }} /></div>
         <span className="dp-bar-count">{count}</span>
       </div>
     );
@@ -471,67 +614,57 @@ const ReviewsSection = ({ doctorId, avgRating }) => {
 
   return (
     <div className="dp-reviews">
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
         <p className="dp-section-label" style={{ margin: 0 }}>Patient reviews</p>
         {avg !== null && (
           <span style={{
-            background: "#fef9c3", color: "#92400e",
+            background: "#fef7e0", color: "#8a6100",
             padding: "3px 10px", borderRadius: 20,
-            fontSize: 12.5, fontWeight: 600,
-          }}>
-            ⭐ {avg.toFixed(1)} / 5
-          </span>
+            fontSize: 12, fontWeight: 700,
+          }}>⭐ {avg.toFixed(1)} / 5</span>
         )}
       </div>
 
       {loading && (
-        <div style={{ display: "flex", alignItems: "center", gap: 8, color: "var(--muted)", fontSize: 13, padding: "16px 0" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, color: "var(--muted)", fontSize: 13, padding: "12px 0" }}>
           <div className="dp-spinner" /> Loading reviews…
         </div>
       )}
 
       {!loading && error && (
-        <div className="dp-state-box" style={{ padding: "24px 0" }}>
-          <div className="dp-state-icon danger">
-            <i className="ti ti-alert-triangle" aria-hidden="true" />
-          </div>
+        <div className="dp-state-box" style={{ padding: "20px 0" }}>
+          <div className="dp-state-icon danger"><i className="ti ti-alert-triangle" /></div>
           <p className="dp-state-h">Couldn't load reviews</p>
           <p className="dp-state-p">{error}</p>
-          <button className="dp-retry-btn" onClick={fetchReviews}>
-            <i className="ti ti-refresh" aria-hidden="true" /> Try again
-          </button>
+          <button className="dp-retry-btn" onClick={fetchReviews}><i className="ti ti-refresh" /> Try again</button>
         </div>
       )}
 
       {!loading && !error && reviews.length === 0 && (
         <div style={{
-          textAlign: "center", padding: "24px 16px",
+          textAlign: "center", padding: "20px 16px",
           background: "var(--neutral-bg)",
           border: "1px dashed var(--border-md)",
-          borderRadius: 10, color: "var(--muted)", fontSize: 13,
-        }}>
-          No reviews yet for this doctor.
-        </div>
+          borderRadius: 9, color: "var(--muted)", fontSize: 13,
+        }}>No reviews yet for this doctor.</div>
       )}
 
       {!loading && !error && reviews.length > 0 && (
         <>
           <div className="dp-rating-summary">
-            <div style={{ textAlign: "center", minWidth: 70 }}>
+            <div style={{ textAlign: "center", minWidth: 64 }}>
               <div className="dp-rating-big">{avg.toFixed(1)}</div>
               <Stars rating={avg} />
               <div className="dp-rating-sub">{reviews.length} review{reviews.length !== 1 ? "s" : ""}</div>
             </div>
-            <div style={{ flex: 1, minWidth: 140 }}>
+            <div style={{ flex: 1, minWidth: 130 }}>
               {[5, 4, 3, 2, 1].map(renderBar)}
             </div>
           </div>
-
           {displayed.map((r, i) => <ReviewCard key={r._id || i} review={r} />)}
-
           {reviews.length > PREVIEW && (
             <button className="dp-show-more-btn" onClick={() => setShowAll(p => !p)}>
-              <i className={`ti ${showAll ? "ti-chevron-up" : "ti-chevron-down"}`} aria-hidden="true" />
+              <i className={`ti ${showAll ? "ti-chevron-up" : "ti-chevron-down"}`} />
               {showAll ? "Show less" : `See all ${reviews.length} reviews`}
             </button>
           )}
@@ -557,17 +690,16 @@ const DoctorProfile = () => {
 
   /* ── inject styles ── */
   useEffect(() => {
-    const id = "dp-styles";
-    if (!document.getElementById(id)) {
+    const styleId = "dp-styles";
+    if (!document.getElementById(styleId)) {
       const tag = document.createElement("style");
-      tag.id = id; tag.textContent = STYLES;
+      tag.id = styleId; tag.textContent = STYLES;
       document.head.appendChild(tag);
     }
   }, []);
 
   const fetchDoctor = async () => {
-    setDocLoading(true);
-    setDocError(null);
+    setDocLoading(true); setDocError(null);
     try {
       const res = await axios.get(`${BASE_URL}/doctors/${id}`);
       setDoctor(res.data);
@@ -578,9 +710,7 @@ const DoctorProfile = () => {
         setDocError("Doctor profile not found. It may have been removed.");
       else
         setDocError(err.response?.data?.message || "Failed to load doctor profile.");
-    } finally {
-      setDocLoading(false);
-    }
+    } finally { setDocLoading(false); }
   };
 
   useEffect(() => { fetchDoctor(); }, [id]);
@@ -588,17 +718,15 @@ const DoctorProfile = () => {
   /* ── availability helpers ── */
   const normalizeDate = (d) => new Date(d).setHours(0, 0, 0, 0);
 
-  const getNext7Days = () => {
-    return Array.from({ length: 7 }, (_, i) => {
-      const d = new Date();
-      d.setDate(d.getDate() + i);
+  const getNext7Days = () =>
+    Array.from({ length: 7 }, (_, i) => {
+      const d = new Date(); d.setDate(d.getDate() + i);
       return {
         date: d,
         dayName: d.toLocaleDateString("en-US", { weekday: "long" }),
         key: d.toISOString().split("T")[0],
       };
     });
-  };
 
   const getSlotsForDate = (dateObj) => {
     const selected    = normalizeDate(dateObj.date);
@@ -609,27 +737,19 @@ const DoctorProfile = () => {
 
     let overrideSlots = [];
     overrides
-      .filter(o => {
-        if (!o.from || !o.to) return false;
-        return selected >= normalizeDate(o.from) && selected <= normalizeDate(o.to);
-      })
+      .filter(o => o.from && o.to && selected >= normalizeDate(o.from) && selected <= normalizeDate(o.to))
       .forEach(o => { overrideSlots = [...overrideSlots, ...(o.slots || [])]; });
 
     const seen = new Set();
     return [...weeklySlots, ...overrideSlots]
-      .filter(s => {
-        const k = `${s.start}-${s.end}`;
-        if (seen.has(k)) return false;
-        seen.add(k); return true;
-      })
+      .filter(s => { const k = `${s.start}-${s.end}`; if (seen.has(k)) return false; seen.add(k); return true; })
       .filter(s => !s.mode || s.mode === selectedMode);
   };
 
   /* ── booking ── */
   const bookAppointment = async () => {
     if (!selectedDate || !selectedTime) {
-      toast.error("Please select a date and a time slot before booking.");
-      return;
+      toast.error("Please select a date and a time slot before booking."); return;
     }
     try {
       const token = localStorage.getItem("patientToken");
@@ -653,42 +773,34 @@ const DoctorProfile = () => {
     }
   };
 
-  /* ── render: loading ── */
+  /* ── loading ── */
   if (docLoading) return (
     <div className="dp-root">
       <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css" />
-      <div className="dp-card">
-        <div className="dp-loading">
-          <div className="dp-spinner" /> Loading doctor profile…
-        </div>
-      </div>
+      <div className="dp-card"><div className="dp-loading"><div className="dp-spinner" /> Loading doctor profile…</div></div>
     </div>
   );
 
-  /* ── render: error ── */
+  /* ── error ── */
   if (docError) return (
     <div className="dp-root">
       <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css" />
       <div className="dp-card">
         <div className="dp-state-box">
-          <div className="dp-state-icon danger">
-            <i className="ti ti-alert-circle" aria-hidden="true" />
-          </div>
+          <div className="dp-state-icon danger"><i className="ti ti-alert-circle" /></div>
           <p className="dp-state-h">Something went wrong</p>
           <p className="dp-state-p">{docError}</p>
-          <button className="dp-retry-btn" onClick={fetchDoctor}>
-            <i className="ti ti-refresh" aria-hidden="true" /> Retry
-          </button>
+          <button className="dp-retry-btn" onClick={fetchDoctor}><i className="ti ti-refresh" /> Retry</button>
         </div>
       </div>
     </div>
   );
 
-  const next7Days   = getNext7Days();
-  const dateObj     = selectedDate
+  const next7Days = getNext7Days();
+  const dateObj   = selectedDate
     ? { date: new Date(selectedDate), dayName: new Date(selectedDate).toLocaleDateString("en-US", { weekday: "long" }) }
     : null;
-  const dateSlots   = dateObj ? getSlotsForDate(dateObj) : [];
+  const dateSlots = dateObj ? getSlotsForDate(dateObj) : [];
 
   return (
     <div className="dp-root">
@@ -699,51 +811,114 @@ const DoctorProfile = () => {
         {/* Page header */}
         <div className="dp-page-header">
           <div className="dp-page-header-icon">
-            <i className="ti ti-user-heart" aria-hidden="true" />
+            <i className="ti ti-user-heart" />
           </div>
           <div className="dp-page-header-text">
             <h1>Doctor Profile</h1>
-            <p>View availability, book a consultation, and read patient reviews</p>
+            <p>Book a consultation and read patient reviews</p>
           </div>
         </div>
 
-        {/* Hero */}
+        {/* ── Hero ── */}
         <div className="dp-hero">
-          <div className="dp-avatar-wrap">
-            <img
-              src={doctor.photo || "https://via.placeholder.com/100"}
-              alt={doctor.name}
-              className="dp-avatar-img"
-            />
-          </div>
-          <div className="dp-doctor-info">
-            <p className="dp-doctor-name">{doctor.name}</p>
-            <p className="dp-doctor-spec">{doctor.specialty}</p>
-            <div className="dp-pill-row">
-              <span className="dp-pill dp-pill-accent">
-                <i className="ti ti-star" aria-hidden="true" />
-                <strong>{doctor.rating || 4}</strong> rating
-              </span>
-              <span className="dp-pill dp-pill-accent">
-                <i className="ti ti-currency-rupee" aria-hidden="true" />
-                <strong>₹{doctor.consultationFee}</strong> consult fee
-              </span>
-              <span className="dp-pill">
-                <i className="ti ti-map-pin" aria-hidden="true" />
-                <strong>{doctor.address?.area}, {doctor.address?.city}</strong>
-              </span>
-              <span className="dp-pill">
-                <i className="ti ti-gender-bigender" aria-hidden="true" />
-                <strong>{doctor.gender}</strong>
-              </span>
+          <div className="dp-hero-top">
+
+            {/* Left: avatar + badge */}
+            <div className="dp-hero-left">
+              <img
+                src={doctor.photo || "https://via.placeholder.com/90"}
+                alt={doctor.name}
+                className="dp-avatar-img"
+              />
+              <span className="dp-availability-badge">Available</span>
             </div>
-            {doctor.about && (
-              <p className="dp-about-text" style={{ marginTop: 10, fontSize: 13 }}>{doctor.about}</p>
-            )}
+
+            {/* Right: all info */}
+            <div className="dp-hero-main">
+              {/* Name + fee */}
+              <div className="dp-hero-name-row">
+                <div>
+                  <p className="dp-doctor-name">{doctor.name}</p>
+                  <p className="dp-doctor-spec">{doctor.specialty}</p>
+                </div>
+                <div className="dp-fee-badge">
+                  <i className="ti ti-currency-rupee" style={{ fontSize: 14 }} />
+                  ₹{doctor.consultationFee}
+                  <small>/visit</small>
+                </div>
+              </div>
+
+              {/* Stats strip */}
+              <div className="dp-stats-strip">
+                <div className="dp-stat">
+                  <i className="ti ti-star-filled dp-stat-icon" />
+                  <span className="dp-stat-value">{doctor.rating || "4.0"}</span>
+                  <span className="dp-stat-label">Rating</span>
+                </div>
+                <div className="dp-stat">
+                  <i className="ti ti-briefcase-medical dp-stat-icon" />
+                  <span className="dp-stat-value">{doctor.experience || "—"}{doctor.experience ? "yr" : ""}</span>
+                  <span className="dp-stat-label">Experience</span>
+                </div>
+                <div className="dp-stat">
+                  <i className="ti ti-users dp-stat-icon" />
+                  <span className="dp-stat-value">{doctor.totalPatients || "—"}</span>
+                  <span className="dp-stat-label">Patients</span>
+                </div>
+                <div className="dp-stat">
+                  <i className="ti ti-certificate dp-stat-icon" />
+                  <span className="dp-stat-value" style={{ fontSize: 13 }}>{doctor.qualification || "MBBS"}</span>
+                  <span className="dp-stat-label">Qualification</span>
+                </div>
+              </div>
+
+              {/* Info grid */}
+              <div className="dp-info-grid">
+                <div className="dp-info-item">
+                  <i className="ti ti-map-pin" />
+                  <span><strong>{doctor.address?.area}</strong>{doctor.address?.city ? `, ${doctor.address.city}` : ""}</span>
+                </div>
+                <div className="dp-info-item">
+                  <i className="ti ti-gender-bigender" />
+                  <span><strong>{doctor.gender}</strong></span>
+                </div>
+                {doctor.languages?.length > 0 && (
+                  <div className="dp-info-item">
+                    <i className="ti ti-language" />
+                    <span>{doctor.languages.join(", ")}</span>
+                  </div>
+                )}
+                {doctor.hospitalName && (
+                  <div className="dp-info-item">
+                    <i className="ti ti-building-hospital" />
+                    <span>{doctor.hospitalName}</span>
+                  </div>
+                )}
+                {doctor.registrationNo && (
+                  <div className="dp-info-item">
+                    <i className="ti ti-id-badge" />
+                    <span>Reg. <strong>{doctor.registrationNo}</strong></span>
+                  </div>
+                )}
+                {doctor.phone && (
+                  <div className="dp-info-item">
+                    <i className="ti ti-phone" />
+                    <span>{doctor.phone}</span>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
+
+          {/* About — full width strip below */}
+          {doctor.about && (
+            <div className="dp-about-strip">
+              <p>{doctor.about}</p>
+            </div>
+          )}
         </div>
 
-        {/* Two-col: booking left, availability right */}
+        {/* Two-col: booking + availability */}
         <div className="dp-two-col">
 
           {/* Booking panel */}
@@ -751,52 +926,44 @@ const DoctorProfile = () => {
             <p className="dp-section-label">Book a consultation</p>
 
             {/* Mode toggle */}
-            <div style={{ marginBottom: 18 }}>
-              <p style={{ fontSize: 12, fontWeight: 600, color: "var(--muted)", marginBottom: 6, textTransform: "uppercase", letterSpacing: ".04em" }}>
-                Consultation mode
-              </p>
+            <div style={{ marginBottom: 16 }}>
+              <p className="dp-sub-label">Consultation mode</p>
               <div className="dp-mode-toggle">
                 <button
                   className={`dp-mode-btn${selectedMode === "online" ? " active" : ""}`}
                   onClick={() => { setSelectedMode("online"); setSelectedTime(""); }}
                 >
-                  <i className="ti ti-wifi" aria-hidden="true" /> Online
+                  <i className="ti ti-wifi" /> Online
                 </button>
                 <button
                   className={`dp-mode-btn${selectedMode === "offline" ? " active" : ""}`}
                   onClick={() => { setSelectedMode("offline"); setSelectedTime(""); }}
                 >
-                  <i className="ti ti-building-hospital" aria-hidden="true" /> In-clinic
+                  <i className="ti ti-building-hospital" /> In-clinic
                 </button>
               </div>
             </div>
 
             {/* Date */}
-            <div style={{ marginBottom: 18 }}>
-              <p style={{ fontSize: 12, fontWeight: 600, color: "var(--muted)", marginBottom: 6, textTransform: "uppercase", letterSpacing: ".04em" }}>
-                Select date
-              </p>
-              <div className="dp-date-row">
-                <input
-                  type="date"
-                  className="dp-date-input"
-                  min={today}
-                  value={selectedDate}
-                  onChange={(e) => { setSelectedDate(e.target.value); setSelectedTime(""); }}
-                />
-              </div>
+            <div style={{ marginBottom: 16 }}>
+              <p className="dp-sub-label">Select date</p>
+              <input
+                type="date"
+                className="dp-date-input"
+                min={today}
+                value={selectedDate}
+                onChange={(e) => { setSelectedDate(e.target.value); setSelectedTime(""); }}
+              />
             </div>
 
-            {/* Slot picker */}
+            {/* Slots */}
             {selectedDate && (
               <div style={{ marginBottom: 4 }}>
-                <p style={{ fontSize: 12, fontWeight: 600, color: "var(--muted)", marginBottom: 6, textTransform: "uppercase", letterSpacing: ".04em" }}>
-                  Select time slot
-                </p>
+                <p className="dp-sub-label">Available time slots</p>
                 {dateSlots.length === 0 ? (
                   <div className="dp-no-slot-notice">
-                    <i className="ti ti-calendar-off" aria-hidden="true" />
-                    No {selectedMode} slots available on this date. Try another date or mode.
+                    <i className="ti ti-calendar-off" />
+                    No {selectedMode} slots on this date. Try another date or mode.
                   </div>
                 ) : (
                   <div className="dp-slot-grid">
@@ -808,7 +975,7 @@ const DoctorProfile = () => {
                           className={`dp-slot-btn${selectedTime === val ? " selected" : ""}`}
                           onClick={() => setSelectedTime(val)}
                         >
-                          <i className="ti ti-clock" aria-hidden="true" />
+                          <i className="ti ti-clock" />
                           {s.start} – {s.end}
                         </button>
                       );
@@ -819,7 +986,7 @@ const DoctorProfile = () => {
             )}
 
             <button className="dp-book-btn" onClick={bookAppointment}>
-              <i className="ti ti-calendar-plus" aria-hidden="true" /> Book Appointment
+              <i className="ti ti-calendar-plus" /> Book Appointment
             </button>
           </div>
 
