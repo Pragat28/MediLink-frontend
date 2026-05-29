@@ -187,8 +187,8 @@ function MyAppointments() {
           borderRadius: "8px",
           boxShadow: "0 2px 6px rgba(0,0,0,0.05)"
         }}>
-          {type === "accepted" && <p>No confirmed appointments.<br/>Book an appointment with a doctor to get started.</p>}
-          {type === "pending" && <p>No pending requests.<br/>Your appointment requests will appear here.</p>}
+          {type === "accepted" && <p>No confirmed appointments.<br />Book an appointment with a doctor to get started.</p>}
+          {type === "pending" && <p>No pending requests.<br />Your appointment requests will appear here.</p>}
           {type === "rejected" && <p>No rejected appointments.</p>}
           {type === "history" && <p>No appointment history yet.</p>}
         </div>
@@ -208,21 +208,6 @@ function MyAppointments() {
         {/* ── ACCEPTED ── */}
         {type === "accepted" && (
           <>
-            <div style={{
-              background: "#f0fdf4",
-              border: "1.5px solid #bbf7d0",
-              borderRadius: "8px",
-              padding: "10px 12px",
-              marginBottom: "10px"
-            }}>
-              <p style={{ margin: 0, color: "#16a34a", fontWeight: "600" }}>
-                ✔ Appointment Confirmed
-              </p>
-              <p style={{ margin: "4px 0 0", fontSize: "13px", color: "#15803d" }}>
-                Your appointment has been accepted by the doctor.
-              </p>
-            </div>
-
             <p style={{ margin: "4px 0", fontSize: "14px" }}>
               📧 {app.doctor?.email}
             </p>
