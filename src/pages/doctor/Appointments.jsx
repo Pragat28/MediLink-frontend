@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import axios from "axios";
 import useBackRedirect from "../../hooks/useBackRedirect";
 import { toast } from "react-toastify";
@@ -8,165 +8,199 @@ const STYLES = `
   *, *::before, *::after { box-sizing: border-box; }
 
   .ap-root {
-    --accent:      #2d5a4e;
-    --accent-bg:   #eaf2ef;
-    --danger:      #b91c1c;
-    --danger-bg:   #fef2f2;
-    --warn:        #92400e;
-    --warn-bg:     #fffbeb;
-    --info:        #1e40af;
-    --info-bg:     #eff6ff;
-    --success:     #166534;
-    --success-bg:  #f0fdf4;
-    --neutral-bg:  #f8f8f7;
-    --border:      rgba(0,0,0,0.08);
-    --border-md:   rgba(0,0,0,0.12);
-    --text:        #111;
-    --muted:       #6b7280;
-    --surface:     #fff;
-    --page-bg:     #f4f3f0;
+    --accent:     #2d5a4e;
+    --accent-bg:  #eaf2ef;
+    --danger:     #b91c1c;
+    --danger-bg:  #fef2f2;
+    --warn:       #92400e;
+    --warn-bg:    #fffbeb;
+    --info:       #1e40af;
+    --info-bg:    #eff6ff;
+    --success:    #166534;
+    --success-bg: #f0fdf4;
+    --neutral-bg: #f9f9f8;
+    --border:     rgba(0,0,0,0.08);
+    --border-md:  rgba(0,0,0,0.13);
+    --text:       #111;
+    --muted:      #6b7280;
+    --surface:    #fff;
+    --page-bg:    #f4f3f0;
     font-family: 'Inter', sans-serif;
     font-size: 14px;
     color: var(--text);
     background: var(--page-bg);
     min-height: 100vh;
-    padding: 32px 16px 80px;
+    padding: 28px 16px 80px;
   }
 
-  .ap-card {
-    max-width: 900px;
+  .ap-wrap {
+    max-width: 860px;
     margin: 0 auto;
-    background: var(--surface);
-    border-radius: 14px;
-    border: 1px solid var(--border);
-    overflow: hidden;
   }
 
-  .ap-header {
-    padding: 24px 32px;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-  .ap-header-icon {
-    width: 36px; height: 36px;
-    background: var(--accent-bg);
-    border-radius: 8px;
-    display: flex; align-items: center; justify-content: center;
-    color: var(--accent);
-    font-size: 17px;
-    flex-shrink: 0;
-  }
-  .ap-header-text h1 {
-    font-size: 17px;
+  .ap-title {
+    font-size: 20px;
     font-weight: 600;
-    margin: 0 0 1px;
+    margin: 0 0 20px;
     color: var(--text);
   }
-  .ap-header-text p {
-    font-size: 12.5px;
+
+  .ap-summary {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .ap-stat {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .ap-stat-num {
+    font-size: 22px;
+    font-weight: 600;
+    margin: 0 0 2px;
+    color: var(--text);
+  }
+  .ap-stat-num.warn    { color: var(--warn); }
+  .ap-stat-num.accent  { color: var(--accent); }
+  .ap-stat-num.success { color: var(--success); }
+  .ap-stat-label {
+    font-size: 12px;
     color: var(--muted);
     margin: 0;
   }
 
-  .ap-body { padding: 24px 32px; }
-
-  .ap-count-label {
-    font-size: 12px;
-    font-weight: 500;
-    letter-spacing: .04em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin: 0 0 16px;
-  }
-
-  .ap-empty {
-    text-align: center;
-    padding: 56px 20px;
-    color: var(--muted);
-  }
-  .ap-empty-icon {
-    width: 48px; height: 48px;
-    background: var(--accent-bg);
-    border-radius: 50%;
-    margin: 0 auto 14px;
-    display: flex; align-items: center; justify-content: center;
-    color: var(--accent);
-    font-size: 22px;
-  }
-  .ap-empty h3 { font-size: 16px; font-weight: 600; color: var(--text); margin: 0 0 4px; }
-  .ap-empty p  { font-size: 13px; margin: 0; }
-
-  .ap-group {
+  .ap-tabs {
+    display: flex;
+    gap: 2px;
+    background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 10px;
+    padding: 4px;
     margin-bottom: 16px;
-    overflow: hidden;
   }
-  .ap-group-header {
+  .ap-tab {
+    flex: 1;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 7px;
+    background: transparent;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--muted);
+    cursor: pointer;
+    transition: background .15s, color .15s;
     display: flex;
     align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+  .ap-tab:hover { background: var(--neutral-bg); color: var(--text); }
+  .ap-tab.active { background: var(--accent); color: #fff; }
+  .ap-tab-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 9px;
+    font-size: 11px;
+    font-weight: 600;
+    background: var(--border);
+    color: var(--muted);
+  }
+  .ap-tab.active .ap-tab-count {
+    background: rgba(255,255,255,0.25);
+    color: #fff;
+  }
+  .ap-tab.active .ap-tab-count.urgent {
+    background: #fff;
+    color: var(--warn);
+  }
+
+  .ap-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 18px;
+    margin-bottom: 10px;
+    transition: border-color .15s;
+  }
+  .ap-card:hover { border-color: var(--border-md); }
+  .ap-card.is-pending  { border-left: 3px solid #d97706; }
+  .ap-card.is-accepted { border-left: 3px solid var(--accent); }
+  .ap-card.is-history  { opacity: 0.72; }
+  .ap-card.is-history:hover { opacity: 1; }
+
+  .ap-card-top {
+    display: flex;
+    align-items: flex-start;
     gap: 12px;
-    padding: 14px 18px;
-    background: var(--neutral-bg);
-    border-bottom: 1px solid var(--border);
   }
   .ap-avatar {
-    width: 36px; height: 36px;
+    width: 38px; height: 38px;
     border-radius: 50%;
-    background: var(--accent);
-    color: #fff;
+    background: var(--accent-bg);
+    color: var(--accent);
     display: flex; align-items: center; justify-content: center;
     font-weight: 600;
     font-size: 13px;
     flex-shrink: 0;
     letter-spacing: .03em;
   }
-  .ap-group-name  { font-weight: 600; font-size: 14px; margin: 0 0 1px; }
-  .ap-group-email { font-size: 12px; color: var(--muted); margin: 0; }
-  .ap-group-count {
-    margin-left: auto;
-    font-size: 11.5px;
-    font-weight: 500;
-    background: var(--border);
-    color: var(--muted);
-    padding: 2px 8px;
-    border-radius: 20px;
+  .ap-card-info { flex: 1; min-width: 0; }
+  .ap-card-name {
+    font-weight: 600;
+    font-size: 14px;
+    margin: 0 0 5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
-
-  .ap-request {
-    padding: 14px 18px;
-    border-bottom: 1px solid var(--border);
-  }
-  .ap-request:last-child { border-bottom: none; }
-
-  .ap-meta {
+  .ap-card-meta {
     display: flex;
-    align-items: center;
     flex-wrap: wrap;
     gap: 6px;
-    margin-bottom: 0;
+    align-items: center;
   }
-  .ap-meta-item {
+
+  .ap-chip {
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    font-size: 12.5px;
+    font-size: 12px;
     color: var(--muted);
     background: var(--neutral-bg);
     border: 1px solid var(--border);
-    padding: 3px 8px;
-    border-radius: 6px;
+    padding: 2px 7px;
+    border-radius: 5px;
   }
-  .ap-meta-item strong { color: var(--text); font-weight: 500; }
-  .ap-meta-item i { font-size: 13px; }
+  .ap-chip strong { color: var(--text); font-weight: 500; }
+  .ap-chip i { font-size: 12px; }
+
+  .ap-mode-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 2px 7px;
+    border-radius: 5px;
+    background: var(--info-bg);
+    color: var(--info);
+    border: 1px solid rgba(30,64,175,0.12);
+  }
+  .ap-mode-chip i { font-size: 12px; }
 
   .ap-badge {
     display: inline-flex;
     align-items: center;
-    padding: 3px 8px;
-    border-radius: 6px;
+    padding: 2px 8px;
+    border-radius: 5px;
     font-size: 11.5px;
     font-weight: 600;
     letter-spacing: .03em;
@@ -178,35 +212,19 @@ const STYLES = `
   .ap-badge-completed { background: var(--success-bg); color: var(--success); }
   .ap-badge-cancelled { background: var(--neutral-bg); color: var(--muted); border: 1px solid var(--border); }
 
-  .ap-mode {
-    display: inline-flex;
+  .ap-actions {
+    display: flex;
+    gap: 6px;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+    flex-wrap: wrap;
     align-items: center;
-    gap: 4px;
-    padding: 3px 8px;
-    border-radius: 6px;
-    font-size: 12px;
-    font-weight: 500;
-    background: var(--info-bg);
-    color: var(--info);
   }
-  .ap-mode i { font-size: 13px; }
-
-  .ap-rating {
-    margin-top: 10px;
-    padding: 10px 12px;
-    background: var(--neutral-bg);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    font-size: 13px;
-  }
-  .ap-rating .stars { color: #ca8a04; font-weight: 600; font-size: 13px; margin-bottom: 3px; }
-  .ap-rating .review { color: var(--muted); font-style: italic; margin: 0; font-size: 12.5px; }
-
-  .ap-actions { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; align-items: center; }
 
   .ap-btn {
     display: inline-flex; align-items: center; gap: 5px;
-    padding: 6px 12px;
+    padding: 6px 14px;
     border-radius: 7px;
     border: 1px solid transparent;
     font-family: 'Inter', sans-serif;
@@ -223,10 +241,10 @@ const STYLES = `
 
   .ap-btn-accept  { background: var(--accent);    color: #fff; border-color: var(--accent); }
   .ap-btn-reject  { background: var(--danger-bg); color: var(--danger); border-color: rgba(185,28,28,0.2); }
-  .ap-btn-verify  { background: var(--info-bg);   color: var(--info); border-color: rgba(30,64,175,0.2); }
-  .ap-btn-cancel  { background: var(--neutral-bg); color: var(--muted); border-color: var(--border-md); }
+  .ap-btn-verify  { background: var(--accent);    color: #fff; border-color: var(--accent); }
+  .ap-btn-cancel  { background: transparent;      color: var(--muted); border-color: var(--border-md); }
   .ap-btn-confirm { background: var(--accent);    color: #fff; border-color: var(--accent); }
-  .ap-btn-ghost   { background: transparent; color: var(--muted); border-color: var(--border-md); }
+  .ap-btn-ghost   { background: transparent;      color: var(--muted); border-color: var(--border-md); }
 
   .ap-verify-box {
     display: flex;
@@ -234,24 +252,22 @@ const STYLES = `
     gap: 8px;
     margin-top: 10px;
     padding: 10px 12px;
-    background: var(--info-bg);
-    border: 1px solid rgba(30,64,175,0.2);
+    background: var(--neutral-bg);
+    border: 1px solid var(--border-md);
     border-radius: 8px;
     flex-wrap: wrap;
   }
   .ap-verify-box label {
     font-size: 12px;
     font-weight: 600;
-    color: var(--info);
+    color: var(--text);
     white-space: nowrap;
-    letter-spacing: .03em;
-    text-transform: uppercase;
   }
   .ap-verify-box input {
     flex: 1;
     min-width: 140px;
     padding: 6px 10px;
-    border: 1px solid rgba(30,64,175,0.25);
+    border: 1px solid var(--border-md);
     border-radius: 6px;
     font-size: 13px;
     font-family: 'Inter', sans-serif;
@@ -259,14 +275,33 @@ const STYLES = `
     background: #fff;
     transition: border-color .15s;
   }
-  .ap-verify-box input:focus { border-color: var(--info); box-shadow: 0 0 0 2px rgba(30,64,175,0.1); }
+  .ap-verify-box input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-bg); }
+
+  .ap-rating {
+    margin-top: 10px;
+    padding: 8px 10px;
+    background: var(--neutral-bg);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    font-size: 12.5px;
+  }
+  .ap-rating .stars  { color: #ca8a04; font-weight: 600; margin-bottom: 2px; }
+  .ap-rating .review { color: var(--muted); font-style: italic; margin: 0; }
+
+  .ap-empty {
+    text-align: center;
+    padding: 48px 20px;
+    color: var(--muted);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+  }
+  .ap-empty i { font-size: 32px; display: block; margin-bottom: 10px; color: var(--accent); opacity: .5; }
+  .ap-empty p { margin: 0; font-size: 13.5px; }
 
   .ap-loading {
     display: flex; align-items: center; justify-content: center;
-    min-height: 40vh;
-    color: var(--muted);
-    font-size: 13px;
-    gap: 10px;
+    min-height: 40vh; color: var(--muted); font-size: 13px; gap: 10px;
   }
   .ap-spinner {
     width: 18px; height: 18px;
@@ -278,7 +313,8 @@ const STYLES = `
   @keyframes ap-spin { to { transform: rotate(360deg); } }
 
   @media (max-width: 600px) {
-    .ap-body, .ap-header { padding-left: 16px; padding-right: 16px; }
+    .ap-summary { grid-template-columns: repeat(2, 1fr); }
+    .ap-tab span { display: none; }
   }
 `;
 
@@ -293,22 +329,20 @@ const statusClass = (s) => ({
   cancelled: "ap-badge-cancelled",
 }[s] || "ap-badge-cancelled");
 
-const Stars = ({ rating }) => {
-  const filled = Math.round(rating);
-  return (
-    <span className="stars">
-      {"★".repeat(filled)}{"☆".repeat(5 - filled)} {rating}/5
-    </span>
-  );
-};
+const Stars = ({ rating }) => (
+  <span className="stars">
+    {"★".repeat(Math.round(rating))}{"☆".repeat(5 - Math.round(rating))} {rating}/5
+  </span>
+);
 
 const Appointments = () => {
   useBackRedirect("/doctor/profile");
 
-  const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [data, setData]                   = useState([]);
+  const [loading, setLoading]             = useState(false);
+  const [tab, setTab]                     = useState("pending");
   const [showVerifyBox, setShowVerifyBox] = useState(null);
-  const [enteredCode, setEnteredCode] = useState("");
+  const [enteredCode, setEnteredCode]     = useState("");
 
   const token = localStorage.getItem("doctorToken");
 
@@ -316,14 +350,13 @@ const Appointments = () => {
     const id = "ap-styles";
     if (!document.getElementById(id)) {
       const tag = document.createElement("style");
-      tag.id = id;
-      tag.textContent = STYLES;
+      tag.id = id; tag.textContent = STYLES;
       document.head.appendChild(tag);
     }
   }, []);
 
   const fetchAppointments = async () => {
-    if (!token) { toast.error("You are not logged in. Please log in again."); return; }
+    if (!token) { toast.error("Not logged in. Please log in again."); return; }
     try {
       setLoading(true);
       const res = await axios.get(
@@ -332,18 +365,16 @@ const Appointments = () => {
       );
       setData(res.data);
     } catch (err) {
-      if (!err.response) toast.error("Network error — please check your internet connection.");
+      if (!err.response) toast.error("Network error — check your connection.");
       else if (err.response.status === 401) toast.error("Session expired. Please log in again.");
       else toast.error(err.response?.data?.message || "Failed to load appointments.");
-    } finally {
-      setLoading(false);
-    }
+    } finally { setLoading(false); }
   };
 
   useEffect(() => { fetchAppointments(); }, []);
 
   const handleAction = async (id, action) => {
-    if (!token) { toast.error("You are not logged in. Please log in again."); return; }
+    if (!token) { toast.error("Not logged in."); return; }
     try {
       const res = await axios.put(
         `https://medilink-j44r.onrender.com/api/doctor-appointments/appointments/${id}/${action}`,
@@ -352,9 +383,9 @@ const Appointments = () => {
       );
       if (action === "approve") {
         if (res.data.mode === "online")
-          toast.info(`Please send the meeting link to: ${res.data.patientEmail}`, { autoClose: 8000 });
+          toast.info(`Send meeting link to: ${res.data.patientEmail}`, { autoClose: 8000 });
         else
-          toast.success("Appointment accepted successfully.");
+          toast.success("Appointment accepted.");
       } else if (action === "reject") {
         toast.success("Appointment rejected.");
       } else if (action === "cancel") {
@@ -362,166 +393,188 @@ const Appointments = () => {
       }
       fetchAppointments();
     } catch (err) {
-      if (!err.response) toast.error("Network error — could not perform action. Please try again.");
-      else toast.error(err.response?.data?.message || "Action failed. Please try again.");
+      toast.error(err.response?.data?.message || "Action failed. Please try again.");
     }
   };
 
   const handleVerify = async (appointmentId) => {
-    if (!enteredCode.trim()) { toast.error("Please enter the patient code before verifying."); return; }
-    if (!token) { toast.error("You are not logged in. Please log in again."); return; }
+    if (!enteredCode.trim()) { toast.error("Enter the patient code first."); return; }
+    if (!token) { toast.error("Not logged in."); return; }
     try {
       await axios.put(
         "https://medilink-j44r.onrender.com/api/doctor-appointments/verify",
         { appointmentId, code: enteredCode },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      toast.success("Appointment verified and marked as completed.");
-      setShowVerifyBox(null);
-      setEnteredCode("");
+      toast.success("Marked as completed.");
+      setShowVerifyBox(null); setEnteredCode("");
       fetchAppointments();
     } catch (err) {
-      if (!err.response) toast.error("Network error — verification failed. Please try again.");
-      else toast.error(err.response?.data?.message || "Verification failed. Please check the code and try again.");
+      toast.error(err.response?.data?.message || "Verification failed. Check the code.");
     }
   };
 
+  const allFlat = useMemo(() => {
+    const flat = [];
+    data.forEach(group => {
+      group.requests.forEach(req => {
+        flat.push({ ...req, patient: group.patient });
+      });
+    });
+    flat.sort((a, b) => new Date(a.date) - new Date(b.date));
+    return flat;
+  }, [data]);
+
+  const pending  = useMemo(() => allFlat.filter(r => r.status === "pending"),  [allFlat]);
+  const upcoming = useMemo(() => allFlat.filter(r => r.status === "accepted"), [allFlat]);
+  const history  = useMemo(() => allFlat.filter(r => ["completed","rejected","cancelled"].includes(r.status)), [allFlat]);
+
+  const current = { pending, upcoming, history }[tab] || [];
+  const counts  = { pending: pending.length, upcoming: upcoming.length, history: history.length };
+  const totalCompleted = allFlat.filter(r => r.status === "completed").length;
+
+  const formatDate = (d) =>
+    new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+
   if (loading) return (
     <div className="ap-root">
-      <div className="ap-loading">
-        <div className="ap-spinner" />
-        Loading appointments…
-      </div>
+      <div className="ap-loading"><div className="ap-spinner" /> Loading appointments…</div>
     </div>
   );
-
-  const totalRequests = data.reduce((acc, g) => acc + g.requests.length, 0);
 
   return (
     <div className="ap-root">
       <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css" />
 
-      <div className="ap-card">
+      <div className="ap-wrap">
 
-        <div className="ap-header">
-          <div className="ap-header-icon">
-            <i className="ti ti-calendar-event" aria-hidden="true" />
+        <h1 className="ap-title">Appointments</h1>
+
+        <div className="ap-summary">
+          <div className="ap-stat">
+            <p className={`ap-stat-num${counts.pending > 0 ? " warn" : ""}`}>{counts.pending}</p>
+            <p className="ap-stat-label">Awaiting response</p>
           </div>
-          <div className="ap-header-text">
-            <h1>Appointments</h1>
-            <p>Review and manage all patient appointment requests</p>
+          <div className="ap-stat">
+            <p className="ap-stat-num accent">{counts.upcoming}</p>
+            <p className="ap-stat-label">Upcoming</p>
+          </div>
+          <div className="ap-stat">
+            <p className="ap-stat-num success">{totalCompleted}</p>
+            <p className="ap-stat-label">Completed</p>
+          </div>
+          <div className="ap-stat">
+            <p className="ap-stat-num">{allFlat.length}</p>
+            <p className="ap-stat-label">Total all time</p>
           </div>
         </div>
 
-        <div className="ap-body">
+        <div className="ap-tabs">
+          {["pending","upcoming","history"].map(t => (
+            <button key={t} className={`ap-tab${tab === t ? " active" : ""}`} onClick={() => setTab(t)}>
+              <span>{t.charAt(0).toUpperCase() + t.slice(1)}</span>
+              {counts[t] > 0 && (
+                <span className={`ap-tab-count${tab === t && t === "pending" ? " urgent" : ""}`}>
+                  {counts[t]}
+                </span>
+              )}
+            </button>
+          ))}
+        </div>
 
-          {data.length === 0 ? (
-            <div className="ap-empty">
-              <div className="ap-empty-icon">
-                <i className="ti ti-calendar-off" aria-hidden="true" />
-              </div>
-              <h3>No appointments yet</h3>
-              <p>When patients book with you, their requests will appear here.</p>
-            </div>
-          ) : (
-            <>
-              <p className="ap-count-label">
-                {totalRequests} appointment{totalRequests !== 1 ? "s" : ""} · {data.length} patient{data.length !== 1 ? "s" : ""}
-              </p>
-
-              {data.map((group, index) => (
-                <div className="ap-group" key={index}>
-
-                  <div className="ap-group-header">
-                    <div className="ap-avatar">{initials(group.patient?.name)}</div>
-                    <div>
-                      <p className="ap-group-name">{group.patient?.name || "Unknown Patient"}</p>
-                      <p className="ap-group-email">{group.patient?.email || ""}</p>
-                    </div>
-                    <span className="ap-group-count">
-                      {group.requests.length}
+        {current.length === 0 ? (
+          <div className="ap-empty">
+            <i className={`ti ${tab === "pending" ? "ti-circle-check" : tab === "upcoming" ? "ti-calendar-off" : "ti-history"}`} aria-hidden="true" />
+            <p>
+              {tab === "pending"  && "No pending requests — you're all caught up."}
+              {tab === "upcoming" && "No upcoming appointments scheduled."}
+              {tab === "history"  && "No past appointments yet."}
+            </p>
+          </div>
+        ) : (
+          current.map(req => (
+            <div
+              key={req.appointmentId}
+              className={`ap-card${req.status === "pending" ? " is-pending" : req.status === "accepted" ? " is-accepted" : " is-history"}`}
+            >
+              <div className="ap-card-top">
+                <div className="ap-avatar">{initials(req.patient?.name)}</div>
+                <div className="ap-card-info">
+                  <p className="ap-card-name">{req.patient?.name || "Unknown Patient"}</p>
+                  <div className="ap-card-meta">
+                    <span className="ap-chip">
+                      <i className="ti ti-calendar" aria-hidden="true" />
+                      <strong>{formatDate(req.date)}</strong>
                     </span>
+                    <span className="ap-chip">
+                      <i className="ti ti-clock" aria-hidden="true" />
+                      <strong>{req.slotTime}</strong>
+                    </span>
+                    {req.mode && (
+                      <span className="ap-mode-chip">
+                        <i className={`ti ${req.mode === "online" ? "ti-video" : "ti-building-hospital"}`} aria-hidden="true" />
+                        {req.mode === "online" ? "Online" : "In-clinic"}
+                      </span>
+                    )}
+                    {tab === "history" && (
+                      <span className={`ap-badge ${statusClass(req.status)}`}>{req.status}</span>
+                    )}
                   </div>
-
-                  {group.requests.map(req => (
-                    <div className="ap-request" key={req.appointmentId}>
-
-                      <div className="ap-meta">
-                        <span className="ap-meta-item">
-                          <i className="ti ti-calendar" aria-hidden="true" />
-                          <strong>{new Date(req.date).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}</strong>
-                        </span>
-                        <span className="ap-meta-item">
-                          <i className="ti ti-clock" aria-hidden="true" />
-                          <strong>{req.slotTime}</strong>
-                        </span>
-                        {req.mode && (
-                          <span className="ap-mode">
-                            <i className={`ti ${req.mode === "online" ? "ti-wifi" : "ti-building-hospital"}`} aria-hidden="true" />
-                            {req.mode === "online" ? "Online" : "In-clinic"}
-                          </span>
-                        )}
-                        <span className={`ap-badge ${statusClass(req.status)}`}>
-                          {req.status}
-                        </span>
-                      </div>
-
-                      {req.status === "completed" && req.rated && (
-                        <div className="ap-rating">
-                          <Stars rating={req.rating} />
-                          {req.review && <p className="review">{req.review}</p>}
-                        </div>
-                      )}
-
-                      {req.status === "pending" && (
-                        <div className="ap-actions">
-                          <button className="ap-btn ap-btn-accept" onClick={() => handleAction(req.appointmentId, "approve")}>
-                            <i className="ti ti-check" aria-hidden="true" /> Accept
-                          </button>
-                          <button className="ap-btn ap-btn-reject" onClick={() => handleAction(req.appointmentId, "reject")}>
-                            <i className="ti ti-x" aria-hidden="true" /> Reject
-                          </button>
-                        </div>
-                      )}
-
-                      {req.status === "accepted" && (
-                        <div className="ap-actions">
-                          <button className="ap-btn ap-btn-verify" onClick={() => setShowVerifyBox(req.appointmentId)}>
-                            <i className="ti ti-shield-check" aria-hidden="true" /> Verify &amp; Complete
-                          </button>
-                          <button className="ap-btn ap-btn-cancel" onClick={() => handleAction(req.appointmentId, "cancel")}>
-                            <i className="ti ti-x" aria-hidden="true" /> Cancel
-                          </button>
-                        </div>
-                      )}
-
-                      {showVerifyBox === req.appointmentId && (
-                        <div className="ap-verify-box">
-                          <label>Patient code</label>
-                          <input
-                            type="text"
-                            placeholder="Enter code from patient"
-                            value={enteredCode}
-                            onChange={(e) => setEnteredCode(e.target.value)}
-                          />
-                          <button className="ap-btn ap-btn-confirm" onClick={() => handleVerify(req.appointmentId)}>
-                            <i className="ti ti-check" aria-hidden="true" /> Verify
-                          </button>
-                          <button className="ap-btn ap-btn-ghost" onClick={() => { setShowVerifyBox(null); setEnteredCode(""); }}>
-                            Cancel
-                          </button>
-                        </div>
-                      )}
-
-                    </div>
-                  ))}
-
                 </div>
-              ))}
-            </>
-          )}
+              </div>
 
-        </div>
+              {req.status === "completed" && req.rated && (
+                <div className="ap-rating">
+                  <Stars rating={req.rating} />
+                  {req.review && <p className="review">{req.review}</p>}
+                </div>
+              )}
+
+              {req.status === "pending" && (
+                <div className="ap-actions">
+                  <button className="ap-btn ap-btn-accept" onClick={() => handleAction(req.appointmentId, "approve")}>
+                    <i className="ti ti-check" aria-hidden="true" /> Accept
+                  </button>
+                  <button className="ap-btn ap-btn-reject" onClick={() => handleAction(req.appointmentId, "reject")}>
+                    <i className="ti ti-x" aria-hidden="true" /> Reject
+                  </button>
+                </div>
+              )}
+
+              {req.status === "accepted" && (
+                <div className="ap-actions">
+                  <button className="ap-btn ap-btn-verify" onClick={() => setShowVerifyBox(req.appointmentId)}>
+                    <i className="ti ti-shield-check" aria-hidden="true" /> Mark as Completed
+                  </button>
+                  <button className="ap-btn ap-btn-cancel" onClick={() => handleAction(req.appointmentId, "cancel")}>
+                    Cancel appointment
+                  </button>
+                </div>
+              )}
+
+              {showVerifyBox === req.appointmentId && (
+                <div className="ap-verify-box">
+                  <label>Patient code</label>
+                  <input
+                    type="text"
+                    placeholder="Enter code shown to patient"
+                    value={enteredCode}
+                    onChange={(e) => setEnteredCode(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && handleVerify(req.appointmentId)}
+                  />
+                  <button className="ap-btn ap-btn-confirm" onClick={() => handleVerify(req.appointmentId)}>
+                    <i className="ti ti-check" aria-hidden="true" /> Confirm
+                  </button>
+                  <button className="ap-btn ap-btn-ghost" onClick={() => { setShowVerifyBox(null); setEnteredCode(""); }}>
+                    Cancel
+                  </button>
+                </div>
+              )}
+
+            </div>
+          ))
+        )}
+
       </div>
     </div>
   );
