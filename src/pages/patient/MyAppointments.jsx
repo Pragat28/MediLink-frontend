@@ -511,7 +511,7 @@ function MyAppointments() {
             <i className="ti ti-clock-hour-4" aria-hidden="true" />
             <div>
               <p className="ma-banner-title">Awaiting doctor's approval</p>
-              <p className="ma-banner-sub">Your request has been sent. The doctor will accept or reject it shortly.</p>
+              <p className="ma-banner-sub">Your request has been sent. The doctor will respond to it shortly.</p>
             </div>
           </div>
         )}
