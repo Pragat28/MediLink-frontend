@@ -13,81 +13,86 @@ const specialties = [
 
 /* ─── Injected Styles ─────────────────────────────────── */
 const STYLES = `
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display&display=swap');
   *, *::before, *::after { box-sizing: border-box; }
 
   .sd-root {
-    --accent:        #1d4ed8;
-    --accent-bg:     #eff6ff;
-    --accent-border: rgba(29,78,216,0.18);
-    --success:       #166534;
-    --success-bg:    #f0fdf4;
-    --neutral-bg:    #f8f9fb;
-    --border:        rgba(0,0,0,0.08);
-    --border-md:     rgba(0,0,0,0.13);
-    --text:          #111;
-    --muted:         #6b7280;
+    --accent:        #3b6b9e;
+    --accent-light:  #4d7daf;
+    --accent-bg:     #eef3f9;
+    --accent-border: rgba(59,107,158,0.18);
+    --accent-muted:  #6a94bc;
+    --success:       #1a6640;
+    --success-bg:    #eef8f2;
+    --neutral-bg:    #f4f6f9;
+    --border:        rgba(0,0,0,0.07);
+    --border-md:     rgba(0,0,0,0.11);
+    --text:          #1a1f2e;
+    --text-sec:      #3d4a5c;
+    --muted:         #697586;
     --surface:       #fff;
-    --page-bg:       #f0f4fa;
-    font-family: 'Inter', sans-serif;
+    --page-bg:       #edf0f5;
+    font-family: 'DM Sans', sans-serif;
     font-size: 14px;
     color: var(--text);
     background: var(--page-bg);
     min-height: 100vh;
-    padding: 32px 16px 80px;
+    padding: 24px 16px 60px;
   }
 
   .sd-layout {
     max-width: 1100px;
     margin: 0 auto;
     display: flex;
-    gap: 22px;
+    gap: 20px;
     align-items: flex-start;
   }
 
   /* ── Sidebar ── */
   .sd-sidebar {
-    width: 248px;
+    width: 236px;
     flex-shrink: 0;
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 14px;
     overflow: hidden;
     position: sticky;
-    top: 32px;
+    top: 24px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.05);
   }
   .sd-sidebar-header {
-    padding: 16px 20px;
+    padding: 13px 18px;
     border-bottom: 1px solid var(--border);
     display: flex;
     align-items: center;
     gap: 9px;
+    background: var(--neutral-bg);
   }
   .sd-sidebar-header-icon {
-    width: 30px; height: 30px;
+    width: 28px; height: 28px;
     background: var(--accent-bg);
-    border-radius: 7px;
+    border-radius: 6px;
     display: flex; align-items: center; justify-content: center;
     color: var(--accent);
-    font-size: 15px;
+    font-size: 14px;
     flex-shrink: 0;
   }
   .sd-sidebar-header span {
-    font-size: 14px;
-    font-weight: 600;
+    font-size: 13.5px;
+    font-weight: 700;
     color: var(--text);
   }
-  .sd-sidebar-body { padding: 16px 18px; }
+  .sd-sidebar-body { padding: 14px 16px; }
 
-  .sd-filter-group { margin-bottom: 14px; }
+  .sd-filter-group { margin-bottom: 12px; }
   .sd-filter-label {
     display: block;
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: .05em;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: .06em;
     text-transform: uppercase;
     color: var(--muted);
-    margin-bottom: 5px;
+    margin-bottom: 4px;
   }
   .sd-filter-select,
   .sd-filter-input {
@@ -95,7 +100,7 @@ const STYLES = `
     padding: 7px 10px;
     border: 1px solid var(--border-md);
     border-radius: 7px;
-    font-family: 'Inter', sans-serif;
+    font-family: 'DM Sans', sans-serif;
     font-size: 13px;
     color: var(--text);
     background: var(--surface);
@@ -104,30 +109,35 @@ const STYLES = `
     appearance: none;
     -webkit-appearance: none;
   }
-  .sd-filter-select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; padding-right: 28px; }
+  .sd-filter-select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    padding-right: 28px;
+  }
   .sd-filter-select:focus,
-  .sd-filter-input:focus  { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-bg); }
+  .sd-filter-input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-bg); }
 
-  .sd-time-row { display: flex; gap: 8px; }
+  .sd-time-row { display: flex; gap: 6px; }
   .sd-time-row .sd-filter-group { flex: 1; margin-bottom: 0; }
 
   .sd-reset-btn {
     width: 100%;
-    padding: 8px;
+    padding: 7px;
     border: 1px solid var(--accent-border);
     border-radius: 7px;
     background: var(--accent-bg);
     color: var(--accent);
-    font-family: 'Inter', sans-serif;
-    font-size: 13px;
-    font-weight: 500;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12.5px;
+    font-weight: 600;
     cursor: pointer;
     margin-top: 4px;
     display: flex; align-items: center; justify-content: center; gap: 5px;
     transition: background .15s;
   }
-  .sd-reset-btn:hover { background: #dbeafe; }
-  .sd-reset-btn i { font-size: 14px; }
+  .sd-reset-btn:hover { background: #d9e5f3; }
+  .sd-reset-btn i { font-size: 13px; }
 
   /* ── Results pane ── */
   .sd-results { flex: 1; min-width: 0; }
@@ -135,24 +145,25 @@ const STYLES = `
   .sd-results-header {
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 18px 24px;
-    margin-bottom: 16px;
+    border-radius: 12px;
+    padding: 14px 20px;
+    margin-bottom: 12px;
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
   }
   .sd-results-icon {
-    width: 34px; height: 34px;
+    width: 32px; height: 32px;
     background: var(--accent-bg);
-    border-radius: 8px;
+    border-radius: 7px;
     display: flex; align-items: center; justify-content: center;
     color: var(--accent);
-    font-size: 16px;
+    font-size: 15px;
     flex-shrink: 0;
   }
-  .sd-results-title { font-size: 16px; font-weight: 600; margin: 0 0 1px; color: var(--text); }
-  .sd-results-sub   { font-size: 12.5px; color: var(--muted); margin: 0; }
+  .sd-results-title { font-size: 15px; font-weight: 700; margin: 0 0 1px; color: var(--text); }
+  .sd-results-sub   { font-size: 12px; color: var(--muted); margin: 0; }
   .sd-count-badge {
     margin-left: auto;
     background: var(--accent-bg);
@@ -161,7 +172,7 @@ const STYLES = `
     border-radius: 20px;
     padding: 3px 10px;
     font-size: 12px;
-    font-weight: 600;
+    font-weight: 700;
   }
 
   /* ── Loading ── */
@@ -173,7 +184,7 @@ const STYLES = `
     font-size: 13px;
   }
   .sd-spinner {
-    width: 18px; height: 18px;
+    width: 16px; height: 16px;
     border: 2px solid var(--border);
     border-top-color: var(--accent);
     border-radius: 50%;
@@ -186,106 +197,170 @@ const STYLES = `
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 12px;
-    padding: 52px 24px;
+    padding: 48px 24px;
     text-align: center;
     color: var(--muted);
   }
   .sd-empty-icon {
-    width: 46px; height: 46px;
+    width: 42px; height: 42px;
     background: var(--accent-bg);
     border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
     color: var(--accent);
-    font-size: 20px;
-    margin: 0 auto 12px;
+    font-size: 18px;
+    margin: 0 auto 10px;
   }
   .sd-empty h3 { font-size: 15px; font-weight: 600; color: var(--text); margin: 0 0 4px; }
-  .sd-empty p  { font-size: 13px; margin: 0; }
+  .sd-empty p  { font-size: 12.5px; margin: 0; }
 
   /* ── Doctor card ── */
   .sd-doc-card {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 12px;
-    padding: 18px 20px;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
     display: flex;
-    gap: 18px;
-    align-items: flex-start;
-    transition: border-color .15s;
+    gap: 0;
+    align-items: stretch;
+    transition: border-color .15s, box-shadow .15s;
+    overflow: hidden;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.04);
   }
-  .sd-doc-card:hover { border-color: var(--accent-border); }
+  .sd-doc-card:hover {
+    border-color: var(--accent-border);
+    box-shadow: 0 3px 14px rgba(59,107,158,0.1);
+  }
 
+  /* Left accent strip with avatar */
+  .sd-doc-left {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 18px 16px;
+    background: linear-gradient(160deg, #eef3f9 0%, #e4ecf5 100%);
+    border-right: 1px solid var(--border);
+    min-width: 110px;
+    gap: 8px;
+  }
   .sd-doc-avatar {
-    width: 76px; height: 76px;
+    width: 68px; height: 68px;
     border-radius: 50%;
     object-fit: cover;
-    border: 2.5px solid var(--accent-bg);
+    border: 2.5px solid var(--surface);
+    box-shadow: 0 2px 8px rgba(59,107,158,0.15);
     flex-shrink: 0;
   }
-  .sd-doc-body { flex: 1; min-width: 0; }
+  .sd-doc-rating-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 11.5px;
+    font-weight: 700;
+    color: #7a5200;
+    background: #fef7e0;
+    border: 1px solid rgba(122,82,0,0.14);
+    padding: 2px 8px;
+    border-radius: 20px;
+  }
+
+  .sd-doc-body { flex: 1; padding: 14px 18px; min-width: 0; }
 
   .sd-doc-top {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
+    justify-content: space-between;
     flex-wrap: wrap;
-    gap: 8px;
+    gap: 6px;
     margin-bottom: 8px;
   }
-  .sd-doc-name    { font-size: 15px; font-weight: 600; color: var(--text); }
-  .sd-doc-spec    {
-    font-size: 12px; font-weight: 500;
-    background: var(--accent-bg);
-    color: var(--accent);
-    border: 1px solid var(--accent-border);
-    padding: 2px 9px; border-radius: 20px;
+  .sd-doc-name-wrap {}
+  .sd-doc-name {
+    font-family: 'DM Serif Display', serif;
+    font-size: 16px;
+    font-weight: 400;
+    color: var(--text);
+    display: block;
+    margin-bottom: 2px;
   }
+  .sd-doc-spec {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .sd-fee-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 5px 12px;
+    background: var(--accent);
+    color: #fff;
+    border-radius: 7px;
+    font-size: 13px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .sd-fee-tag small { font-size: 10px; font-weight: 400; opacity: .8; }
 
-  .sd-pill-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
-  .sd-pill {
-    display: inline-flex; align-items: center; gap: 4px;
-    font-size: 12.5px; color: var(--muted);
+  /* Info row — all doctor meta in one consistent colour */
+  .sd-info-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px 10px;
+    margin-bottom: 12px;
+  }
+  .sd-info-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    color: var(--text-sec);
     background: var(--neutral-bg);
     border: 1px solid var(--border);
-    padding: 3px 8px; border-radius: 6px;
+    padding: 3px 9px;
+    border-radius: 6px;
   }
-  .sd-pill i { font-size: 13px; }
-  .sd-pill strong { color: var(--text); font-weight: 500; }
-  .sd-pill-accent {
+  .sd-info-chip i {
+    font-size: 13px;
+    color: var(--accent-muted);
+    flex-shrink: 0;
+  }
+  .sd-info-chip strong { color: var(--text); font-weight: 600; }
+
+  /* Available days chip — same muted blue family */
+  .sd-info-chip-avail {
     background: var(--accent-bg);
     border-color: var(--accent-border);
     color: var(--accent);
   }
-  .sd-pill-accent strong { color: var(--accent); }
-  .sd-pill-green {
-    background: var(--success-bg);
-    border-color: rgba(22,101,52,0.15);
-    color: var(--success);
-  }
-  .sd-pill-green strong { color: var(--success); }
+  .sd-info-chip-avail i { color: var(--accent); }
+  .sd-info-chip-avail strong { color: var(--accent); }
 
   .sd-view-btn {
     display: inline-flex; align-items: center; gap: 5px;
     padding: 7px 14px;
     border: none; border-radius: 7px;
     background: var(--accent); color: #fff;
-    font-family: 'Inter', sans-serif;
-    font-size: 13px; font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12.5px; font-weight: 700;
     cursor: pointer;
     transition: opacity .15s, transform .1s;
   }
   .sd-view-btn:hover  { opacity: .87; }
   .sd-view-btn:active { transform: scale(.97); }
-  .sd-view-btn i { font-size: 14px; }
+  .sd-view-btn i { font-size: 13px; }
 
   @media (max-width: 720px) {
     .sd-layout    { flex-direction: column; }
     .sd-sidebar   { width: 100%; position: static; }
     .sd-doc-card  { flex-direction: column; }
-    .sd-doc-avatar { width: 60px; height: 60px; }
+    .sd-doc-left  { flex-direction: row; padding: 14px 16px; border-right: none; border-bottom: 1px solid var(--border); justify-content: flex-start; min-width: unset; }
+    .sd-doc-avatar { width: 52px; height: 52px; }
   }
   @media (max-width: 480px) {
-    .sd-root { padding: 16px 12px 60px; }
+    .sd-root { padding: 14px 10px 50px; }
   }
 `;
 
@@ -387,7 +462,7 @@ const SearchDoctors = () => {
 
   const viewProfile = (doctorId) => navigate(`/patient/doctor/${doctorId}`);
 
-  const PLACEHOLDER = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='76' height='76'%3E%3Crect width='76' height='76' fill='%23dbeafe'/%3E%3Ccircle cx='38' cy='30' r='13' fill='%2393c5fd'/%3E%3Cellipse cx='38' cy='65' rx='20' ry='15' fill='%2393c5fd'/%3E%3C/svg%3E";
+  const PLACEHOLDER = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='76' height='76'%3E%3Crect width='76' height='76' fill='%23d9e5f3'/%3E%3Ccircle cx='38' cy='30' r='13' fill='%236a94bc'/%3E%3Cellipse cx='38' cy='65' rx='20' ry='15' fill='%236a94bc'/%3E%3C/svg%3E";
 
   const activeFilterCount = Object.values(filters).filter(Boolean).length;
 
@@ -495,9 +570,7 @@ const SearchDoctors = () => {
               <p className="sd-results-sub">Showing results based on your filters</p>
             </div>
             {!loading && (
-              <span className="sd-count-badge">
-                {doctors.length} found
-              </span>
+              <span className="sd-count-badge">{doctors.length} found</span>
             )}
           </div>
 
@@ -519,41 +592,64 @@ const SearchDoctors = () => {
 
           {!loading && doctors.map(doc => (
             <div key={doc._id} className="sd-doc-card">
-              <img
-                src={doc.photo || PLACEHOLDER}
-                alt={doc.name}
-                className="sd-doc-avatar"
-              />
+
+              {/* Left: avatar + rating */}
+              <div className="sd-doc-left">
+                <img
+                  src={doc.photo || PLACEHOLDER}
+                  alt={doc.name}
+                  className="sd-doc-avatar"
+                />
+                {doc.rating && (
+                  <span className="sd-doc-rating-pill">
+                    ⭐ {doc.rating}
+                  </span>
+                )}
+              </div>
+
+              {/* Right: info */}
               <div className="sd-doc-body">
                 <div className="sd-doc-top">
-                  <span className="sd-doc-name">{doc.name}</span>
-                  <span className="sd-doc-spec">{doc.specialty}</span>
+                  <div className="sd-doc-name-wrap">
+                    <span className="sd-doc-name">{doc.name}</span>
+                    <span className="sd-doc-spec">{doc.specialty}</span>
+                  </div>
+                  <span className="sd-fee-tag">
+                    <i className="ti ti-currency-rupee" style={{ fontSize: 13 }} />
+                    ₹{doc.consultationFee}
+                    <small>/visit</small>
+                  </span>
                 </div>
 
-                <div className="sd-pill-row">
-                  <span className="sd-pill sd-pill-accent">
-                    <i className="ti ti-star" aria-hidden="true" />
-                    <strong>{doc.rating || "—"}</strong> rating
-                  </span>
-                  <span className="sd-pill sd-pill-accent">
-                    <i className="ti ti-currency-rupee" aria-hidden="true" />
-                    <strong>₹{doc.consultationFee}</strong>
-                  </span>
+                {/* All doctor info chips — unified muted-blue family */}
+                <div className="sd-info-row">
                   {doc.gender && (
-                    <span className="sd-pill">
-                      <i className="ti ti-gender-bigender" aria-hidden="true" />
+                    <span className="sd-info-chip">
+                      <i className="ti ti-gender-bigender" />
                       <strong>{doc.gender}</strong>
                     </span>
                   )}
                   {(doc.address?.area || doc.address?.street) && (
-                    <span className="sd-pill">
-                      <i className="ti ti-map-pin" aria-hidden="true" />
+                    <span className="sd-info-chip">
+                      <i className="ti ti-map-pin" />
                       <strong>{[doc.address?.street, doc.address?.area].filter(Boolean).join(", ")}</strong>
                     </span>
                   )}
+                  {doc.experience && (
+                    <span className="sd-info-chip">
+                      <i className="ti ti-briefcase-medical" />
+                      <strong>{doc.experience} yr</strong> exp
+                    </span>
+                  )}
+                  {doc.qualification && (
+                    <span className="sd-info-chip">
+                      <i className="ti ti-certificate" />
+                      <strong>{doc.qualification}</strong>
+                    </span>
+                  )}
                   {doc.availableDays?.length > 0 && (
-                    <span className="sd-pill sd-pill-green">
-                      <i className="ti ti-calendar-check" aria-hidden="true" />
+                    <span className="sd-info-chip sd-info-chip-avail">
+                      <i className="ti ti-calendar-check" />
                       <strong>{doc.availableDays.join(", ")}</strong>
                     </span>
                   )}
