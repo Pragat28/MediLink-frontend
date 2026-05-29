@@ -47,6 +47,7 @@ const STYLES = `
     align-items: flex-start;
   }
 
+  /* ── KEY FIX: sidebar stays in viewport while list scrolls ── */
   .sd-sidebar {
     width: 236px;
     flex-shrink: 0;
@@ -56,8 +57,19 @@ const STYLES = `
     overflow: hidden;
     position: sticky;
     top: 24px;
+    /* cap height to viewport so sticky actually kicks in */
+    max-height: calc(100vh - 48px);
+    /* allow sidebar itself to scroll if filters exceed viewport height */
+    overflow-y: auto;
     box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+    /* keep the header always visible at the top when sidebar scrolls */
+    scrollbar-width: thin;
+    scrollbar-color: var(--accent-border) transparent;
   }
+  .sd-sidebar::-webkit-scrollbar { width: 4px; }
+  .sd-sidebar::-webkit-scrollbar-track { background: transparent; }
+  .sd-sidebar::-webkit-scrollbar-thumb { background: var(--accent-border); border-radius: 4px; }
+
   .sd-sidebar-header {
     padding: 13px 18px;
     border-bottom: 1px solid var(--border);
@@ -65,6 +77,10 @@ const STYLES = `
     align-items: center;
     gap: 9px;
     background: var(--neutral-bg);
+    /* keep header pinned inside the sidebar even when sidebar scrolls */
+    position: sticky;
+    top: 0;
+    z-index: 1;
   }
   .sd-sidebar-header-icon {
     width: 28px; height: 28px;
@@ -345,7 +361,12 @@ const STYLES = `
 
   @media (max-width: 720px) {
     .sd-layout    { flex-direction: column; }
-    .sd-sidebar   { width: 100%; position: static; }
+    .sd-sidebar   {
+      width: 100%;
+      position: static;
+      max-height: none;
+      overflow-y: visible;
+    }
     .sd-doc-card  { flex-direction: column; }
     .sd-doc-left  { flex-direction: row; padding: 14px 16px; border-right: none; border-bottom: 1px solid var(--border); justify-content: flex-start; min-width: unset; }
     .sd-doc-avatar { width: 52px; height: 52px; }
@@ -355,7 +376,6 @@ const STYLES = `
   }
 `;
 
-// ✅ proper silhouette placeholder like WhatsApp/Instagram
 const PLACEHOLDER = "https://cdn-icons-png.flaticon.com/512/3135/3135715.png";
 
 const SearchDoctors = () => {
@@ -453,10 +473,8 @@ const SearchDoctors = () => {
 
   const activeFilterCount = Object.values(filters).filter(Boolean).length;
 
-  // ✅ helper — only show rating if > 0
   const hasRating = (doc) => doc.rating && Number(doc.rating) > 0;
 
-  // ✅ helper — photo with proper fallback
   const getPhoto = (doc) =>
     doc.photo && doc.photo.trim() !== ""
       ? doc.photo.startsWith("http")
@@ -592,14 +610,12 @@ const SearchDoctors = () => {
             <div key={doc._id} className="sd-doc-card">
 
               <div className="sd-doc-left">
-                {/* ✅ FIX 3 — proper silhouette fallback */}
                 <img
                   src={getPhoto(doc)}
                   alt={doc.name}
                   className="sd-doc-avatar"
                   onError={(e) => { e.target.src = PLACEHOLDER; }}
                 />
-                {/* ✅ FIX 2 — show "No ratings yet" when rating is 0 */}
                 {hasRating(doc) ? (
                   <span className="sd-doc-rating-pill">
                     ⭐ {Number(doc.rating).toFixed(1)}
@@ -617,7 +633,6 @@ const SearchDoctors = () => {
                     <span className="sd-doc-name">{doc.name}</span>
                     <span className="sd-doc-spec">{doc.specialty}</span>
                   </div>
-                  {/* ✅ FIX 1 — removed ti-currency-rupee icon, kept only ₹ symbol */}
                   <span className="sd-fee-tag">
                     ₹{doc.consultationFee}
                     <small>/visit</small>
