@@ -515,7 +515,7 @@ const Profile = () => {
 
           {/* Basic Information */}
           <div className="dp-section">
-            <SectionTitle icon="👤">Basic Information</SectionTitle>
+            <SectionTitle>Basic Information</SectionTitle>
             <div className="dp-grid">
               <Field label="Full Name">
                 <input name="name" value={doctor.name || ""} onChange={handleChange} placeholder="Dr. Jane Smith" />
@@ -542,7 +542,7 @@ const Profile = () => {
 
           {/* About */}
           <div className="dp-section">
-            <SectionTitle icon="📝">About</SectionTitle>
+            <SectionTitle>About</SectionTitle>
             <Field label="Short bio visible to patients">
               <textarea
                 name="about"
@@ -555,7 +555,7 @@ const Profile = () => {
 
           {/* Clinic Address */}
           <div className="dp-section">
-            <SectionTitle icon="🏥">Clinic Address</SectionTitle>
+            <SectionTitle>Clinic Address</SectionTitle>
             <div className="dp-grid">
               <Field label="Street / Building">
                 <input
@@ -576,7 +576,7 @@ const Profile = () => {
 
           {/* Weekly Availability */}
           <div className="dp-section">
-            <SectionTitle icon="📅">Weekly Availability</SectionTitle>
+            <SectionTitle>Weekly Availability</SectionTitle>
 
             {daysOfWeek.map(day => (
               <div className="dp-day-row" key={day}>
@@ -651,7 +651,7 @@ const Profile = () => {
 
           {/* Special / Override Availability */}
           <div className="dp-section">
-            <SectionTitle icon="⭐">Special Availability</SectionTitle>
+            <SectionTitle>Special Availability</SectionTitle>
             <p style={{ color: "#787167", marginTop: -8, marginBottom: 16, fontSize: 13 }}>
               Override your weekly schedule for specific date ranges (e.g. conferences, holidays).
             </p>
