@@ -47,6 +47,7 @@ const STYLES = `
     flex-direction: column;
     z-index: 100;
     border-right: 1px solid rgba(255,255,255,0.05);
+    overflow: hidden;
   }
 
   /* Brand */
@@ -190,7 +191,6 @@ const STYLES = `
     width: calc(100% - 240px);
     min-height: 100vh;
     background: var(--page-bg);
-    overflow-y: auto;
   }
 
   @media (max-width: 768px) {
