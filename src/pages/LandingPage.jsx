@@ -8,40 +8,36 @@ const STYLES = `
   .lp-root {
     min-height: 100vh;
     font-family: 'Inter', sans-serif;
-    background: #f8f7f4;
+    background: #fff;
     display: flex;
     flex-direction: column;
   }
 
   .lp-header {
-    padding: 18px 40px;
+    padding: 16px 40px;
     display: flex;
     align-items: center;
-    justify-content: space-between;
     background: #fff;
     border-bottom: 1px solid rgba(0,0,0,0.07);
   }
-  .lp-logo {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
   .lp-logo-icon {
-    width: 34px; height: 34px;
+    width: 36px; height: 36px;
     background: #2d5a4e;
-    border-radius: 8px;
+    border-radius: 9px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 17px;
-  }
-  .lp-logo-text {
     font-size: 18px;
+    margin-right: 10px;
+    flex-shrink: 0;
+  }
+  .lp-logo-name {
+    font-size: 17px;
     font-weight: 700;
-    color: #111;
+    color: #0f172a;
     letter-spacing: -.02em;
   }
-  .lp-logo-sub {
-    font-size: 12px;
-    color: #6b7280;
+  .lp-logo-tagline {
+    font-size: 11.5px;
+    color: #9ca3af;
     font-weight: 400;
   }
 
@@ -51,104 +47,99 @@ const STYLES = `
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 48px 20px 60px;
+    padding: 56px 20px 64px;
     text-align: center;
   }
 
-  .lp-eyebrow {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: #eaf2ef;
-    color: #2d5a4e;
-    font-size: 12px;
-    font-weight: 600;
-    letter-spacing: .04em;
-    text-transform: uppercase;
-    padding: 4px 12px;
-    border-radius: 20px;
-    margin-bottom: 20px;
-  }
-  .lp-eyebrow-dot {
-    width: 6px; height: 6px;
-    background: #2d5a4e;
-    border-radius: 50%;
-  }
-
   .lp-heading {
-    font-size: 40px;
+    font-size: 46px;
     font-weight: 700;
     color: #0f172a;
-    letter-spacing: -.03em;
-    line-height: 1.15;
-    margin-bottom: 14px;
-    max-width: 500px;
+    letter-spacing: -.04em;
+    line-height: 1.1;
+    margin-bottom: 16px;
   }
-  .lp-heading span { color: #2d5a4e; }
+  .lp-heading em {
+    font-style: normal;
+    color: #2d5a4e;
+  }
 
   .lp-sub {
     font-size: 15px;
     color: #6b7280;
-    line-height: 1.6;
-    max-width: 420px;
-    margin-bottom: 48px;
+    line-height: 1.65;
+    max-width: 380px;
+    margin-bottom: 52px;
   }
 
   .lp-cards {
     display: flex;
-    gap: 20px;
+    gap: 18px;
     justify-content: center;
     flex-wrap: wrap;
   }
 
   .lp-card {
     background: #fff;
-    border: 1px solid rgba(0,0,0,0.08);
-    border-radius: 16px;
-    padding: 28px 24px;
-    width: 260px;
+    border: 1.5px solid rgba(0,0,0,0.09);
+    border-radius: 18px;
+    padding: 28px 24px 24px;
+    width: 256px;
     text-align: left;
-    transition: box-shadow .2s, transform .2s;
+    transition: box-shadow .2s, transform .18s;
   }
   .lp-card:hover {
-    box-shadow: 0 12px 40px rgba(0,0,0,0.10);
-    transform: translateY(-2px);
+    box-shadow: 0 16px 48px rgba(0,0,0,0.11);
+    transform: translateY(-3px);
   }
 
-  .lp-card-icon {
-    width: 44px; height: 44px;
-    border-radius: 10px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 22px;
-    margin-bottom: 14px;
+  .lp-card-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 20px;
+    margin-bottom: 16px;
   }
-  .lp-card-icon.blue { background: #eff6ff; }
-  .lp-card-icon.green { background: #eaf2ef; }
+  .lp-card-badge.blue  { background: #eff6ff; color: #1d4ed8; }
+  .lp-card-badge.green { background: #eaf2ef; color: #2d5a4e; }
+  .lp-card-badge-dot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  .lp-card-emoji {
+    font-size: 36px;
+    margin-bottom: 12px;
+    display: block;
+    line-height: 1;
+  }
 
   .lp-card-title {
-    font-size: 16px;
-    font-weight: 600;
-    color: #111;
+    font-size: 17px;
+    font-weight: 700;
+    color: #0f172a;
     margin-bottom: 6px;
+    letter-spacing: -.02em;
   }
   .lp-card-desc {
     font-size: 13px;
     color: #6b7280;
     line-height: 1.55;
-    margin-bottom: 20px;
-  }
-
-  .lp-divider {
-    height: 1px;
-    background: rgba(0,0,0,0.07);
-    margin-bottom: 16px;
+    margin-bottom: 22px;
+    min-height: 52px;
   }
 
   .lp-btn {
     display: block;
     width: 100%;
-    padding: 9px 0;
-    border-radius: 8px;
+    padding: 10px 0;
+    border-radius: 9px;
     border: none;
     font-family: 'Inter', sans-serif;
     font-size: 13.5px;
@@ -156,28 +147,29 @@ const STYLES = `
     cursor: pointer;
     transition: opacity .15s, transform .1s;
     text-align: center;
+    letter-spacing: -.01em;
   }
-  .lp-btn:hover  { opacity: .87; }
+  .lp-btn:hover  { opacity: .85; }
   .lp-btn:active { transform: scale(.98); }
   .lp-btn + .lp-btn { margin-top: 8px; }
 
-  .lp-btn-primary-blue  { background: #1d4ed8; color: #fff; }
-  .lp-btn-outline-blue  { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
-  .lp-btn-primary-green { background: #2d5a4e; color: #fff; }
-  .lp-btn-outline-green { background: #eaf2ef; color: #2d5a4e; border: 1px solid #a7d4c8; }
+  .lp-btn-blue        { background: #1d4ed8; color: #fff; }
+  .lp-btn-blue-ghost  { background: #eff6ff; color: #1d4ed8; border: 1.5px solid #bfdbfe; }
+  .lp-btn-green       { background: #2d5a4e; color: #fff; }
+  .lp-btn-green-ghost { background: #eaf2ef; color: #2d5a4e; border: 1.5px solid #a7d4c8; }
 
   .lp-footer {
     text-align: center;
-    padding: 16px;
-    background: #fff;
+    padding: 14px;
     border-top: 1px solid rgba(0,0,0,0.07);
     font-size: 12px;
-    color: #9ca3af;
+    color: #cbd5e1;
   }
 
   @media (max-width: 600px) {
-    .lp-heading { font-size: 28px; }
-    .lp-header  { padding: 16px 20px; }
+    .lp-heading { font-size: 32px; }
+    .lp-header  { padding: 14px 20px; }
+    .lp-card    { width: 100%; max-width: 320px; }
   }
 `;
 
@@ -190,58 +182,52 @@ function LandingPage() {
       <style>{STYLES}</style>
       <div className="lp-root">
 
-        {/* Header */}
         <header className="lp-header">
-          <div className="lp-logo">
-            <div className="lp-logo-icon">🏥</div>
-            <div>
-              <div className="lp-logo-text">MediCo</div>
-              <div className="lp-logo-sub">Smart Healthcare</div>
-            </div>
+          <div className="lp-logo-icon">🏥</div>
+          <div>
+            <div className="lp-logo-name">MediCo</div>
+            <div className="lp-logo-tagline">Smart Healthcare</div>
           </div>
         </header>
 
-        {/* Hero */}
         <main className="lp-hero">
-          <div className="lp-eyebrow">
-            <span className="lp-eyebrow-dot" />
-            AI-Powered Healthcare
-          </div>
-
           <h1 className="lp-heading">
-            Your health,<br /><span>simplified.</span>
+            Healthcare that<br /><em>actually works.</em>
           </h1>
-
           <p className="lp-sub">
-            Book appointments, consult doctors, and get AI-powered health insights — all in one place.
+            Book appointments, consult doctors, and manage your health — all in one place.
           </p>
 
           <div className="lp-cards">
 
-            {/* Patient card */}
+            {/* Patient */}
             <div className="lp-card">
-              <div className="lp-card-icon blue">🧑‍⚕️</div>
+              <span className="lp-card-badge blue">
+                <span className="lp-card-badge-dot" /> For patients
+              </span>
+              <span className="lp-card-emoji">🙋</span>
               <p className="lp-card-title">Patient</p>
-              <p className="lp-card-desc">Book appointments, predict conditions, and manage your health records.</p>
-              <div className="lp-divider" />
-              <button className="lp-btn lp-btn-primary-blue" onClick={() => navigate("/patient/login")}>
+              <p className="lp-card-desc">Book appointments, get health predictions, and manage your records.</p>
+              <button className="lp-btn lp-btn-blue" onClick={() => navigate("/patient/login")}>
                 Login
               </button>
-              <button className="lp-btn lp-btn-outline-blue" onClick={() => navigate("/patient/register")}>
+              <button className="lp-btn lp-btn-blue-ghost" onClick={() => navigate("/patient/register")}>
                 Create account
               </button>
             </div>
 
-            {/* Doctor card */}
+            {/* Doctor */}
             <div className="lp-card">
-              <div className="lp-card-icon green">👨‍⚕️</div>
+              <span className="lp-card-badge green">
+                <span className="lp-card-badge-dot" /> For doctors
+              </span>
+              <span className="lp-card-emoji">🩺</span>
               <p className="lp-card-title">Doctor</p>
-              <p className="lp-card-desc">Manage patients, appointments, and your availability with ease.</p>
-              <div className="lp-divider" />
-              <button className="lp-btn lp-btn-primary-green" onClick={() => navigate("/doctor/login")}>
+              <p className="lp-card-desc">Manage patients, handle appointments, and set your availability.</p>
+              <button className="lp-btn lp-btn-green" onClick={() => navigate("/doctor/login")}>
                 Login
               </button>
-              <button className="lp-btn lp-btn-outline-green" onClick={() => navigate("/doctor/register")}>
+              <button className="lp-btn lp-btn-green-ghost" onClick={() => navigate("/doctor/register")}>
                 Create account
               </button>
             </div>
@@ -249,7 +235,6 @@ function LandingPage() {
           </div>
         </main>
 
-        {/* Footer */}
         <footer className="lp-footer">
           © 2026 MediCo — Smart Healthcare
         </footer>
