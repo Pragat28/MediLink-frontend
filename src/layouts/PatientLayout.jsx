@@ -7,6 +7,11 @@ const STYLES = `
   @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display&display=swap');
   *, *::before, *::after { box-sizing: border-box; }
 
+  html, body {
+    overflow-y: auto !important;
+    height: auto !important;
+  }
+
   .pl-root {
     --accent:        #3b6b9e;
     --accent-light:  #4d7daf;
