@@ -117,7 +117,6 @@ function PatientLayout() {
 
         <nav style={{ marginTop: "20px", display: "flex", flexDirection: "column", gap: "15px" }}>
           <Link to="/patient/search" style={{ color: "white" }}>Search Doctors</Link>
-          <Link to="/patient/predict" style={{ color: "white" }}>Diagnose</Link>
 
           <Link
             to="/patient/appointments"
