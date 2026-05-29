@@ -53,25 +53,31 @@ const DoctorRegister = () => {
   /* ================= HANDLERS ================= */
 
   const handleChange = (e) => {
-    setForm({
-      ...form,
-      [e.target.name]: e.target.value
-    });
+    setForm({ ...form, [e.target.name]: e.target.value });
   };
 
   const handleFileChange = (e) => {
-    setForm({
-      ...form,
-      photo: e.target.files[0]
-    });
+    const file = e.target.files[0];
+    if (file && file.size > 5 * 1024 * 1024) {
+      toast.error("Photo must be smaller than 5MB.");
+      return;
+    }
+    setForm({ ...form, photo: file });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!isFormValid) {
-      return toast.error("Please fill all fields correctly");
-    }
+    if (!form.name.trim()) return toast.error("Full name is required.");
+    if (!isEmailValid) return toast.error("Please enter a valid email address.");
+    if (!isPasswordValid) return toast.error("Password must be at least 6 characters.");
+    if (!isPhoneValid) return toast.error("Please enter a valid phone number.");
+    if (!form.specialty) return toast.error("Please select a specialty.");
+    if (!form.gender) return toast.error("Please select a gender.");
+    if (!form.consultationFee) return toast.error("Please enter a consultation fee.");
+    if (!form.registrationNumber.trim()) return toast.error("Medical registration number is required.");
+    if (!form.councilName.trim()) return toast.error("Medical council name is required.");
+    if (!form.degree.trim()) return toast.error("Degree is required.");
 
     try {
       setLoading(true);
@@ -90,21 +96,29 @@ const DoctorRegister = () => {
       await axios.post(
         "https://medilink-j44r.onrender.com/api/doctor-auth/register",
         formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data"
-          }
-        }
+        { headers: { "Content-Type": "multipart/form-data" } }
       );
 
-      // ✅ CORRECT FLOW MESSAGE
-      toast.success("Waiting for admin approval. Try LOG IN after some time");
-
+      toast.success("Registration submitted! Awaiting admin approval. You can try logging in after some time.");
       navigate("/");
 
     } catch (error) {
-      console.error(error.response?.data || error);
-      toast.error(error.response?.data?.message || "Registration failed");
+      if (!error.response) {
+        toast.error("Network error — please check your internet connection and try again.");
+      } else {
+        const msg = error.response?.data?.message;
+        if (msg === "Doctor already exists") {
+          toast.error("This email is already registered. Please log in instead.");
+        } else if (msg === "Invalid email format") {
+          toast.error("Please enter a valid email address.");
+        } else if (msg === "Password must be at least 6 characters long") {
+          toast.error("Password must be at least 6 characters long.");
+        } else if (msg === "Phone must include country code") {
+          toast.error("Phone number must include country code (e.g. +91).");
+        } else {
+          toast.error(msg || "Registration failed. Please try again.");
+        }
+      }
     } finally {
       setLoading(false);
     }
@@ -125,9 +139,11 @@ const DoctorRegister = () => {
           <input name="name" placeholder="Full Name" onChange={handleChange} required style={input} />
 
           <input type="email" name="email" placeholder="Email" onChange={handleChange} required style={input} />
+          {form.email && !isEmailValid && (
+            <p style={{ fontSize: "12px", color: "red" }}>Please enter a valid email.</p>
+          )}
 
           <input type="password" name="password" placeholder="Password" onChange={handleChange} required style={input} />
-
           {form.password && (
             <p style={{ fontSize: "12px", color: isPasswordValid ? "green" : "red" }}>
               {isPasswordValid ? "Password looks good ✅" : "Minimum 6 characters required"}
@@ -208,7 +224,7 @@ const DoctorRegister = () => {
           {/* PHOTO */}
           <div>
             <label style={{ fontSize: "14px", fontWeight: "500" }}>
-              Choose profile photo
+              Choose profile photo (max 5MB)
             </label>
             <input type="file" accept="image/*" onChange={handleFileChange} style={{ marginTop: "5px" }} />
           </div>
@@ -218,11 +234,11 @@ const DoctorRegister = () => {
             disabled={!isFormValid || loading}
             style={{
               ...button,
-              opacity: isFormValid ? 1 : 0.6,
-              cursor: isFormValid ? "pointer" : "not-allowed"
+              opacity: isFormValid && !loading ? 1 : 0.6,
+              cursor: isFormValid && !loading ? "pointer" : "not-allowed"
             }}
           >
-            {loading ? "Registering" : "Register"}
+            {loading ? "Registering... please wait" : "Register"}
           </button>
 
         </form>
