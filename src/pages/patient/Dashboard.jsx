@@ -10,10 +10,6 @@ const PatientDashboard = () => {
 
       <p>You are logged in successfully ✅</p>
 
-      <button onClick={() => navigate("/patient/predict")}>
-        Predict Disease
-      </button>
-
       <br /><br />
 
       <button onClick={() => navigate("/patient/search")}>
