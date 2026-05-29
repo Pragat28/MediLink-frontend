@@ -513,12 +513,14 @@ const SearchDoctors = () => {
 
   const hasRating = (doc) => doc.rating && Number(doc.rating) > 0;
 
+  const placeholder = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='76' height='76'%3E%3Crect width='76' height='76' fill='%23d9e5f3'/%3E%3Ccircle cx='38' cy='30' r='13' fill='%236a94bc'/%3E%3Cellipse cx='38' cy='65' rx='20' ry='15' fill='%236a94bc'/%3E%3C/svg%3E";
+
   const getPhoto = (doc) =>
     doc.photo && doc.photo.trim() !== ""
       ? doc.photo.startsWith("http")
         ? doc.photo
         : `https://medilink-j44r.onrender.com${doc.photo}`
-      : PLACEHOLDER;
+      : placeholder;
 
   return (
     <div className="sd-root">
