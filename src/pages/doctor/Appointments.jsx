@@ -44,11 +44,13 @@ const Appointments = () => {
       );
 
       if (action === "approve") {
-        // ✅ compact toast for doctor only
-        toast.info(
-          `📩 Kindly send meeting link to: ${res.data.patientEmail} before the appointment`,
-          { autoClose: 8000 }
-        );
+        if (action === "approve") {
+          if (res.data.mode === "online") {
+              toast.info(`📩 Kindly send meeting link to: ${res.data.patientEmail}`, { autoClose: 8000 });
+  } else {
+    toast.success("Appointment approved successfully");
+  }
+}
       } else {
         toast.success(`Appointment ${action}ed successfully`);
       }
