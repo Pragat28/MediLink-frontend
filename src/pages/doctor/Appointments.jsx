@@ -44,13 +44,9 @@ const Appointments = () => {
       );
 
       if (action === "approve") {
-        if (action === "approve") {
           if (res.data.mode === "online") {
               toast.info(`📩 Kindly send meeting link to: ${res.data.patientEmail}`, { autoClose: 8000 });
-  } else {
-    toast.success("Appointment approved successfully");
-  }
-}
+          }
       } else {
         toast.success(`Appointment ${action}ed successfully`);
       }
