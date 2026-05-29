@@ -7,7 +7,6 @@ import AdminLogin from "./pages/admin/adminLogin";
 /* Patient */
 import PatientRegister from "./pages/patient/Register";
 import PatientLogin from "./pages/patient/Login";
-import Predict from "./pages/patient/Predict";
 import SearchDoctors from "./pages/patient/SearchDoctors";
 import MyAppointments from "./pages/patient/MyAppointments";
 import DoctorProfile from "./pages/patient/DoctorProfile";
@@ -65,7 +64,6 @@ function App() {
           }
         >
           <Route index element={<SearchDoctors />} />
-          <Route path="predict" element={<Predict />} />
           <Route path="search" element={<SearchDoctors />} />
           <Route path="appointments" element={<MyAppointments />} />
           <Route path="profile" element={<PatientProfile />} />
