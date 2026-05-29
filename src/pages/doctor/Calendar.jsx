@@ -164,9 +164,10 @@ const STYLES = `
   .dc-cal-pane .react-calendar__tile {
     border-radius: 7px;
     font-size: 13px;
-    padding: 8px 4px;
+    padding: 10px 4px 6px;
     color: var(--text);
     transition: background .12s;
+    line-height: 1.2;
   }
   .dc-cal-pane .react-calendar__tile:hover {
     background: var(--accent-lt) !important;
@@ -184,24 +185,24 @@ const STYLES = `
     font-weight: 600;
   }
 
-  /* Appointment dot tile */
+  /* Appointment highlight tile */
   .dc-cal-pane .appointment-day {
+    background: var(--accent-lt) !important;
+    color: var(--accent) !important;
+    font-weight: 700;
+    border-radius: 7px;
+    border: 1.5px solid var(--accent) !important;
     position: relative;
-    font-weight: 600;
   }
-  .dc-cal-pane .appointment-day::after {
-    content: '';
-    position: absolute;
-    bottom: 4px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 5px;
-    height: 5px;
-    border-radius: 50%;
-    background: var(--accent);
+  .dc-cal-pane .appointment-day:hover {
+    background: #c8ddd8 !important;
   }
-  .dc-cal-pane .react-calendar__tile--active.appointment-day::after {
-    background: rgba(255,255,255,0.7);
+  /* Keep active/selected state dominant over appointment highlight */
+  .dc-cal-pane .react-calendar__tile--active.appointment-day,
+  .dc-cal-pane .react-calendar__tile--active.appointment-day:hover {
+    background: var(--accent) !important;
+    color: #fff !important;
+    border-color: var(--accent) !important;
   }
 
   /* Appointment cards */
@@ -389,6 +390,29 @@ function DoctorCalendar() {
     return null;
   };
 
+  const tileContent = ({ date: tileDate, view }) => {
+    if (view === "month") {
+      const count = appointments.filter(
+        a => new Date(a.date).toDateString() === tileDate.toDateString()
+      ).length;
+      if (count > 0) {
+        return (
+          <span style={{
+            display: "block",
+            fontSize: "9px",
+            fontWeight: 700,
+            lineHeight: 1,
+            marginTop: "1px",
+            opacity: 0.8,
+          }}>
+            {count} appt{count > 1 ? "s" : ""}
+          </span>
+        );
+      }
+    }
+    return null;
+  };
+
   const formattedDate = date.toLocaleDateString("en-GB", {
     weekday: "long", day: "numeric", month: "long", year: "numeric"
   });
@@ -426,9 +450,17 @@ function DoctorCalendar() {
               onChange={handleDateChange}
               value={date}
               tileClassName={tileClassName}
+              tileContent={tileContent}
             />
             <div className="dc-legend">
-              <span className="dc-legend-dot" />
+              <span style={{
+                display: "inline-block",
+                width: 14, height: 14,
+                background: "var(--accent-lt)",
+                border: "1.5px solid var(--accent)",
+                borderRadius: 3,
+                flexShrink: 0,
+              }} />
               <span>Date has appointments</span>
             </div>
           </div>
