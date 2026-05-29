@@ -256,18 +256,18 @@ function MyAppointments() {
           </div>
         )}
 
-        {/* ── REJECTED ── */}
+        {/* ── REJECTED ── ✅ same style as cancelled */}
         {type === "rejected" && (
           <div style={{
-            background: "#fef2f2",
-            border: "1.5px solid #fca5a5",
+            background: "#fafafa",
+            border: "1.5px solid #e2e8f0",
             borderRadius: "8px",
             padding: "10px 12px"
           }}>
-            <p style={{ margin: 0, color: "#dc2626", fontWeight: "600" }}>
-              ✖ Appointment Rejected
+            <p style={{ margin: 0, color: "#64748b", fontWeight: "600" }}>
+              🚫 Appointment Rejected
             </p>
-            <p style={{ margin: "4px 0 0", fontSize: "13px", color: "#991b1b" }}>
+            <p style={{ margin: "4px 0 0", fontSize: "13px", color: "#94a3b8" }}>
               The doctor was unable to accept this request. You can book a different slot or consult another doctor.
             </p>
           </div>
