@@ -20,8 +20,6 @@ const STYLES = `
     --danger-bg:     #fdf1f1;
     --warn:          #7a4f1d;
     --warn-bg:       #fdf8f0;
-    --info:          #2b6098;
-    --info-bg:       #eef4fb;
     --success:       #1a6640;
     --success-bg:    #eef8f2;
     --neutral-bg:    #f4f6f9;
@@ -77,13 +75,11 @@ const STYLES = `
     border-bottom: 1px solid var(--border);
     background: linear-gradient(135deg, #f0f4f9 0%, #e8eef5 100%);
   }
-
   .dp-hero-top {
     display: flex;
     gap: 0;
     align-items: stretch;
   }
-
   .dp-hero-left {
     display: flex;
     flex-direction: column;
@@ -95,7 +91,6 @@ const STYLES = `
     min-width: 150px;
     gap: 10px;
   }
-
   .dp-avatar-img {
     width: 90px; height: 90px;
     border-radius: 50%;
@@ -103,7 +98,6 @@ const STYLES = `
     border: 3px solid var(--surface);
     box-shadow: 0 2px 10px rgba(59,107,158,0.2);
   }
-
   .dp-availability-badge {
     display: inline-flex;
     align-items: center;
@@ -123,7 +117,6 @@ const STYLES = `
     border-radius: 50%;
     flex-shrink: 0;
   }
-
   .dp-hero-main {
     flex: 1;
     padding: 20px 24px;
@@ -131,7 +124,6 @@ const STYLES = `
     flex-direction: column;
     gap: 12px;
   }
-
   .dp-hero-name-row {
     display: flex;
     align-items: flex-start;
@@ -139,7 +131,6 @@ const STYLES = `
     flex-wrap: wrap;
     gap: 8px;
   }
-
   .dp-doctor-name {
     font-family: 'DM Serif Display', serif;
     font-size: 22px;
@@ -148,7 +139,6 @@ const STYLES = `
     color: var(--text);
     line-height: 1.2;
   }
-
   .dp-doctor-spec {
     font-size: 13px;
     color: var(--accent);
@@ -157,7 +147,6 @@ const STYLES = `
     letter-spacing: .01em;
     text-transform: uppercase;
   }
-
   .dp-fee-badge {
     display: inline-flex;
     align-items: center;
@@ -174,43 +163,6 @@ const STYLES = `
     font-size: 10px;
     font-weight: 400;
     opacity: .8;
-  }
-
-  /* ── Stats strip ── */
-  .dp-stats-strip {
-    display: flex;
-    gap: 0;
-    border: 1px solid var(--border);
-    border-radius: 9px;
-    overflow: hidden;
-    background: var(--surface);
-  }
-  .dp-stat {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 10px 8px;
-    border-right: 1px solid var(--border);
-    gap: 1px;
-  }
-  .dp-stat:last-child { border-right: none; }
-  .dp-stat-value {
-    font-size: 17px;
-    font-weight: 700;
-    color: var(--text);
-    line-height: 1;
-  }
-  .dp-stat-label {
-    font-size: 10.5px;
-    color: var(--muted);
-    text-align: center;
-    margin-top: 1px;
-  }
-  .dp-stat-icon {
-    font-size: 14px;
-    color: var(--accent-muted);
-    margin-bottom: 2px;
   }
 
   /* ── Info grid ── */
@@ -232,10 +184,7 @@ const STYLES = `
     flex-shrink: 0;
     width: 16px;
   }
-  .dp-info-item strong {
-    color: var(--text);
-    font-weight: 600;
-  }
+  .dp-info-item strong { color: var(--text); font-weight: 600; }
 
   /* ── About strip ── */
   .dp-about-strip {
@@ -248,50 +197,53 @@ const STYLES = `
   }
   .dp-about-strip p { margin: 0; }
 
-  /* ── Section layout ── */
-  .dp-body { padding: 0; }
+  /* ── Two-col lower body ── */
   .dp-two-col {
     display: grid;
     grid-template-columns: 1fr 300px;
     gap: 0;
     border-bottom: 1px solid var(--border);
   }
-  @media (max-width: 720px) {
-    .dp-two-col { grid-template-columns: 1fr; }
-    .dp-avail-col { border-left: none !important; border-top: 1px solid var(--border); }
-    .dp-info-grid { grid-template-columns: 1fr; }
-    .dp-hero-top { flex-direction: column; }
-    .dp-hero-left { flex-direction: row; padding: 16px; border-right: none; border-bottom: 1px solid var(--border); justify-content: flex-start; }
-  }
 
-  /* ── Availability column ── */
-  .dp-avail-col {
-    border-left: 1px solid var(--border);
-    padding: 16px 18px;
-    background: var(--neutral-bg);
-  }
-  .dp-day-row { margin-bottom: 12px; }
-  .dp-day-name { font-size: 12px; font-weight: 700; color: var(--text); margin: 0 0 1px; text-transform: uppercase; letter-spacing: .03em; }
-  .dp-day-date { font-size: 11px; color: var(--muted); margin: 0 0 4px; }
-  .dp-slot-tag {
-    display: inline-block;
-    background: var(--accent-bg);
-    color: var(--accent);
-    border: 1px solid var(--accent-border);
-    padding: 2px 7px;
-    border-radius: 5px;
-    font-size: 11.5px;
-    font-weight: 500;
-    margin-right: 4px;
-    margin-bottom: 3px;
-  }
-  .dp-no-slot { font-size: 11.5px; color: var(--border-md); font-style: italic; }
-
-  /* ── Booking panel ── */
+  /* ── Left: about + booking ── */
   .dp-booking-panel {
-    padding: 18px 24px;
+    padding: 20px 24px;
     background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
   }
+
+  /* ── Section / sub labels ── */
+  .dp-section-label {
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 10px;
+  }
+  .dp-sub-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--muted);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+  }
+
+  /* ── About block inside booking panel ── */
+  .dp-about-block {
+    padding: 13px 16px;
+    background: var(--neutral-bg);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+  .dp-about-block p { margin: 0; }
 
   /* ── Mode toggle ── */
   .dp-mode-toggle {
@@ -313,11 +265,67 @@ const STYLES = `
     transition: background .15s, color .15s;
     line-height: 1;
   }
-  .dp-mode-btn.active {
-    background: var(--accent);
-    color: #fff;
-  }
+  .dp-mode-btn.active { background: var(--accent); color: #fff; }
   .dp-mode-btn i { font-size: 14px; }
+
+  /* ── Custom date picker ── */
+  .dp-date-picker-wrap {
+    position: relative;
+    max-width: 240px;
+  }
+  .dp-date-picker-wrap i {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--accent-muted);
+    font-size: 15px;
+    pointer-events: none;
+  }
+  .dp-date-input {
+    padding: 8px 11px 8px 34px;
+    border: 1.5px solid var(--border-md);
+    border-radius: 8px;
+    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text);
+    outline: none;
+    transition: border-color .15s, box-shadow .15s;
+    background: var(--surface);
+    width: 100%;
+    cursor: pointer;
+    letter-spacing: .02em;
+  }
+  .dp-date-input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-bg);
+  }
+  .dp-date-input::-webkit-calendar-picker-indicator {
+    opacity: 0;
+    position: absolute;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+  }
+  .dp-date-display {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+  }
+  .dp-date-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 11px;
+    background: var(--accent-bg);
+    border: 1px solid var(--accent-border);
+    border-radius: 6px;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--accent);
+  }
 
   /* ── Slot picker ── */
   .dp-slot-grid {
@@ -337,49 +345,10 @@ const STYLES = `
     border: 1px solid var(--accent-border);
     background: var(--accent-bg);
     color: var(--accent);
-    transition: background .15s, color .15s, border-color .15s;
+    transition: background .15s, color .15s;
   }
-  .dp-slot-btn.selected {
-    background: var(--accent);
-    color: #fff;
-    border-color: var(--accent);
-  }
+  .dp-slot-btn.selected { background: var(--accent); color: #fff; border-color: var(--accent); }
   .dp-slot-btn:hover:not(.selected) { background: #d9e5f3; }
-
-  /* ── Date input ── */
-  .dp-date-input {
-    padding: 7px 11px;
-    border: 1px solid var(--border-md);
-    border-radius: 7px;
-    font-size: 13px;
-    font-family: 'DM Sans', sans-serif;
-    color: var(--text);
-    outline: none;
-    transition: border-color .15s;
-    background: var(--surface);
-    width: 100%;
-    max-width: 220px;
-  }
-  .dp-date-input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-bg); }
-
-  /* ── Book button ── */
-  .dp-book-btn {
-    display: inline-flex; align-items: center; gap: 6px;
-    margin-top: 14px;
-    padding: 10px 22px;
-    border: none;
-    border-radius: 8px;
-    background: var(--accent);
-    color: #fff;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: opacity .15s, transform .1s;
-  }
-  .dp-book-btn:hover  { opacity: .87; }
-  .dp-book-btn:active { transform: scale(.97); }
-  .dp-book-btn i { font-size: 15px; }
 
   /* ── No-slot notice ── */
   .dp-no-slot-notice {
@@ -394,24 +363,70 @@ const STYLES = `
   }
   .dp-no-slot-notice i { font-size: 14px; flex-shrink: 0; }
 
-  /* ── Section label ── */
-  .dp-section-label {
-    font-size: 10.5px;
-    font-weight: 700;
-    letter-spacing: .07em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin: 0 0 10px;
+  /* ── Book button ── */
+  .dp-book-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 10px 22px;
+    border: none;
+    border-radius: 8px;
+    background: var(--accent);
+    color: #fff;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity .15s, transform .1s;
+    align-self: flex-start;
   }
+  .dp-book-btn:hover  { opacity: .87; }
+  .dp-book-btn:active { transform: scale(.97); }
+  .dp-book-btn i { font-size: 15px; }
 
-  /* ── Sub-label ── */
-  .dp-sub-label {
-    font-size: 11px;
+  /* ── Availability column (right) ── */
+  .dp-avail-col {
+    padding: 20px 18px;
+    background: var(--neutral-bg);
+    overflow-y: auto;
+  }
+  .dp-day-row {
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    margin-bottom: 8px;
+  }
+  .dp-day-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 5px;
+  }
+  .dp-day-name {
+    font-size: 12px;
     font-weight: 700;
-    color: var(--muted);
-    margin-bottom: 6px;
+    color: var(--text);
     text-transform: uppercase;
     letter-spacing: .04em;
+  }
+  .dp-day-date {
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .dp-slot-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+  .dp-slot-tag {
+    display: inline-block;
+    background: var(--accent-bg);
+    color: var(--accent);
+    border: 1px solid var(--accent-border);
+    padding: 2px 7px;
+    border-radius: 5px;
+    font-size: 11.5px;
+    font-weight: 500;
+  }
+  .dp-no-slot {
+    font-size: 11.5px;
+    color: var(--border-md);
+    font-style: italic;
   }
 
   /* ── Reviews ── */
@@ -526,15 +541,47 @@ const STYLES = `
 
   .dp-divider { border: none; border-top: 1px solid var(--border); margin: 0; }
 
+  @media (max-width: 720px) {
+    .dp-two-col { grid-template-columns: 1fr; }
+    .dp-avail-col { border-top: 1px solid var(--border); }
+    .dp-info-grid { grid-template-columns: 1fr; }
+    .dp-hero-top { flex-direction: column; }
+    .dp-hero-left {
+      flex-direction: row; padding: 16px;
+      border-right: none; border-bottom: 1px solid var(--border);
+      justify-content: flex-start;
+    }
+    .dp-booking-panel { border-right: none; }
+  }
   @media (max-width: 600px) {
     .dp-hero-main, .dp-booking-panel, .dp-reviews { padding-left: 16px; padding-right: 16px; }
     .dp-page-header { padding-left: 16px; padding-right: 16px; }
     .dp-avail-col { padding: 14px 16px; }
-    .dp-about-strip { padding: 12px 16px; }
   }
 `;
 
 /* ─── Helpers ─────────────────────────────────────────── */
+const fmtRating = (r) => {
+  if (!r && r !== 0) return "—";
+  const n = parseFloat(r);
+  if (isNaN(n)) return "—";
+  // truncate (not round) to 2 decimal places
+  return Math.trunc(n * 100) / 100 === Math.round(n)
+    ? n.toFixed(0)
+    : (Math.trunc(n * 100) / 100).toFixed(2).replace(/\.?0+$/, "") || n.toString();
+};
+
+// Returns rating string: if >2 decimal places, truncate to 2
+const truncateRating = (r) => {
+  if (!r && r !== 0) return null;
+  const n = parseFloat(r);
+  if (isNaN(n)) return null;
+  // truncate to at most 2 decimal digits
+  const truncated = Math.trunc(n * 100) / 100;
+  // display without trailing zeros
+  return truncated % 1 === 0 ? truncated.toFixed(1) : truncated.toString();
+};
+
 const Stars = ({ rating }) => {
   const filled = Math.round(rating);
   return (
@@ -551,7 +598,6 @@ const ReviewCard = ({ review }) => {
     day: "numeric", month: "short", year: "numeric",
   });
   const initial = review.patientName ? review.patientName[0].toUpperCase() : "P";
-
   return (
     <div className="dp-review-card">
       <div className="dp-review-top">
@@ -570,20 +616,18 @@ const ReviewCard = ({ review }) => {
 };
 
 /* ─── ReviewsSection ──────────────────────────────────── */
-const ReviewsSection = ({ doctorId, avgRating }) => {
-  const [reviews, setReviews]   = useState([]);
-  const [loading, setLoading]   = useState(true);
-  const [error, setError]       = useState(null);
-  const [showAll, setShowAll]   = useState(false);
+const ReviewsSection = ({ doctorId }) => {
+  const [reviews, setReviews] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError]     = useState(null);
+  const [showAll, setShowAll] = useState(false);
   const PREVIEW = 3;
 
   const fetchReviews = async () => {
     setLoading(true); setError(null);
     try {
       const res = await axios.get(`${BASE_URL}/doctors/${doctorId}/reviews`);
-      const sorted = (res.data || []).sort(
-        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-      );
+      const sorted = (res.data || []).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
       setReviews(sorted);
     } catch (err) {
       setError(!err.response
@@ -619,9 +663,8 @@ const ReviewsSection = ({ doctorId, avgRating }) => {
         {avg !== null && (
           <span style={{
             background: "#fef7e0", color: "#8a6100",
-            padding: "3px 10px", borderRadius: 20,
-            fontSize: 12, fontWeight: 700,
-          }}>⭐ {avg.toFixed(1)} / 5</span>
+            padding: "3px 10px", borderRadius: 20, fontSize: 12, fontWeight: 700,
+          }}>⭐ {truncateRating(avg)} / 5</span>
         )}
       </div>
 
@@ -630,7 +673,6 @@ const ReviewsSection = ({ doctorId, avgRating }) => {
           <div className="dp-spinner" /> Loading reviews…
         </div>
       )}
-
       {!loading && error && (
         <div className="dp-state-box" style={{ padding: "20px 0" }}>
           <div className="dp-state-icon danger"><i className="ti ti-alert-triangle" /></div>
@@ -639,27 +681,22 @@ const ReviewsSection = ({ doctorId, avgRating }) => {
           <button className="dp-retry-btn" onClick={fetchReviews}><i className="ti ti-refresh" /> Try again</button>
         </div>
       )}
-
       {!loading && !error && reviews.length === 0 && (
         <div style={{
           textAlign: "center", padding: "20px 16px",
-          background: "var(--neutral-bg)",
-          border: "1px dashed var(--border-md)",
+          background: "var(--neutral-bg)", border: "1px dashed var(--border-md)",
           borderRadius: 9, color: "var(--muted)", fontSize: 13,
         }}>No reviews yet for this doctor.</div>
       )}
-
       {!loading && !error && reviews.length > 0 && (
         <>
           <div className="dp-rating-summary">
             <div style={{ textAlign: "center", minWidth: 64 }}>
-              <div className="dp-rating-big">{avg.toFixed(1)}</div>
+              <div className="dp-rating-big">{truncateRating(avg)}</div>
               <Stars rating={avg} />
               <div className="dp-rating-sub">{reviews.length} review{reviews.length !== 1 ? "s" : ""}</div>
             </div>
-            <div style={{ flex: 1, minWidth: 130 }}>
-              {[5, 4, 3, 2, 1].map(renderBar)}
-            </div>
+            <div style={{ flex: 1, minWidth: 130 }}>{[5, 4, 3, 2, 1].map(renderBar)}</div>
           </div>
           {displayed.map((r, i) => <ReviewCard key={r._id || i} review={r} />)}
           {reviews.length > PREVIEW && (
@@ -688,7 +725,6 @@ const DoctorProfile = () => {
 
   const today = new Date().toISOString().split("T")[0];
 
-  /* ── inject styles ── */
   useEffect(() => {
     const styleId = "dp-styles";
     if (!document.getElementById(styleId)) {
@@ -715,7 +751,6 @@ const DoctorProfile = () => {
 
   useEffect(() => { fetchDoctor(); }, [id]);
 
-  /* ── availability helpers ── */
   const normalizeDate = (d) => new Date(d).setHours(0, 0, 0, 0);
 
   const getNext7Days = () =>
@@ -746,7 +781,6 @@ const DoctorProfile = () => {
       .filter(s => !s.mode || s.mode === selectedMode);
   };
 
-  /* ── booking ── */
   const bookAppointment = async () => {
     if (!selectedDate || !selectedTime) {
       toast.error("Please select a date and a time slot before booking."); return;
@@ -773,7 +807,6 @@ const DoctorProfile = () => {
     }
   };
 
-  /* ── loading ── */
   if (docLoading) return (
     <div className="dp-root">
       <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css" />
@@ -781,7 +814,6 @@ const DoctorProfile = () => {
     </div>
   );
 
-  /* ── error ── */
   if (docError) return (
     <div className="dp-root">
       <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css" />
@@ -798,9 +830,16 @@ const DoctorProfile = () => {
 
   const next7Days = getNext7Days();
   const dateObj   = selectedDate
-    ? { date: new Date(selectedDate), dayName: new Date(selectedDate).toLocaleDateString("en-US", { weekday: "long" }) }
+    ? { date: new Date(selectedDate + "T00:00:00"), dayName: new Date(selectedDate + "T00:00:00").toLocaleDateString("en-US", { weekday: "long" }) }
     : null;
   const dateSlots = dateObj ? getSlotsForDate(dateObj) : [];
+
+  // Format selected date nicely
+  const formattedDate = selectedDate
+    ? new Date(selectedDate + "T00:00:00").toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short", year: "numeric" })
+    : null;
+
+  const displayRating = truncateRating(doctor.rating);
 
   return (
     <div className="dp-root">
@@ -810,9 +849,7 @@ const DoctorProfile = () => {
 
         {/* Page header */}
         <div className="dp-page-header">
-          <div className="dp-page-header-icon">
-            <i className="ti ti-user-heart" />
-          </div>
+          <div className="dp-page-header-icon"><i className="ti ti-user-heart" /></div>
           <div className="dp-page-header-text">
             <h1>Doctor Profile</h1>
             <p>Book a consultation and read patient reviews</p>
@@ -833,55 +870,41 @@ const DoctorProfile = () => {
               <span className="dp-availability-badge">Available</span>
             </div>
 
-            {/* Right: all info */}
+            {/* Right: doctor info */}
             <div className="dp-hero-main">
-              {/* Name + fee */}
               <div className="dp-hero-name-row">
                 <div>
                   <p className="dp-doctor-name">{doctor.name}</p>
                   <p className="dp-doctor-spec">{doctor.specialty}</p>
                 </div>
+                {/* ── Fee badge: no icon here, ₹ is part of the text, not a separate icon ── */}
                 <div className="dp-fee-badge">
-                  <i className="ti ti-currency-rupee" style={{ fontSize: 14 }} />
                   ₹{doctor.consultationFee}
                   <small>/visit</small>
                 </div>
               </div>
 
-              {/* Stats strip */}
-              <div className="dp-stats-strip">
-                <div className="dp-stat">
-                  <i className="ti ti-star-filled dp-stat-icon" />
-                  <span className="dp-stat-value">{doctor.rating || "4.0"}</span>
-                  <span className="dp-stat-label">Rating</span>
-                </div>
-                <div className="dp-stat">
-                  <i className="ti ti-briefcase-medical dp-stat-icon" />
-                  <span className="dp-stat-value">{doctor.experience || "—"}{doctor.experience ? "yr" : ""}</span>
-                  <span className="dp-stat-label">Experience</span>
-                </div>
-                <div className="dp-stat">
-                  <i className="ti ti-users dp-stat-icon" />
-                  <span className="dp-stat-value">{doctor.totalPatients || "—"}</span>
-                  <span className="dp-stat-label">Patients</span>
-                </div>
-                <div className="dp-stat">
-                  <i className="ti ti-certificate dp-stat-icon" />
-                  <span className="dp-stat-value" style={{ fontSize: 13 }}>{doctor.qualification || "MBBS"}</span>
-                  <span className="dp-stat-label">Qualification</span>
-                </div>
-              </div>
-
-              {/* Info grid */}
+              {/* Info grid — rating included here, no stats strip */}
               <div className="dp-info-grid">
-                <div className="dp-info-item">
-                  <i className="ti ti-map-pin" />
-                  <span><strong>{doctor.address?.area}</strong>{doctor.address?.city ? `, ${doctor.address.city}` : ""}</span>
-                </div>
+                {displayRating && (
+                  <div className="dp-info-item">
+                    <i className="ti ti-star-filled" />
+                    <span><strong>{displayRating}</strong> / 5 rating</span>
+                  </div>
+                )}
                 <div className="dp-info-item">
                   <i className="ti ti-gender-bigender" />
                   <span><strong>{doctor.gender}</strong></span>
                 </div>
+                {(doctor.address?.area || doctor.address?.city) && (
+                  <div className="dp-info-item">
+                    <i className="ti ti-map-pin" />
+                    <span>
+                      <strong>{doctor.address?.area}</strong>
+                      {doctor.address?.city ? `, ${doctor.address.city}` : ""}
+                    </span>
+                  </div>
+                )}
                 {doctor.languages?.length > 0 && (
                   <div className="dp-info-item">
                     <i className="ti ti-language" />
@@ -909,102 +932,129 @@ const DoctorProfile = () => {
               </div>
             </div>
           </div>
-
-          {/* About — full width strip below */}
-          {doctor.about && (
-            <div className="dp-about-strip">
-              <p>{doctor.about}</p>
-            </div>
-          )}
         </div>
 
-        {/* Two-col: booking + availability */}
+        {/* ── Two-col: left = about + booking, right = availability ── */}
         <div className="dp-two-col">
 
-          {/* Booking panel */}
+          {/* Left: About + Booking */}
           <div className="dp-booking-panel">
-            <p className="dp-section-label">Book a consultation</p>
 
-            {/* Mode toggle */}
-            <div style={{ marginBottom: 16 }}>
-              <p className="dp-sub-label">Consultation mode</p>
-              <div className="dp-mode-toggle">
-                <button
-                  className={`dp-mode-btn${selectedMode === "online" ? " active" : ""}`}
-                  onClick={() => { setSelectedMode("online"); setSelectedTime(""); }}
-                >
-                  <i className="ti ti-wifi" /> Online
-                </button>
-                <button
-                  className={`dp-mode-btn${selectedMode === "offline" ? " active" : ""}`}
-                  onClick={() => { setSelectedMode("offline"); setSelectedTime(""); }}
-                >
-                  <i className="ti ti-building-hospital" /> In-clinic
-                </button>
-              </div>
-            </div>
-
-            {/* Date */}
-            <div style={{ marginBottom: 16 }}>
-              <p className="dp-sub-label">Select date</p>
-              <input
-                type="date"
-                className="dp-date-input"
-                min={today}
-                value={selectedDate}
-                onChange={(e) => { setSelectedDate(e.target.value); setSelectedTime(""); }}
-              />
-            </div>
-
-            {/* Slots */}
-            {selectedDate && (
-              <div style={{ marginBottom: 4 }}>
-                <p className="dp-sub-label">Available time slots</p>
-                {dateSlots.length === 0 ? (
-                  <div className="dp-no-slot-notice">
-                    <i className="ti ti-calendar-off" />
-                    No {selectedMode} slots on this date. Try another date or mode.
-                  </div>
-                ) : (
-                  <div className="dp-slot-grid">
-                    {dateSlots.map((s, i) => {
-                      const val = `${s.start}-${s.end}`;
-                      return (
-                        <button
-                          key={i}
-                          className={`dp-slot-btn${selectedTime === val ? " selected" : ""}`}
-                          onClick={() => setSelectedTime(val)}
-                        >
-                          <i className="ti ti-clock" />
-                          {s.start} – {s.end}
-                        </button>
-                      );
-                    })}
-                  </div>
-                )}
+            {/* About */}
+            {doctor.about && (
+              <div>
+                <p className="dp-section-label">About</p>
+                <div className="dp-about-block">
+                  <p>{doctor.about}</p>
+                </div>
               </div>
             )}
 
-            <button className="dp-book-btn" onClick={bookAppointment}>
-              <i className="ti ti-calendar-plus" /> Book Appointment
-            </button>
+            {/* Book a consultation */}
+            <div>
+              <p className="dp-section-label">Book a Consultation</p>
+
+              {/* Mode toggle */}
+              <div style={{ marginBottom: 16 }}>
+                <p className="dp-sub-label">Consultation mode</p>
+                <div className="dp-mode-toggle">
+                  <button
+                    className={`dp-mode-btn${selectedMode === "online" ? " active" : ""}`}
+                    onClick={() => { setSelectedMode("online"); setSelectedTime(""); }}
+                  >
+                    <i className="ti ti-wifi" /> Online
+                  </button>
+                  <button
+                    className={`dp-mode-btn${selectedMode === "offline" ? " active" : ""}`}
+                    onClick={() => { setSelectedMode("offline"); setSelectedTime(""); }}
+                  >
+                    <i className="ti ti-building-hospital" /> In-clinic
+                  </button>
+                </div>
+              </div>
+
+              {/* Date picker */}
+              <div style={{ marginBottom: 16 }}>
+                <p className="dp-sub-label">Select date</p>
+                <div className="dp-date-picker-wrap">
+                  <i className="ti ti-calendar-event" />
+                  <input
+                    type="date"
+                    className="dp-date-input"
+                    min={today}
+                    value={selectedDate}
+                    onChange={(e) => { setSelectedDate(e.target.value); setSelectedTime(""); }}
+                  />
+                </div>
+                {formattedDate && (
+                  <div className="dp-date-display">
+                    <span className="dp-date-chip">
+                      <i className="ti ti-check" style={{ fontSize: 12 }} />
+                      {formattedDate}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {/* Slot picker */}
+              {selectedDate && (
+                <div style={{ marginBottom: 4 }}>
+                  <p className="dp-sub-label">Available time slots</p>
+                  {dateSlots.length === 0 ? (
+                    <div className="dp-no-slot-notice">
+                      <i className="ti ti-calendar-off" />
+                      No {selectedMode} slots on this date. Try another date or mode.
+                    </div>
+                  ) : (
+                    <div className="dp-slot-grid">
+                      {dateSlots.map((s, i) => {
+                        const val = `${s.start}-${s.end}`;
+                        return (
+                          <button
+                            key={i}
+                            className={`dp-slot-btn${selectedTime === val ? " selected" : ""}`}
+                            onClick={() => setSelectedTime(val)}
+                          >
+                            <i className="ti ti-clock" />
+                            {s.start} – {s.end}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              <button className="dp-book-btn" onClick={bookAppointment}>
+                <i className="ti ti-calendar-plus" /> Book Appointment
+              </button>
+            </div>
           </div>
 
-          {/* Availability column */}
+          {/* Right: Availability */}
           <div className="dp-avail-col">
-            <p className="dp-section-label">Availability this week</p>
+            <p className="dp-section-label">Availability — next 7 days</p>
             {next7Days.map((d, idx) => {
               const slots = getSlotsForDate(d);
+              const isToday = idx === 0;
               return (
-                <div key={idx} className="dp-day-row">
-                  <p className="dp-day-name">{d.dayName}</p>
-                  <p className="dp-day-date">{d.date.toLocaleDateString("en-IN", { day: "numeric", month: "short" })}</p>
-                  {slots.length > 0
-                    ? slots.map((s, i) => (
-                        <span key={i} className="dp-slot-tag">{s.start}–{s.end}</span>
-                      ))
-                    : <span className="dp-no-slot">Not available</span>
-                  }
+                <div key={idx} className="dp-day-row" style={isToday ? { borderColor: "var(--accent-border)", background: "var(--accent-bg)" } : {}}>
+                  <div className="dp-day-head">
+                    <span className="dp-day-name" style={isToday ? { color: "var(--accent)" } : {}}>
+                      {isToday ? "Today" : d.dayName}
+                    </span>
+                    <span className="dp-day-date">
+                      {d.date.toLocaleDateString("en-IN", { day: "numeric", month: "short" })}
+                    </span>
+                  </div>
+                  <div className="dp-slot-tags">
+                    {slots.length > 0
+                      ? slots.map((s, i) => (
+                          <span key={i} className="dp-slot-tag">{s.start}–{s.end}</span>
+                        ))
+                      : <span className="dp-no-slot">Not available</span>
+                    }
+                  </div>
                 </div>
               );
             })}
@@ -1014,7 +1064,7 @@ const DoctorProfile = () => {
         <hr className="dp-divider" />
 
         {/* Reviews */}
-        <ReviewsSection doctorId={doctor._id} avgRating={doctor.rating} />
+        <ReviewsSection doctorId={doctor._id} />
 
       </div>
     </div>
