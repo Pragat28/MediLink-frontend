@@ -4,6 +4,7 @@ import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 
 const BASE_URL = "https://medilink-j44r.onrender.com/api";
+
 const STYLES = `
   @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display&display=swap');
   *, *::before, *::after { box-sizing: border-box; }
@@ -903,3 +904,5 @@ const DoctorProfile = () => {
     </div>
   );
 };
+
+export default DoctorProfile;
