@@ -12,6 +12,29 @@ const dayLabels = {
   thursday: "Thu", friday: "Fri", saturday: "Sat", sunday: "Sun",
 };
 
+/* ─── Generic doctor SVG avatar (no external image needed) ─── */
+const DoctorAvatar = ({ size = 56 }) => (
+  <svg width={size} height={size} viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg"
+    style={{ borderRadius: "50%", flexShrink: 0 }}>
+    <circle cx="28" cy="28" r="28" fill="rgba(255,255,255,0.18)" />
+    {/* Body / coat */}
+    <path d="M10 52 C10 38 18 34 28 34 C38 34 46 38 46 52" fill="rgba(255,255,255,0.85)" />
+    {/* Stethoscope on coat */}
+    <path d="M24 36 C24 36 22 40 22 43 C22 45.2 23.8 47 26 47 C28.2 47 30 45.2 30 43"
+      stroke="rgba(45,90,78,0.7)" strokeWidth="1.8" fill="none" strokeLinecap="round" />
+    <circle cx="30" cy="43" r="2" fill="rgba(45,90,78,0.7)" />
+    {/* Head */}
+    <circle cx="28" cy="20" r="10" fill="rgba(255,255,255,0.85)" />
+    {/* Face details */}
+    <circle cx="25" cy="19" r="1.2" fill="rgba(45,90,78,0.5)" />
+    <circle cx="31" cy="19" r="1.2" fill="rgba(45,90,78,0.5)" />
+    <path d="M25 23.5 Q28 25.5 31 23.5" stroke="rgba(45,90,78,0.5)" strokeWidth="1.2" fill="none" strokeLinecap="round" />
+    {/* Cross on coat pocket */}
+    <rect x="26.5" y="37" width="3" height="0.8" rx="0.4" fill="rgba(45,90,78,0.6)" />
+    <rect x="27.6" y="35.9" width="0.8" height="3" rx="0.4" fill="rgba(45,90,78,0.6)" />
+  </svg>
+);
+
 /* ─── Global styles injected once ─── */
 const STYLES = `
   @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display&display=swap');
@@ -54,13 +77,6 @@ const STYLES = `
     display: flex;
     align-items: center;
     gap: 16px;
-  }
-  .dp-header-icon {
-    width: 48px; height: 48px;
-    background: rgba(255,255,255,0.15);
-    border-radius: 12px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 22px;
   }
   .dp-header h1 {
     font-family: 'DM Serif Display', serif;
@@ -180,7 +196,7 @@ const STYLES = `
 
   .dp-slots-col { display: flex; flex-direction: column; gap: 10px; }
 
-  /* Single slot row — KEY FIX: all in one flex line */
+  /* Single slot row */
   .dp-slot-row {
     display: flex;
     flex-direction: row;
@@ -247,26 +263,39 @@ const STYLES = `
   .dp-btn-sm { padding: 6px 10px; font-size: 12px; }
   .dp-btn-icon { padding: 6px 8px; }
 
-  /* Override card */
+  /* Override card — improved layout */
   .dp-override-card {
     border: 1.5px solid var(--border);
     border-radius: var(--radius);
-    padding: 18px 20px;
+    padding: 20px 22px;
     margin-bottom: 14px;
     background: #fafaf8;
   }
-  .dp-override-header {
-    display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
-    margin-bottom: 14px;
+
+  .dp-override-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 16px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--border);
   }
-  .dp-override-header .date-field {
+  .dp-override-dates {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .dp-override-dates .date-field {
     display: flex; flex-direction: column; gap: 3px;
   }
-  .dp-override-header .date-field label {
+  .dp-override-dates .date-field label {
     font-size: 10.5px; font-weight: 600; letter-spacing: .06em;
     text-transform: uppercase; color: var(--muted);
   }
-  .dp-override-header .date-field input {
+  .dp-override-dates .date-field input {
     padding: 7px 10px;
     border: 1.5px solid var(--border);
     border-radius: 8px;
@@ -275,7 +304,56 @@ const STYLES = `
     outline: none;
     transition: border-color .15s;
   }
-  .dp-override-header .date-field input:focus { border-color: var(--accent); }
+  .dp-override-dates .date-field input:focus { border-color: var(--accent); }
+  .dp-override-dates .arrow {
+    color: var(--muted);
+    font-size: 16px;
+    padding-top: 18px;
+  }
+
+  .dp-delete-range-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 13px;
+    border-radius: 8px;
+    border: 1.5px solid #e2b8b5;
+    background: #fdf1f0;
+    color: var(--danger);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background .15s, border-color .15s;
+    white-space: nowrap;
+  }
+  .dp-delete-range-btn:hover { background: #fae4e2; border-color: #d9928e; }
+
+  .dp-override-slots-label {
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+
+  /* Locked first slot indicator */
+  .dp-slot-locked-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: var(--accent-lt);
+    border-radius: 5px;
+    padding: 3px 8px;
+    margin-top: 18px;
+    flex-shrink: 0;
+  }
 
   /* Save bar */
   .dp-save-bar {
@@ -295,6 +373,7 @@ const STYLES = `
     .dp-save-bar { padding: 14px 20px; }
     .dp-day-row { grid-template-columns: 70px 1fr; }
     .dp-slot-row { flex-wrap: wrap; }
+    .dp-override-meta { flex-direction: column; align-items: flex-start; }
   }
 `;
 
@@ -383,6 +462,7 @@ const Profile = () => {
   /* Overrides */
   const addSpecialAvailability = () => {
     const ranges = [...(doctor.availability.overrides || [])];
+    // Always start with one non-removable slot
     ranges.push({ from: "", to: "", slots: [{ start: "", end: "", maxPatients: 1, mode: "online" }] });
     setDoctor({ ...doctor, availability: { ...doctor.availability, overrides: ranges } });
   };
@@ -492,7 +572,7 @@ const Profile = () => {
 
         {/* Header */}
         <div className="dp-header">
-          <div className="dp-header-icon">🩺</div>
+          <DoctorAvatar size={56} />
           <div>
             <h1>Doctor Profile</h1>
             <p>Manage your information and availability</p>
@@ -588,7 +668,6 @@ const Profile = () => {
                 <div className="dp-slots-col">
                   {(doctor.availability.weekly?.[day] || []).map((slot, index) => (
                     <div className="dp-slot-row" key={index}>
-
                       <div className="slot-field">
                         <label>Start</label>
                         <input
@@ -597,7 +676,6 @@ const Profile = () => {
                           onChange={(e) => handleSlotChange(day, index, "start", e.target.value)}
                         />
                       </div>
-
                       <div className="slot-field">
                         <label>End</label>
                         <input
@@ -606,9 +684,8 @@ const Profile = () => {
                           onChange={(e) => handleSlotChange(day, index, "end", e.target.value)}
                         />
                       </div>
-
                       <div className="slot-field">
-                        <label>Max Pts</label>
+                        <label>Max Patients</label>
                         <input
                           type="number"
                           min="1"
@@ -616,7 +693,6 @@ const Profile = () => {
                           onChange={(e) => handleSlotChange(day, index, "maxPatients", e.target.value)}
                         />
                       </div>
-
                       <div className="slot-field">
                         <label>Mode</label>
                         <select
@@ -627,7 +703,6 @@ const Profile = () => {
                           <option value="offline">Offline</option>
                         </select>
                       </div>
-
                       <button
                         className="dp-btn dp-btn-danger dp-btn-sm"
                         style={{ marginTop: 18, flexShrink: 0 }}
@@ -653,71 +728,87 @@ const Profile = () => {
           <div className="dp-section">
             <SectionTitle>Special Availability</SectionTitle>
             <p style={{ color: "#787167", marginTop: -8, marginBottom: 16, fontSize: 13 }}>
-              Override your weekly schedule for specific date ranges (e.g. conferences, holidays).
+              Use this to set different hours for specific dates — e.g. holidays, conferences, or temporary schedule changes. This overrides your regular weekly schedule for the chosen date range.
             </p>
 
-            {(doctor.availability.overrides || []).map((range, index) => (
-              <div className="dp-override-card" key={index}>
-                <div className="dp-override-header">
-                  <div className="date-field">
-                    <label>From Date</label>
-                    <input
-                      type="date"
-                      value={range.from ? range.from.substring(0, 10) : ""}
-                      onChange={(e) => handleRangeChange(index, "from", e.target.value)}
-                    />
+            {(doctor.availability.overrides || []).map((range, rIndex) => (
+              <div className="dp-override-card" key={rIndex}>
+
+                {/* Date range row + delete button */}
+                <div className="dp-override-meta">
+                  <div className="dp-override-dates">
+                    <div className="date-field">
+                      <label>Start Date</label>
+                      <input
+                        type="date"
+                        value={range.from ? range.from.substring(0, 10) : ""}
+                        onChange={(e) => handleRangeChange(rIndex, "from", e.target.value)}
+                      />
+                    </div>
+                    <span className="arrow">→</span>
+                    <div className="date-field">
+                      <label>End Date</label>
+                      <input
+                        type="date"
+                        value={range.to ? range.to.substring(0, 10) : ""}
+                        onChange={(e) => handleRangeChange(rIndex, "to", e.target.value)}
+                      />
+                    </div>
                   </div>
-                  <div style={{ color: "#787167", paddingTop: 20 }}>→</div>
-                  <div className="date-field">
-                    <label>To Date</label>
-                    <input
-                      type="date"
-                      value={range.to ? range.to.substring(0, 10) : ""}
-                      onChange={(e) => handleRangeChange(index, "to", e.target.value)}
-                    />
-                  </div>
+
                   <button
-                    className="dp-btn dp-btn-danger dp-btn-sm"
-                    style={{ marginTop: 18 }}
-                    onClick={() => removeRange(index)}
+                    className="dp-delete-range-btn"
+                    onClick={() => removeRange(rIndex)}
+                    title="Delete this special availability period"
                   >
-                    ✕ Remove Range
+                    🗑 Delete This Period
                   </button>
                 </div>
 
+                {/* Slots */}
+                <div className="dp-override-slots-label">Time Slots for This Period</div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                   {(range.slots || []).map((slot, sIndex) => (
                     <div className="dp-slot-row" key={sIndex}>
                       <div className="slot-field">
                         <label>Start</label>
                         <input type="time" value={slot.start}
-                          onChange={(e) => handleRangeSlotChange(index, sIndex, "start", e.target.value)} />
+                          onChange={(e) => handleRangeSlotChange(rIndex, sIndex, "start", e.target.value)} />
                       </div>
                       <div className="slot-field">
                         <label>End</label>
                         <input type="time" value={slot.end}
-                          onChange={(e) => handleRangeSlotChange(index, sIndex, "end", e.target.value)} />
+                          onChange={(e) => handleRangeSlotChange(rIndex, sIndex, "end", e.target.value)} />
                       </div>
                       <div className="slot-field">
-                        <label>Max Pts</label>
+                        <label>Max Patients</label>
                         <input type="number" min="1" value={slot.maxPatients || 1}
-                          onChange={(e) => handleRangeSlotChange(index, sIndex, "maxPatients", e.target.value)} />
+                          onChange={(e) => handleRangeSlotChange(rIndex, sIndex, "maxPatients", e.target.value)} />
                       </div>
                       <div className="slot-field">
                         <label>Mode</label>
                         <select value={slot.mode || "online"}
-                          onChange={(e) => handleRangeSlotChange(index, sIndex, "mode", e.target.value)}>
+                          onChange={(e) => handleRangeSlotChange(rIndex, sIndex, "mode", e.target.value)}>
                           <option value="online">Online</option>
                           <option value="offline">Offline</option>
                         </select>
                       </div>
-                      <button
-                        className="dp-btn dp-btn-danger dp-btn-sm"
-                        style={{ marginTop: 18, flexShrink: 0 }}
-                        onClick={() => removeRangeSlot(index, sIndex)}
-                      >
-                        ✕
-                      </button>
+
+                      {/* First slot is locked — cannot be removed */}
+                      {sIndex === 0 ? (
+                        <span className="dp-slot-locked-badge" title="At least one slot is required">
+                          🔒 Required
+                        </span>
+                      ) : (
+                        <button
+                          className="dp-btn dp-btn-danger dp-btn-sm"
+                          style={{ marginTop: 18, flexShrink: 0 }}
+                          onClick={() => removeRangeSlot(rIndex, sIndex)}
+                          title="Remove this slot"
+                        >
+                          ✕ Remove
+                        </button>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -725,9 +816,9 @@ const Profile = () => {
                 <button
                   className="dp-btn dp-btn-ghost dp-btn-sm"
                   style={{ marginTop: 12 }}
-                  onClick={() => addRangeSlot(index)}
+                  onClick={() => addRangeSlot(rIndex)}
                 >
-                  + Add Slot
+                  + Add Another Slot
                 </button>
               </div>
             ))}
