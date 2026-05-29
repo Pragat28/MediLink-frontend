@@ -1,25 +1,6 @@
 import { Link, Outlet, useNavigate, useLocation } from "react-router-dom";
 import { useEffect } from "react";
 
-/* ─── Generic doctor SVG avatar (same as Profile.jsx) ─── */
-const DoctorAvatar = ({ size = 40 }) => (
-  <svg width={size} height={size} viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg"
-    style={{ borderRadius: "50%", flexShrink: 0 }}>
-    <circle cx="28" cy="28" r="28" fill="rgba(255,255,255,0.18)" />
-    <path d="M10 52 C10 38 18 34 28 34 C38 34 46 38 46 52" fill="rgba(255,255,255,0.85)" />
-    <path d="M24 36 C24 36 22 40 22 43 C22 45.2 23.8 47 26 47 C28.2 47 30 45.2 30 43"
-      stroke="rgba(45,90,78,0.7)" strokeWidth="1.8" fill="none" strokeLinecap="round" />
-    <circle cx="30" cy="43" r="2" fill="rgba(45,90,78,0.7)" />
-    <circle cx="28" cy="20" r="10" fill="rgba(255,255,255,0.85)" />
-    <circle cx="25" cy="19" r="1.2" fill="rgba(45,90,78,0.5)" />
-    <circle cx="31" cy="19" r="1.2" fill="rgba(45,90,78,0.5)" />
-    <path d="M25 23.5 Q28 25.5 31 23.5" stroke="rgba(45,90,78,0.5)" strokeWidth="1.2" fill="none" strokeLinecap="round" />
-    <rect x="26.5" y="37" width="3" height="0.8" rx="0.4" fill="rgba(45,90,78,0.6)" />
-    <rect x="27.6" y="35.9" width="0.8" height="3" rx="0.4" fill="rgba(45,90,78,0.6)" />
-  </svg>
-);
-
-/* ─── Injected Styles ─── */
 const STYLES = `
   @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display&display=swap');
   *, *::before, *::after { box-sizing: border-box; }
@@ -49,13 +30,11 @@ const STYLES = `
     font-family: 'DM Sans', sans-serif;
   }
 
-  /* ── Layout ── */
   .dl-layout {
     display: flex;
     min-height: 100vh;
   }
 
-  /* ── Sidebar ── */
   .dl-sidebar {
     width: 240px;
     background: var(--sidebar-bg);
@@ -69,7 +48,6 @@ const STYLES = `
     overflow: hidden;
   }
 
-  /* Brand */
   .dl-brand {
     padding: 22px 20px 18px;
     border-bottom: 1px solid rgba(255,255,255,0.06);
@@ -89,7 +67,6 @@ const STYLES = `
     letter-spacing: 0.03em;
   }
 
-  /* Doctor card */
   .dl-doctor-card {
     margin: 14px 14px 0;
     background: linear-gradient(135deg, #1a3a2e 0%, #2d5a4e 100%);
@@ -119,7 +96,6 @@ const STYLES = `
     text-overflow: ellipsis;
   }
 
-  /* Nav */
   .dl-nav {
     flex: 1;
     padding: 18px 10px 10px;
@@ -160,7 +136,6 @@ const STYLES = `
     font-weight: 600;
   }
 
-  /* Logout */
   .dl-logout-wrap {
     padding: 12px 10px 20px;
     border-top: 1px solid rgba(255,255,255,0.06);
@@ -187,7 +162,6 @@ const STYLES = `
     color: #fecaca;
   }
 
-  /* ── Main content ── */
   .dl-main {
     margin-left: 240px;
     width: calc(100% - 240px);
@@ -201,11 +175,13 @@ const STYLES = `
   }
 `;
 
+// ✅ same as SearchDoctors.jsx
+const PLACEHOLDER = "https://cdn-icons-png.flaticon.com/512/3135/3135715.png";
+
 function DoctorLayout() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  /* Inject styles once */
   useEffect(() => {
     const sid = "dl-styles";
     if (!document.getElementById(sid)) {
@@ -232,66 +208,55 @@ function DoctorLayout() {
 
   const isActive = (path) => location.pathname.startsWith(path);
 
-  /* Determine avatar: use photo from doctorData if available, else generic SVG */
-  const hasPhoto = doctorData?.photo && doctorData.photo.trim() !== "";
+  // ✅ same photo logic as SearchDoctors.jsx
+  const getPhoto = () => {
+    const photo = doctorData?.photo;
+    if (photo && photo.trim() !== "") {
+      return photo.startsWith("http")
+        ? photo
+        : `https://medilink-j44r.onrender.com${photo}`;
+    }
+    return PLACEHOLDER;
+  };
 
   return (
     <div className="dl-root">
       <div className="dl-layout">
 
-        {/* ── Sidebar ── */}
         <aside className="dl-sidebar">
 
-          {/* Brand */}
           <div className="dl-brand">
             <p className="dl-brand-name">MediLink</p>
             <p className="dl-brand-sub">Doctor Portal</p>
           </div>
 
-          {/* Doctor card */}
           <div className="dl-doctor-card">
-            {hasPhoto ? (
-              <img
-                src={doctorData.photo}
-                alt="Doctor"
-                style={{ width: 40, height: 40, borderRadius: "50%", objectFit: "cover", flexShrink: 0 }}
-              />
-            ) : (
-              <DoctorAvatar size={40} />
-            )}
+            {/* ✅ CHANGED — proper photo with fallback */}
+            <img
+              src={getPhoto()}
+              alt="Doctor"
+              style={{ width: 40, height: 40, borderRadius: "50%", objectFit: "cover", flexShrink: 0 }}
+              onError={(e) => { e.target.src = PLACEHOLDER; }}
+            />
             <div className="dl-doctor-info">
               <p className="dl-doctor-role">Signed in as</p>
               <p className="dl-doctor-name">{doctorData?.name || "Doctor"}</p>
             </div>
           </div>
 
-          {/* Nav */}
           <nav className="dl-nav">
             <p className="dl-nav-label">Menu</p>
-
-            <Link
-              to="/doctor/appointments"
-              className={`dl-nav-link${isActive("/doctor/appointments") ? " active" : ""}`}
-            >
+            <Link to="/doctor/appointments" className={`dl-nav-link${isActive("/doctor/appointments") ? " active" : ""}`}>
               Appointments
             </Link>
-
-            <Link
-              to="/doctor/calendar"
-              className={`dl-nav-link${isActive("/doctor/calendar") ? " active" : ""}`}
-            >
+            <Link to="/doctor/calendar" className={`dl-nav-link${isActive("/doctor/calendar") ? " active" : ""}`}>
               Calendar
             </Link>
-
-            <Link
-              to="/doctor/profile"
-              className={`dl-nav-link${isActive("/doctor/profile") ? " active" : ""}`}
-            >
+            <Link to="/doctor/profile" className={`dl-nav-link${isActive("/doctor/profile") ? " active" : ""}`}>
               Profile
             </Link>
           </nav>
 
-          {/* Logout */}
           <div className="dl-logout-wrap">
             <button className="dl-logout-btn" onClick={handleLogout}>
               Logout
@@ -300,7 +265,6 @@ function DoctorLayout() {
 
         </aside>
 
-        {/* ── Main ── */}
         <main className="dl-main">
           <Outlet />
         </main>
