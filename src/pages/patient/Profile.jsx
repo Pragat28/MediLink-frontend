@@ -57,23 +57,13 @@ const STYLES = `
     gap: 12px;
     box-shadow: 0 2px 10px rgba(0,0,0,0.05);
   }
-  .pp-page-header-icon {
-    width: 38px; height: 38px;
-    background: var(--accent-bg);
-    border-radius: 9px;
-    display: flex; align-items: center; justify-content: center;
-    color: var(--accent);
-    font-size: 19px;
-    flex-shrink: 0;
-  }
   .pp-page-header-text h1 {
     font-family: 'DM Serif Display', serif;
     font-size: 20px;
     font-weight: 400;
-    margin: 0 0 2px;
+    margin: 0;
     color: var(--text);
   }
-  .pp-page-header-text p { font-size: 12.5px; color: var(--muted); margin: 0; }
 
   /* ── Loading / error full-page states ── */
   .pp-state-box {
@@ -122,15 +112,6 @@ const STYLES = `
     align-items: center;
     gap: 9px;
     background: var(--neutral-bg);
-  }
-  .pp-card-header-icon {
-    width: 28px; height: 28px;
-    background: var(--accent-bg);
-    border-radius: 6px;
-    display: flex; align-items: center; justify-content: center;
-    color: var(--accent);
-    font-size: 14px;
-    flex-shrink: 0;
   }
   .pp-card-header h2 {
     font-size: 13.5px;
@@ -514,19 +495,14 @@ function PatientProfile() {
 
         {/* Page header */}
         <div className="pp-page-header">
-          <div className="pp-page-header-icon">
-            <i className="ti ti-user-circle" />
-          </div>
           <div className="pp-page-header-text">
             <h1>My Profile</h1>
-            <p>Keep your health information up to date for better consultations</p>
           </div>
         </div>
 
         {/* ── Basic Info ── */}
         <div className="pp-card">
           <div className="pp-card-header">
-            <div className="pp-card-header-icon"><i className="ti ti-id-badge" /></div>
             <h2>Basic Information</h2>
           </div>
           <div className="pp-card-body">
@@ -584,7 +560,6 @@ function PatientProfile() {
         {/* ── Physical Stats ── */}
         <div className="pp-card">
           <div className="pp-card-header">
-            <div className="pp-card-header-icon"><i className="ti ti-activity" /></div>
             <h2>Physical Stats</h2>
           </div>
           <div className="pp-card-body">
@@ -622,7 +597,6 @@ function PatientProfile() {
         {isFemale && (
           <div className="pp-card">
             <div className="pp-card-header">
-              <div className="pp-card-header-icon"><i className="ti ti-heart" /></div>
               <h2>Women's Health</h2>
             </div>
             <div className="pp-card-body">
@@ -673,7 +647,6 @@ function PatientProfile() {
         {/* ── Medical History ── */}
         <div className="pp-card">
           <div className="pp-card-header">
-            <div className="pp-card-header-icon"><i className="ti ti-notes-medical" /></div>
             <h2>Medical History</h2>
           </div>
           <div className="pp-card-body">
@@ -717,7 +690,6 @@ function PatientProfile() {
         {/* ── Medications ── */}
         <div className="pp-card">
           <div className="pp-card-header">
-            <div className="pp-card-header-icon"><i className="ti ti-pill" /></div>
             <h2>Current Medications</h2>
           </div>
           <div className="pp-card-body">
