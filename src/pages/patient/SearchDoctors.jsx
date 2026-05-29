@@ -11,7 +11,6 @@ const specialties = [
   "Nephrologist", "Gynecologist", "Pediatrician"
 ];
 
-/* ─── Injected Styles ─────────────────────────────────── */
 const STYLES = `
   @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display&display=swap');
   *, *::before, *::after { box-sizing: border-box; }
@@ -48,7 +47,6 @@ const STYLES = `
     align-items: flex-start;
   }
 
-  /* ── Sidebar ── */
   .sd-sidebar {
     width: 236px;
     flex-shrink: 0;
@@ -137,9 +135,7 @@ const STYLES = `
     transition: background .15s;
   }
   .sd-reset-btn:hover { background: #d9e5f3; }
-  .sd-reset-btn i { font-size: 13px; }
 
-  /* ── Results pane ── */
   .sd-results { flex: 1; min-width: 0; }
 
   .sd-results-header {
@@ -175,7 +171,6 @@ const STYLES = `
     font-weight: 700;
   }
 
-  /* ── Loading ── */
   .sd-loading {
     display: flex; align-items: center; gap: 10px;
     padding: 48px 0;
@@ -192,7 +187,6 @@ const STYLES = `
   }
   @keyframes sd-spin { to { transform: rotate(360deg); } }
 
-  /* ── Empty state ── */
   .sd-empty {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -213,14 +207,12 @@ const STYLES = `
   .sd-empty h3 { font-size: 15px; font-weight: 600; color: var(--text); margin: 0 0 4px; }
   .sd-empty p  { font-size: 12.5px; margin: 0; }
 
-  /* ── Doctor card ── */
   .sd-doc-card {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 12px;
     margin-bottom: 10px;
     display: flex;
-    gap: 0;
     align-items: stretch;
     transition: border-color .15s, box-shadow .15s;
     overflow: hidden;
@@ -231,7 +223,6 @@ const STYLES = `
     box-shadow: 0 3px 14px rgba(59,107,158,0.1);
   }
 
-  /* Left accent strip with avatar */
   .sd-doc-left {
     display: flex;
     flex-direction: column;
@@ -250,6 +241,7 @@ const STYLES = `
     border: 2.5px solid var(--surface);
     box-shadow: 0 2px 8px rgba(59,107,158,0.15);
     flex-shrink: 0;
+    background: #d9e5f3;
   }
   .sd-doc-rating-pill {
     display: inline-flex;
@@ -263,6 +255,12 @@ const STYLES = `
     padding: 2px 8px;
     border-radius: 20px;
   }
+  .sd-doc-rating-pill.no-rating {
+    color: var(--muted);
+    background: var(--neutral-bg);
+    border-color: var(--border-md);
+    font-weight: 500;
+  }
 
   .sd-doc-body { flex: 1; padding: 14px 18px; min-width: 0; }
 
@@ -274,7 +272,6 @@ const STYLES = `
     gap: 6px;
     margin-bottom: 8px;
   }
-  .sd-doc-name-wrap {}
   .sd-doc-name {
     font-family: 'DM Serif Display', serif;
     font-size: 16px;
@@ -304,7 +301,6 @@ const STYLES = `
   }
   .sd-fee-tag small { font-size: 10px; font-weight: 400; opacity: .8; }
 
-  /* Info row — all doctor meta in one consistent colour */
   .sd-info-row {
     display: flex;
     flex-wrap: wrap;
@@ -322,14 +318,9 @@ const STYLES = `
     padding: 3px 9px;
     border-radius: 6px;
   }
-  .sd-info-chip i {
-    font-size: 13px;
-    color: var(--accent-muted);
-    flex-shrink: 0;
-  }
+  .sd-info-chip i { font-size: 13px; color: var(--accent-muted); flex-shrink: 0; }
   .sd-info-chip strong { color: var(--text); font-weight: 600; }
 
-  /* Available days chip — same muted blue family */
   .sd-info-chip-avail {
     background: var(--accent-bg);
     border-color: var(--accent-border);
@@ -364,7 +355,9 @@ const STYLES = `
   }
 `;
 
-/* ─── Component ─────────────────────────────────────────── */
+// ✅ proper silhouette placeholder like WhatsApp/Instagram
+const PLACEHOLDER = "https://cdn-icons-png.flaticon.com/512/3135/3135715.png";
+
 const SearchDoctors = () => {
   useBackRedirect("/patient/profile");
 
@@ -391,7 +384,6 @@ const SearchDoctors = () => {
     endTime:    searchParams.get("endTime")    || "",
   });
 
-  /* ── inject styles ── */
   useEffect(() => {
     const sid = "sd-styles";
     if (!document.getElementById(sid)) {
@@ -401,7 +393,6 @@ const SearchDoctors = () => {
     }
   }, []);
 
-  /* ── sync filters → URL ── */
   useEffect(() => {
     const params = {};
     Object.keys(filters).forEach(k => { if (filters[k]) params[k] = filters[k]; });
@@ -409,7 +400,6 @@ const SearchDoctors = () => {
     if (JSON.stringify(params) !== JSON.stringify(current)) setSearchParams(params);
   }, [filters]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  /* ── fetch areas ── */
   useEffect(() => {
     let cancelled = false;
     const fetchAreas = async () => {
@@ -426,7 +416,6 @@ const SearchDoctors = () => {
     return () => { cancelled = true; };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  /* ── fetch doctors (debounced + abortable) ── */
   const abortRef = useRef(null);
 
   const fetchDoctors = useCallback(async (currentFilters) => {
@@ -462,9 +451,18 @@ const SearchDoctors = () => {
 
   const viewProfile = (doctorId) => navigate(`/patient/doctor/${doctorId}`);
 
-  const PLACEHOLDER = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='76' height='76'%3E%3Crect width='76' height='76' fill='%23d9e5f3'/%3E%3Ccircle cx='38' cy='30' r='13' fill='%236a94bc'/%3E%3Cellipse cx='38' cy='65' rx='20' ry='15' fill='%236a94bc'/%3E%3C/svg%3E";
-
   const activeFilterCount = Object.values(filters).filter(Boolean).length;
+
+  // ✅ helper — only show rating if > 0
+  const hasRating = (doc) => doc.rating && Number(doc.rating) > 0;
+
+  // ✅ helper — photo with proper fallback
+  const getPhoto = (doc) =>
+    doc.photo && doc.photo.trim() !== ""
+      ? doc.photo.startsWith("http")
+        ? doc.photo
+        : `https://medilink-j44r.onrender.com${doc.photo}`
+      : PLACEHOLDER;
 
   return (
     <div className="sd-root">
@@ -476,7 +474,7 @@ const SearchDoctors = () => {
         <aside className="sd-sidebar">
           <div className="sd-sidebar-header">
             <div className="sd-sidebar-header-icon">
-              <i className="ti ti-adjustments-horizontal" aria-hidden="true" />
+              <i className="ti ti-adjustments-horizontal" />
             </div>
             <span>Filters {activeFilterCount > 0 && `(${activeFilterCount})`}</span>
           </div>
@@ -551,7 +549,7 @@ const SearchDoctors = () => {
 
             {activeFilterCount > 0 && (
               <button className="sd-reset-btn" onClick={resetFilters}>
-                <i className="ti ti-x" aria-hidden="true" /> Clear all filters
+                <i className="ti ti-x" /> Clear all filters
               </button>
             )}
 
@@ -563,7 +561,7 @@ const SearchDoctors = () => {
 
           <div className="sd-results-header">
             <div className="sd-results-icon">
-              <i className="ti ti-stethoscope" aria-hidden="true" />
+              <i className="ti ti-stethoscope" />
             </div>
             <div>
               <p className="sd-results-title">Available Doctors</p>
@@ -583,7 +581,7 @@ const SearchDoctors = () => {
           {!loading && doctors.length === 0 && (
             <div className="sd-empty">
               <div className="sd-empty-icon">
-                <i className="ti ti-user-search" aria-hidden="true" />
+                <i className="ti ti-user-search" />
               </div>
               <h3>No doctors found</h3>
               <p>Try adjusting your filters or clearing some to see more results.</p>
@@ -593,35 +591,39 @@ const SearchDoctors = () => {
           {!loading && doctors.map(doc => (
             <div key={doc._id} className="sd-doc-card">
 
-              {/* Left: avatar + rating */}
               <div className="sd-doc-left">
+                {/* ✅ FIX 3 — proper silhouette fallback */}
                 <img
-                  src={doc.photo || PLACEHOLDER}
+                  src={getPhoto(doc)}
                   alt={doc.name}
                   className="sd-doc-avatar"
+                  onError={(e) => { e.target.src = PLACEHOLDER; }}
                 />
-                {doc.rating && (
+                {/* ✅ FIX 2 — show "No ratings yet" when rating is 0 */}
+                {hasRating(doc) ? (
                   <span className="sd-doc-rating-pill">
-                    ⭐ {Number(doc.rating).toFixed(2)}
+                    ⭐ {Number(doc.rating).toFixed(1)}
+                  </span>
+                ) : (
+                  <span className="sd-doc-rating-pill no-rating">
+                    No ratings yet
                   </span>
                 )}
               </div>
 
-              {/* Right: info */}
               <div className="sd-doc-body">
                 <div className="sd-doc-top">
-                  <div className="sd-doc-name-wrap">
+                  <div>
                     <span className="sd-doc-name">{doc.name}</span>
                     <span className="sd-doc-spec">{doc.specialty}</span>
                   </div>
+                  {/* ✅ FIX 1 — removed ti-currency-rupee icon, kept only ₹ symbol */}
                   <span className="sd-fee-tag">
-                    <i className="ti ti-currency-rupee" style={{ fontSize: 13 }} />
                     ₹{doc.consultationFee}
                     <small>/visit</small>
                   </span>
                 </div>
 
-                {/* All doctor info chips — unified muted-blue family */}
                 <div className="sd-info-row">
                   {doc.gender && (
                     <span className="sd-info-chip">
@@ -641,12 +643,6 @@ const SearchDoctors = () => {
                       <strong>{doc.experience} yr</strong> exp
                     </span>
                   )}
-                  {doc.qualification && (
-                    <span className="sd-info-chip">
-                      <i className="ti ti-certificate" />
-                      <strong>{doc.qualification}</strong>
-                    </span>
-                  )}
                   {doc.availableDays?.length > 0 && (
                     <span className="sd-info-chip sd-info-chip-avail">
                       <i className="ti ti-calendar-check" />
@@ -656,9 +652,10 @@ const SearchDoctors = () => {
                 </div>
 
                 <button className="sd-view-btn" onClick={() => viewProfile(doc._id)}>
-                  <i className="ti ti-user-circle" aria-hidden="true" /> View profile
+                  <i className="ti ti-user-circle" /> View profile
                 </button>
               </div>
+
             </div>
           ))}
 
