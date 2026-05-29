@@ -47,20 +47,24 @@ const labelStyle = {
 
 const Profile = () => {
   useBackRedirect(null, true);
-  const [doctor,setDoctor] = useState(null);
-  const [loading,setLoading] = useState(false);
+  const [doctor, setDoctor] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [fetchError, setFetchError] = useState(null);
   const [showPopup, setShowPopup] = useState(false);
 
-  useEffect(()=>{
+  useEffect(() => {
+    const fetchProfile = async () => {
+      const token = localStorage.getItem("doctorToken");
 
-    const fetchProfile = async()=>{
+      if (!token) {
+        setFetchError("You are not logged in. Please log in again.");
+        return;
+      }
 
-      try{
-        const token = localStorage.getItem("doctorToken");
-
+      try {
         const res = await axios.get(
           "https://medilink-j44r.onrender.com/api/doctor-profile/me",
-          { headers:{ Authorization:`Bearer ${token}` } }
+          { headers: { Authorization: `Bearer ${token}` } }
         );
 
         const data = res.data;
@@ -69,185 +73,150 @@ const Profile = () => {
           ...data,
           gender: data.gender || "",
           about: data.about || "",
-          address: data.address || { street:"", area:"" },
-          availability: data.availability || { weekly:{}, overrides:[] }
+          address: data.address || { street: "", area: "" },
+          availability: data.availability || { weekly: {}, overrides: [] }
         });
 
         const hasSlots = Object.values(data.availability?.weekly || {})
           .some(day => day && day.length > 0);
 
-        if (!hasSlots) {
-          setShowPopup(true);
+        if (!hasSlots) setShowPopup(true);
+
+      } catch (err) {
+        if (!err.response) {
+          setFetchError("Network error — please check your internet connection.");
+        } else if (err.response.status === 401) {
+          setFetchError("Session expired. Please log in again.");
+        } else {
+          setFetchError(err.response?.data?.error || "Failed to load profile. Please try again.");
         }
-
-      }catch(err){
-        console.error(err);
       }
-
     };
 
     fetchProfile();
+  }, []);
 
-  },[]);
-
-  const handleChange = (e)=>{
-    setDoctor({
-      ...doctor,
-      [e.target.name]: e.target.value
-    });
+  const handleChange = (e) => {
+    setDoctor({ ...doctor, [e.target.name]: e.target.value });
   };
 
-  const handleAddressChange = (field,value)=>{
-    setDoctor({
-      ...doctor,
-      address:{
-        ...doctor.address,
-        [field]:value
-      }
-    });
+  const handleAddressChange = (field, value) => {
+    setDoctor({ ...doctor, address: { ...doctor.address, [field]: value } });
   };
 
   /* ================= WEEKLY SLOTS ================= */
 
-  const handleSlotChange = (day,index,field,value)=>{
+  const handleSlotChange = (day, index, field, value) => {
     const updated = { ...doctor.availability.weekly };
     updated[day][index][field] = value;
-
-    setDoctor({
-      ...doctor,
-      availability:{
-        ...doctor.availability,
-        weekly:updated
-      }
-    });
+    setDoctor({ ...doctor, availability: { ...doctor.availability, weekly: updated } });
   };
 
-  const addSlot = (day)=>{
+  const addSlot = (day) => {
     const updated = { ...doctor.availability.weekly };
-
-    if(!updated[day]) updated[day] = [];
-
-    updated[day].push({ start:"", end:"", maxPatients:1, mode:"online" });
-
-    setDoctor({
-      ...doctor,
-      availability:{
-        ...doctor.availability,
-        weekly:updated
-      }
-    });
+    if (!updated[day]) updated[day] = [];
+    updated[day].push({ start: "", end: "", maxPatients: 1, mode: "online" });
+    setDoctor({ ...doctor, availability: { ...doctor.availability, weekly: updated } });
   };
 
-  const removeSlot = (day,index)=>{
+  const removeSlot = (day, index) => {
     const updated = { ...doctor.availability.weekly };
-    updated[day].splice(index,1);
-
-    setDoctor({
-      ...doctor,
-      availability:{
-        ...doctor.availability,
-        weekly:updated
-      }
-    });
+    updated[day].splice(index, 1);
+    setDoctor({ ...doctor, availability: { ...doctor.availability, weekly: updated } });
   };
 
   /* ================= OVERRIDES ================= */
 
-  const addSpecialAvailability = ()=>{
+  const addSpecialAvailability = () => {
     const ranges = doctor.availability.overrides || [];
-
-    ranges.push({
-      from:"",
-      to:"",
-      slots:[{start:"", end:"", maxPatients:1, mode:"online"}]
-    });
-
-    setDoctor({
-      ...doctor,
-      availability:{
-        ...doctor.availability,
-        overrides:ranges
-      }
-    });
+    ranges.push({ from: "", to: "", slots: [{ start: "", end: "", maxPatients: 1, mode: "online" }] });
+    setDoctor({ ...doctor, availability: { ...doctor.availability, overrides: ranges } });
   };
 
-  const handleRangeChange = (index,field,value)=>{
+  const handleRangeChange = (index, field, value) => {
     const ranges = [...doctor.availability.overrides];
     ranges[index][field] = value ? new Date(value).toISOString() : "";
-
-    setDoctor({
-      ...doctor,
-      availability:{
-        ...doctor.availability,
-        overrides:ranges
-      }
-    });
+    setDoctor({ ...doctor, availability: { ...doctor.availability, overrides: ranges } });
   };
 
-  const handleRangeSlotChange = (rIndex,sIndex,field,value)=>{
+  const handleRangeSlotChange = (rIndex, sIndex, field, value) => {
     const ranges = [...doctor.availability.overrides];
     ranges[rIndex].slots[sIndex][field] = value;
-
-    setDoctor({
-      ...doctor,
-      availability:{
-        ...doctor.availability,
-        overrides:ranges
-      }
-    });
+    setDoctor({ ...doctor, availability: { ...doctor.availability, overrides: ranges } });
   };
 
-  const addRangeSlot = (rIndex)=>{
+  const addRangeSlot = (rIndex) => {
     const ranges = [...doctor.availability.overrides];
-    ranges[rIndex].slots.push({start:"", end:"", maxPatients:1, mode:"online"});
-
-    setDoctor({
-      ...doctor,
-      availability:{
-        ...doctor.availability,
-        overrides:ranges
-      }
-    });
+    ranges[rIndex].slots.push({ start: "", end: "", maxPatients: 1, mode: "online" });
+    setDoctor({ ...doctor, availability: { ...doctor.availability, overrides: ranges } });
   };
 
-  const removeRange = (index)=>{
+  const removeRange = (index) => {
     const ranges = [...doctor.availability.overrides];
-    ranges.splice(index,1);
-
-    setDoctor({
-      ...doctor,
-      availability:{
-        ...doctor.availability,
-        overrides:ranges
-      }
-    });
+    ranges.splice(index, 1);
+    setDoctor({ ...doctor, availability: { ...doctor.availability, overrides: ranges } });
   };
 
-  const removeRangeSlot = (rIndex,sIndex)=>{
+  const removeRangeSlot = (rIndex, sIndex) => {
     const ranges = [...doctor.availability.overrides];
-    ranges[rIndex].slots.splice(sIndex,1);
-
-    setDoctor({
-      ...doctor,
-      availability:{
-        ...doctor.availability,
-        overrides:ranges
-      }
-    });
+    ranges[rIndex].slots.splice(sIndex, 1);
+    setDoctor({ ...doctor, availability: { ...doctor.availability, overrides: ranges } });
   };
 
-  const handleSave = async()=>{
-    setLoading(true);
-
+  const handleSave = async () => {
     const token = localStorage.getItem("doctorToken");
 
-    try {
+    if (!token) {
+      toast.error("You are not logged in. Please log in again.");
+      return;
+    }
 
+    if (!doctor.name?.trim()) return toast.error("Name cannot be empty.");
+    if (!doctor.phone?.trim()) return toast.error("Phone number cannot be empty.");
+
+    // Validate weekly slots
+    for (const day of daysOfWeek) {
+      const slots = doctor.availability.weekly?.[day] || [];
+      for (let i = 0; i < slots.length; i++) {
+        const s = slots[i];
+        if (!s.start || !s.end) {
+          return toast.error(`Please fill in start and end time for all ${day} slots.`);
+        }
+        if (s.start >= s.end) {
+          return toast.error(`${day} slot ${i + 1}: start time must be before end time.`);
+        }
+      }
+    }
+
+    // Validate override ranges
+    const overrides = doctor.availability.overrides || [];
+    for (let i = 0; i < overrides.length; i++) {
+      const r = overrides[i];
+      if (!r.from || !r.to) {
+        return toast.error(`Special availability ${i + 1}: please set both from and to dates.`);
+      }
+      if (new Date(r.from) > new Date(r.to)) {
+        return toast.error(`Special availability ${i + 1}: start date must be before end date.`);
+      }
+      for (let j = 0; j < (r.slots || []).length; j++) {
+        const s = r.slots[j];
+        if (!s.start || !s.end) {
+          return toast.error(`Special availability ${i + 1}, slot ${j + 1}: please fill in start and end time.`);
+        }
+        if (s.start >= s.end) {
+          return toast.error(`Special availability ${i + 1}, slot ${j + 1}: start time must be before end time.`);
+        }
+      }
+    }
+
+    setLoading(true);
+
+    try {
       const cleanedDoctor = {
         ...doctor,
         availability: {
           ...doctor.availability,
-          overrides: (doctor.availability.overrides || []).map(r => ({
+          overrides: overrides.map(r => ({
             ...r,
             from: r.from || null,
             to: r.to || null,
@@ -259,51 +228,54 @@ const Profile = () => {
       const res = await axios.put(
         "https://medilink-j44r.onrender.com/api/doctor-profile/me",
         cleanedDoctor,
-        { headers:{ Authorization:`Bearer ${token}` } }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
 
       setDoctor(res.data.doctor);
-      toast.success("Profile updated successfully");
+      toast.success("Profile updated successfully.");
 
     } catch (err) {
-
-      console.error("SAVE ERROR:", err.response?.data || err);
-      toast.error(err.response?.data?.message || "Failed to save profile");
-
+      if (!err.response) {
+        toast.error("Network error — changes could not be saved. Please check your connection.");
+      } else if (err.response.status === 401) {
+        toast.error("Session expired. Please log in again.");
+      } else {
+        toast.error(err.response?.data?.error || err.response?.data?.message || "Failed to save profile. Please try again.");
+      }
     } finally {
       setLoading(false);
     }
   };
 
-  if(!doctor) return <p style={{padding:"30px"}}>Loading...</p>;
+  if (fetchError) return (
+    <div style={{ padding: "30px", color: "#dc2626", fontWeight: "500" }}>
+      ⚠️ {fetchError}
+    </div>
+  );
 
-  return(
+  if (!doctor) return <p style={{ padding: "30px" }}>Loading profile...</p>;
 
+  return (
     <div style={{
-      maxWidth:"950px",
-      margin:"auto",
-      padding:"50px",
-      background:"#fff",
-      borderRadius:"12px",
-      boxShadow:"0 4px 20px rgba(0,0,0,0.08)"
+      maxWidth: "950px",
+      margin: "auto",
+      padding: "50px",
+      background: "#fff",
+      borderRadius: "12px",
+      boxShadow: "0 4px 20px rgba(0,0,0,0.08)"
     }}>
 
       {showPopup && (
         <div style={{
-          background:"#fee2e2",
-          color:"#991b1b",
-          padding:"12px",
-          marginBottom:"20px",
-          borderRadius:"8px"
+          background: "#fee2e2",
+          color: "#991b1b",
+          padding: "12px",
+          marginBottom: "20px",
+          borderRadius: "8px"
         }}>
           ⚠️ Please complete your slot timings. Without availability, patients cannot see your profile.
-          <br/>
-          <button
-            style={{ marginTop:"8px" }}
-            onClick={()=>setShowPopup(false)}
-          >
-            OK
-          </button>
+          <br />
+          <button style={{ marginTop: "8px" }} onClick={() => setShowPopup(false)}>OK</button>
         </div>
       )}
 
@@ -311,10 +283,10 @@ const Profile = () => {
 
       <div style={sectionTitle}>Basic Information</div>
 
-      <input style={inputStyle} name="name" value={doctor.name || ""} onChange={handleChange} placeholder="Full Name"/>
-      <input style={inputStyle} value={doctor.email || ""} disabled/>
-      <input style={inputStyle} name="phone" value={doctor.phone || ""} onChange={handleChange} placeholder="Phone"/>
-      <input style={inputStyle} name="specialty" value={doctor.specialty || ""} onChange={handleChange} placeholder="Specialty"/>
+      <input style={inputStyle} name="name" value={doctor.name || ""} onChange={handleChange} placeholder="Full Name" />
+      <input style={inputStyle} value={doctor.email || ""} disabled />
+      <input style={inputStyle} name="phone" value={doctor.phone || ""} onChange={handleChange} placeholder="Phone" />
+      <input style={inputStyle} name="specialty" value={doctor.specialty || ""} onChange={handleChange} placeholder="Specialty" />
 
       <select style={inputStyle} name="gender" value={doctor.gender} onChange={handleChange}>
         <option value="">Select Gender</option>
@@ -328,7 +300,7 @@ const Profile = () => {
       <label style={labelStyle}>Write a short description about yourself</label>
 
       <textarea
-        style={{...inputStyle,width:"520px",height:"140px"}}
+        style={{ ...inputStyle, width: "520px", height: "140px" }}
         name="about"
         value={doctor.about}
         onChange={handleChange}
@@ -341,23 +313,23 @@ const Profile = () => {
         style={inputStyle}
         placeholder="Street (e.g. Building, Road)"
         value={doctor.address.street || ""}
-        onChange={(e)=>handleAddressChange("street",e.target.value)}
+        onChange={(e) => handleAddressChange("street", e.target.value)}
       />
 
       <input
         style={inputStyle}
         placeholder="Area (e.g. Andheri West)"
         value={doctor.address.area || ""}
-        onChange={(e)=>handleAddressChange("area",e.target.value)}
+        onChange={(e) => handleAddressChange("area", e.target.value)}
       />
 
       <div style={sectionTitle}>Weekly Availability</div>
 
-      {daysOfWeek.map(day=>(
+      {daysOfWeek.map(day => (
         <div key={day}>
           <b>{day}</b>
 
-          {(doctor.availability.weekly?.[day] || []).map((slot,index)=>(
+          {(doctor.availability.weekly?.[day] || []).map((slot, index) => (
             <div key={index} style={{ display: "flex", gap: "12px", alignItems: "flex-end", flexWrap: "wrap" }}>
 
               <div>
@@ -366,7 +338,7 @@ const Profile = () => {
                   type="time"
                   style={inputStyle}
                   value={slot.start}
-                  onChange={(e)=>handleSlotChange(day,index,"start",e.target.value)}
+                  onChange={(e) => handleSlotChange(day, index, "start", e.target.value)}
                 />
               </div>
 
@@ -376,7 +348,7 @@ const Profile = () => {
                   type="time"
                   style={inputStyle}
                   value={slot.end}
-                  onChange={(e)=>handleSlotChange(day,index,"end",e.target.value)}
+                  onChange={(e) => handleSlotChange(day, index, "end", e.target.value)}
                 />
               </div>
 
@@ -387,7 +359,7 @@ const Profile = () => {
                   min="1"
                   style={inputStyle}
                   value={slot.maxPatients || 1}
-                  onChange={(e)=>handleSlotChange(day,index,"maxPatients",e.target.value)}
+                  onChange={(e) => handleSlotChange(day, index, "maxPatients", e.target.value)}
                 />
               </div>
 
@@ -396,71 +368,66 @@ const Profile = () => {
                 <select
                   style={inputStyle}
                   value={slot.mode || "online"}
-                  onChange={(e)=>handleSlotChange(day,index,"mode",e.target.value)}
+                  onChange={(e) => handleSlotChange(day, index, "mode", e.target.value)}
                 >
                   <option value="online">Online</option>
                   <option value="offline">Offline</option>
                 </select>
               </div>
 
-              <button style={dangerButton} onClick={()=>removeSlot(day,index)}>
-                Remove
-              </button>
+              <button style={dangerButton} onClick={() => removeSlot(day, index)}>Remove</button>
 
             </div>
           ))}
 
-          <button style={primaryButton} onClick={()=>addSlot(day)}>Add Slot</button>
+          <button style={primaryButton} onClick={() => addSlot(day)}>Add Slot</button>
         </div>
       ))}
 
       <div style={sectionTitle}>Special Timings</div>
 
-      {(doctor.availability.overrides || []).map((range,index)=>(
-        <div key={index} style={{border:"1px solid #e5e7eb",padding:"20px",borderRadius:"10px",marginBottom:"20px"}}>
+      {(doctor.availability.overrides || []).map((range, index) => (
+        <div key={index} style={{ border: "1px solid #e5e7eb", padding: "20px", borderRadius: "10px", marginBottom: "20px" }}>
 
           <input type="date" style={inputStyle}
-            value={range.from ? range.from.substring(0,10) : ""}
-            onChange={(e)=>handleRangeChange(index,"from",e.target.value)}
+            value={range.from ? range.from.substring(0, 10) : ""}
+            onChange={(e) => handleRangeChange(index, "from", e.target.value)}
           />
 
           <input type="date" style={inputStyle}
-            value={range.to ? range.to.substring(0,10) : ""}
-            onChange={(e)=>handleRangeChange(index,"to",e.target.value)}
+            value={range.to ? range.to.substring(0, 10) : ""}
+            onChange={(e) => handleRangeChange(index, "to", e.target.value)}
           />
 
-          {(range.slots || []).map((slot,sIndex)=>(
+          {(range.slots || []).map((slot, sIndex) => (
             <div key={sIndex} style={{ display: "flex", gap: "12px", alignItems: "flex-end", flexWrap: "wrap" }}>
               <input type="time" style={inputStyle} value={slot.start}
-                onChange={(e)=>handleRangeSlotChange(index,sIndex,"start",e.target.value)}/>
+                onChange={(e) => handleRangeSlotChange(index, sIndex, "start", e.target.value)} />
               <input type="time" style={inputStyle} value={slot.end}
-                onChange={(e)=>handleRangeSlotChange(index,sIndex,"end",e.target.value)}/>
-
+                onChange={(e) => handleRangeSlotChange(index, sIndex, "end", e.target.value)} />
               <input
                 type="number"
                 min="1"
                 style={inputStyle}
                 value={slot.maxPatients || 1}
-                onChange={(e)=>handleRangeSlotChange(index,sIndex,"maxPatients",e.target.value)}
+                onChange={(e) => handleRangeSlotChange(index, sIndex, "maxPatients", e.target.value)}
                 placeholder="Max Patients"
               />
-
               <select
                 style={inputStyle}
                 value={slot.mode || "online"}
-                onChange={(e)=>handleRangeSlotChange(index,sIndex,"mode",e.target.value)}
+                onChange={(e) => handleRangeSlotChange(index, sIndex, "mode", e.target.value)}
               >
                 <option value="online">Online</option>
                 <option value="offline">Offline</option>
               </select>
-
-              <button style={dangerButton} onClick={()=>removeRangeSlot(index,sIndex)}>Remove Slot</button>
+              <button style={dangerButton} onClick={() => removeRangeSlot(index, sIndex)}>Remove Slot</button>
             </div>
           ))}
 
-          <button style={primaryButton} onClick={()=>addRangeSlot(index)}>Add Slot</button>
-          <br/>
-          <button style={dangerButton} onClick={()=>removeRange(index)}>Remove Date Range</button>
+          <button style={primaryButton} onClick={() => addRangeSlot(index)}>Add Slot</button>
+          <br />
+          <button style={dangerButton} onClick={() => removeRange(index)}>Remove Date Range</button>
         </div>
       ))}
 
@@ -468,7 +435,7 @@ const Profile = () => {
         Add Special Availability
       </button>
 
-      <br/><br/>
+      <br /><br />
 
       <button style={primaryButton} onClick={handleSave} disabled={loading}>
         {loading ? "Saving..." : "Save Changes"}
