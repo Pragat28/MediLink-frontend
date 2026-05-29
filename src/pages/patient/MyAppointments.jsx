@@ -23,7 +23,6 @@ function MyAppointments() {
     return () => clearInterval(interval);
   }, []);
 
-  // ✅ show unacknowledged notifications on mount
   useEffect(() => {
     const unseen = JSON.parse(localStorage.getItem("apptNotifications") || "[]");
     unseen.forEach(n => showPersistentToast(n));
@@ -87,7 +86,6 @@ function MyAppointments() {
       );
 
       const appointments = res.data.appointments;
-
       const savedMap = JSON.parse(localStorage.getItem("apptStatusMap") || "{}");
 
       appointments.forEach(app => {
@@ -99,28 +97,23 @@ function MyAppointments() {
           const notifId = `${app._id}-${curr}`;
 
           if (curr === "rejected") {
-            addNotification(
-              notifId,
-              `❌ Your appointment with Dr. ${app.doctor?.name} on ${date} was rejected by the doctor.`,
+            addNotification(notifId,
+              `❌ Dr. ${app.doctor?.name} has rejected your appointment request for ${date}. You may book another slot.`,
               "error"
             );
           } else if (curr === "cancelled") {
-            addNotification(
-              notifId,
-              `⚠️ Your appointment with Dr. ${app.doctor?.name} on ${date} was cancelled by the doctor.`,
+            addNotification(notifId,
+              `⚠️ Dr. ${app.doctor?.name} has cancelled your confirmed appointment on ${date}. Please book a new appointment.`,
               "warning"
             );
           } else if (curr === "accepted") {
-            addNotification(
-              notifId,
-              `✅ Your appointment with Dr. ${app.doctor?.name} on ${date} has been confirmed!`,
+            addNotification(notifId,
+              `✅ Dr. ${app.doctor?.name} has confirmed your appointment on ${date}. Check the Accepted tab for details.`,
               "success"
             );
           } else if (curr === "completed") {
-            // ✅ notify patient to rate
-            addNotification(
-              notifId,
-              `🌟 Your appointment with Dr. ${app.doctor?.name} on ${date} is completed! Please rate your experience in the History section.`,
+            addNotification(notifId,
+              `🌟 Your appointment with Dr. ${app.doctor?.name} on ${date} is completed! Go to History tab to rate your experience.`,
               "success"
             );
           }
@@ -179,33 +172,68 @@ function MyAppointments() {
 
   const formatDate = (date) => new Date(date).toLocaleDateString();
 
-  // ✅ count unrated completed appointments
   const unratedCount = history.filter(
     app => app.status === "completed" && !app.rated
   ).length;
 
   const renderAppointments = (list, type) => {
     if (list.length === 0) {
-      return <p style={{ opacity: 0.6 }}>No appointments</p>;
+      return (
+        <div style={{
+          textAlign: "center",
+          padding: "30px",
+          color: "#94a3b8",
+          background: "white",
+          borderRadius: "8px",
+          boxShadow: "0 2px 6px rgba(0,0,0,0.05)"
+        }}>
+          {type === "accepted" && <p>No confirmed appointments.<br/>Book an appointment with a doctor to get started.</p>}
+          {type === "pending" && <p>No pending requests.<br/>Your appointment requests will appear here.</p>}
+          {type === "rejected" && <p>No rejected appointments.</p>}
+          {type === "history" && <p>No appointment history yet.</p>}
+        </div>
+      );
     }
 
     return list.map(app => (
       <div key={app._id} style={cardStyle}>
 
-        <p><strong>{app.doctor?.name}</strong></p>
-        <p>{formatDate(app.date)} • {app.slotTime}</p>
+        <p style={{ fontSize: "16px", fontWeight: "600", margin: "0 0 4px" }}>
+          Dr. {app.doctor?.name}
+        </p>
+        <p style={{ color: "#64748b", margin: "0 0 10px" }}>
+          📅 {formatDate(app.date)} &nbsp;⏰ {app.slotTime}
+        </p>
 
+        {/* ── ACCEPTED ── */}
         {type === "accepted" && (
           <>
-            <p style={{ color: "green" }}>✔ Confirmed</p>
-            <p>{app.doctor?.email}</p>
-            <p>{app.doctor?.phone}</p>
+            <div style={{
+              background: "#f0fdf4",
+              border: "1.5px solid #bbf7d0",
+              borderRadius: "8px",
+              padding: "10px 12px",
+              marginBottom: "10px"
+            }}>
+              <p style={{ margin: 0, color: "#16a34a", fontWeight: "600" }}>
+                ✔ Appointment Confirmed
+              </p>
+              <p style={{ margin: "4px 0 0", fontSize: "13px", color: "#15803d" }}>
+                Your appointment has been accepted by the doctor.
+              </p>
+            </div>
+
+            <p style={{ margin: "4px 0", fontSize: "14px" }}>
+              📧 {app.doctor?.email}
+            </p>
+            <p style={{ margin: "4px 0", fontSize: "14px" }}>
+              📞 {app.doctor?.phone}
+            </p>
 
             {(app.doctor?.address?.street || app.doctor?.address?.area || app.doctor?.address?.city) && (
-              <p style={{ marginTop: "6px", color: "#374151" }}>
+              <p style={{ margin: "4px 0", fontSize: "14px", color: "#374151" }}>
                 📍 {[app.doctor?.address?.street, app.doctor?.address?.area, app.doctor?.address?.city]
-                  .filter(Boolean)
-                  .join(", ")}
+                  .filter(Boolean).join(", ")}
               </p>
             )}
 
@@ -226,69 +254,134 @@ function MyAppointments() {
           </>
         )}
 
+        {/* ── PENDING ── */}
         {type === "pending" && (
-          <p style={{ color: "orange" }}>⏳ Waiting for approval</p>
+          <div style={{
+            background: "#fffbeb",
+            border: "1.5px solid #fde68a",
+            borderRadius: "8px",
+            padding: "10px 12px"
+          }}>
+            <p style={{ margin: 0, color: "#d97706", fontWeight: "600" }}>
+              ⏳ Awaiting Doctor's Approval
+            </p>
+            <p style={{ margin: "4px 0 0", fontSize: "13px", color: "#92400e" }}>
+              Your request has been sent. The doctor will accept or reject it shortly.
+            </p>
+          </div>
         )}
 
+        {/* ── REJECTED ── */}
         {type === "rejected" && (
-          <p style={{ color: "red" }}>✖ Rejected by doctor</p>
+          <div style={{
+            background: "#fef2f2",
+            border: "1.5px solid #fca5a5",
+            borderRadius: "8px",
+            padding: "10px 12px"
+          }}>
+            <p style={{ margin: 0, color: "#dc2626", fontWeight: "600" }}>
+              ✖ Appointment Rejected
+            </p>
+            <p style={{ margin: "4px 0 0", fontSize: "13px", color: "#991b1b" }}>
+              The doctor was unable to accept this request. You can book a different slot or consult another doctor.
+            </p>
+          </div>
         )}
 
+        {/* ── HISTORY ── */}
         {type === "history" && (
           <>
-            <p>Status: {app.status}</p>
+            {app.status === "completed" && (
+              <div style={{
+                background: "#f0fdf4",
+                border: "1.5px solid #bbf7d0",
+                borderRadius: "8px",
+                padding: "10px 12px",
+                marginBottom: "10px"
+              }}>
+                <p style={{ margin: 0, color: "#16a34a", fontWeight: "600" }}>
+                  ✅ Appointment Completed
+                </p>
+              </div>
+            )}
+
+            {app.status === "cancelled" && (
+              <div style={{
+                background: "#fafafa",
+                border: "1.5px solid #e2e8f0",
+                borderRadius: "8px",
+                padding: "10px 12px",
+                marginBottom: "10px"
+              }}>
+                <p style={{ margin: 0, color: "#64748b", fontWeight: "600" }}>
+                  🚫 Appointment Cancelled
+                </p>
+                <p style={{ margin: "4px 0 0", fontSize: "13px", color: "#94a3b8" }}>
+                  This appointment was cancelled by the doctor. You may book a new one.
+                </p>
+              </div>
+            )}
 
             {app.rated && (
-              <div style={{ marginTop: "10px" }}>
-                <p>⭐ {app.rating}</p>
-                {app.review && <p>📝 {app.review}</p>}
+              <div style={{
+                background: "#fffbeb",
+                border: "1.5px solid #fde68a",
+                borderRadius: "8px",
+                padding: "10px 12px",
+                marginTop: "8px"
+              }}>
+                <p style={{ margin: 0, fontWeight: "600" }}>⭐ Your Rating: {app.rating}/5</p>
+                {app.review && (
+                  <p style={{ margin: "4px 0 0", fontStyle: "italic", color: "#78350f" }}>
+                    "{app.review}"
+                  </p>
+                )}
               </div>
             )}
 
             {app.status === "completed" && !app.rated && (
               <>
-                {/* ✅ red reminder banner */}
                 <div style={{
                   background: "#fef2f2",
                   border: "1.5px solid #fca5a5",
                   borderRadius: "8px",
                   padding: "10px 12px",
-                  marginTop: "10px",
                   marginBottom: "10px"
                 }}>
                   <p style={{ margin: 0, color: "#dc2626", fontWeight: "600", fontSize: "14px" }}>
                     ⭐ Please rate your experience with Dr. {app.doctor?.name}
                   </p>
+                  <p style={{ margin: "4px 0 0", fontSize: "12px", color: "#991b1b" }}>
+                    Your feedback helps other patients find the right doctor.
+                  </p>
                 </div>
 
-                <div style={{ marginTop: "5px" }}>
-                  <select
-                    value={rating[app._id] || ""}
-                    onChange={(e) =>
-                      setRating(prev => ({ ...prev, [app._id]: e.target.value }))
-                    }
-                  >
-                    <option value="">Rate Doctor</option>
-                    <option value="1">1 ⭐</option>
-                    <option value="2">2 ⭐</option>
-                    <option value="3">3 ⭐</option>
-                    <option value="4">4 ⭐</option>
-                    <option value="5">5 ⭐</option>
-                  </select>
+                <select
+                  value={rating[app._id] || ""}
+                  onChange={(e) =>
+                    setRating(prev => ({ ...prev, [app._id]: e.target.value }))
+                  }
+                >
+                  <option value="">Rate Doctor</option>
+                  <option value="1">1 ⭐</option>
+                  <option value="2">2 ⭐</option>
+                  <option value="3">3 ⭐</option>
+                  <option value="4">4 ⭐</option>
+                  <option value="5">5 ⭐</option>
+                </select>
 
-                  <textarea
-                    placeholder="Write a review..."
-                    style={textarea}
-                    value={review[app._id] || ""}
-                    onChange={(e) =>
-                      setReview(prev => ({ ...prev, [app._id]: e.target.value }))
-                    }
-                  />
+                <textarea
+                  placeholder="Write a review..."
+                  style={textarea}
+                  value={review[app._id] || ""}
+                  onChange={(e) =>
+                    setReview(prev => ({ ...prev, [app._id]: e.target.value }))
+                  }
+                />
 
-                  <button style={rateButton} onClick={() => submitRating(app._id)}>
-                    Submit
-                  </button>
-                </div>
+                <button style={rateButton} onClick={() => submitRating(app._id)}>
+                  Submit Rating
+                </button>
               </>
             )}
           </>
@@ -325,7 +418,6 @@ function MyAppointments() {
           Rejected ({rejected.length})
         </button>
 
-        {/* ✅ red badge on History tab when unrated appointments exist */}
         <button
           style={activeTab === "history" ? activeTabStyle : tabStyle}
           onClick={() => setActiveTab("history")}
