@@ -3,7 +3,6 @@ import axios from "axios";
 import useBackRedirect from "../../hooks/useBackRedirect";
 import { toast } from "react-toastify";
 
-/* ─── Injected Styles ─────────────────────────────────── */
 const STYLES = `
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
   *, *::before, *::after { box-sizing: border-box; }
@@ -42,7 +41,6 @@ const STYLES = `
     overflow: hidden;
   }
 
-  /* ── Page header ── */
   .ma-header {
     padding: 22px 32px;
     border-bottom: 1px solid var(--border);
@@ -62,7 +60,6 @@ const STYLES = `
   .ma-header-text h1 { font-size: 17px; font-weight: 600; margin: 0 0 2px; color: var(--text); }
   .ma-header-text p  { font-size: 12.5px; color: var(--muted); margin: 0; }
 
-  /* ── Tabs ── */
   .ma-tab-bar {
     display: flex;
     gap: 0;
@@ -114,10 +111,8 @@ const STYLES = `
     min-width: 18px;
   }
 
-  /* ── Body ── */
   .ma-body { padding: 20px 32px 28px; }
 
-  /* ── Empty state ── */
   .ma-empty {
     text-align: center;
     padding: 48px 20px;
@@ -135,7 +130,6 @@ const STYLES = `
   .ma-empty h3 { font-size: 15px; font-weight: 600; color: var(--text); margin: 0 0 4px; }
   .ma-empty p  { font-size: 13px; margin: 0; }
 
-  /* ── Appointment card ── */
   .ma-appt-card {
     border: 1px solid var(--border);
     border-radius: 10px;
@@ -174,7 +168,6 @@ const STYLES = `
     color: var(--accent);
   }
 
-  /* ── Status banners ── */
   .ma-banner {
     display: flex; align-items: flex-start; gap: 9px;
     padding: 10px 13px;
@@ -192,7 +185,6 @@ const STYLES = `
   .ma-banner-success { background: var(--success-bg); border: 1px solid rgba(22,101,52,0.15); color: var(--success); }
   .ma-banner-neutral { background: var(--neutral-bg); border: 1px solid var(--border-md);    color: var(--muted); }
 
-  /* ── Doctor contact row ── */
   .ma-contact-row {
     display: flex; flex-wrap: wrap; gap: 6px;
     margin-top: 10px;
@@ -206,7 +198,6 @@ const STYLES = `
   }
   .ma-contact-pill i { font-size: 13px; }
 
-  /* ── Rating ── */
   .ma-rating-box {
     margin-top: 10px;
     padding: 12px 14px;
@@ -274,7 +265,6 @@ const STYLES = `
   }
 `;
 
-/* ─── Helpers ─────────────────────────────────────────── */
 const Stars = ({ rating }) => {
   const filled = Math.round(rating);
   return (
@@ -292,7 +282,6 @@ const modeLabel = (mode) => mode === "online" ? "Online"  : "In-clinic";
 const formatDate = (date) =>
   new Date(date).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
 
-/* ─── Main component ──────────────────────────────────── */
 function MyAppointments() {
   useBackRedirect("/patient/profile");
   const token = localStorage.getItem("patientToken");
@@ -301,13 +290,13 @@ function MyAppointments() {
   const [pending,  setPending]  = useState([]);
   const [rejected, setRejected] = useState([]);
   const [history,  setHistory]  = useState([]);
+  const [expired,  setExpired]  = useState([]);
   const [rating,   setRating]   = useState({});
   const [review,   setReview]   = useState({});
   const [activeTab, setActiveTab] = useState("accepted");
 
   const isFirstFetch = useRef(true);
 
-  /* ── inject styles ── */
   useEffect(() => {
     const sid = "ma-styles";
     if (!document.getElementById(sid)) {
@@ -385,6 +374,8 @@ function MyAppointments() {
               addNotification(notifId, `⚠️ Dr. ${app.doctor?.name} cancelled your appointment request for ${date}.`, "warning");
             else if (curr === "completed")
               addNotification(notifId, `🌟 Appointment with Dr. ${app.doctor?.name} on ${date} is complete! Please rate your experience.`, "success");
+            else if (curr === "expired")
+              addNotification(notifId, `⏰ Your appointment with Dr. ${app.doctor?.name} on ${date} has expired. You can book a new one.`, "warning");
           }
         });
       }
@@ -394,14 +385,15 @@ function MyAppointments() {
       appointments.forEach(app => { newMap[app._id] = app.status; });
       localStorage.setItem("apptStatusMap", JSON.stringify(newMap));
 
-      const a = [], p = [], r = [], h = [];
+      const a = [], p = [], r = [], h = [], e = [];
       appointments.forEach(app => {
-        if (app.status === "accepted")  a.push(app);
-        else if (app.status === "pending")  p.push(app);
-        else if (app.status === "rejected") r.push(app);
-        else h.push(app);
+        if      (app.status === "accepted")  a.push(app);
+        else if (app.status === "pending")   p.push(app);
+        else if (app.status === "rejected")  r.push(app);
+        else if (app.status === "expired")   e.push(app);
+        else                                 h.push(app);
       });
-      setAccepted(a); setPending(p); setRejected(r); setHistory(h);
+      setAccepted(a); setPending(p); setRejected(r); setHistory(h); setExpired(e);
 
     } catch (err) {
       if (!err.response) toast.error("Network error — could not load appointments.");
@@ -428,19 +420,25 @@ function MyAppointments() {
 
   const unratedCount = history.filter(a => a.status === "completed" && !a.rated).length;
 
-  /* ── Render list ── */
   const renderList = (list, type) => {
     if (list.length === 0) {
       const msgs = {
-        accepted: ["No confirmed appointments", "Accepted appointments will appear here once a doctor confirms your request."],
-        pending:  ["No pending requests",       "Your sent appointment requests will appear here while awaiting doctor approval."],
-        rejected: ["No rejected appointments",  ""],
-        history:  ["No appointment history",    "Completed and cancelled appointments will appear here."],
+        accepted: ["No confirmed appointments",  "Accepted appointments will appear here once a doctor confirms your request."],
+        pending:  ["No pending requests",         "Your sent appointment requests will appear here while awaiting doctor approval."],
+        rejected: ["No rejected appointments",    ""],
+        history:  ["No appointment history",      "Completed and cancelled appointments will appear here."],
+        expired:  ["No expired appointments",     "Appointments that were never completed will appear here."],
       };
       return (
         <div className="ma-empty">
           <div className="ma-empty-icon">
-            <i className={`ti ${type === "accepted" ? "ti-calendar-check" : type === "pending" ? "ti-clock" : type === "rejected" ? "ti-calendar-x" : "ti-history"}`} aria-hidden="true" />
+            <i className={`ti ${
+              type === "accepted" ? "ti-calendar-check" :
+              type === "pending"  ? "ti-clock" :
+              type === "rejected" ? "ti-calendar-x" :
+              type === "expired"  ? "ti-clock-off" :
+              "ti-history"
+            }`} aria-hidden="true" />
           </div>
           <h3>{msgs[type][0]}</h3>
           {msgs[type][1] && <p>{msgs[type][1]}</p>}
@@ -451,7 +449,6 @@ function MyAppointments() {
     return list.map(app => (
       <div className="ma-appt-card" key={app._id}>
 
-        {/* Top row */}
         <div className="ma-appt-top">
           <div>
             <p className="ma-doctor-name">Dr. {app.doctor?.name}</p>
@@ -474,7 +471,7 @@ function MyAppointments() {
           </div>
         </div>
 
-        {/* ── ACCEPTED ── */}
+        {/* ACCEPTED */}
         {type === "accepted" && (
           <>
             <div className="ma-contact-row">
@@ -505,18 +502,18 @@ function MyAppointments() {
           </>
         )}
 
-        {/* ── PENDING ── */}
+        {/* PENDING */}
         {type === "pending" && (
           <div className="ma-banner ma-banner-warn">
             <i className="ti ti-clock-hour-4" aria-hidden="true" />
             <div>
               <p className="ma-banner-title">Awaiting doctor's approval</p>
-              <p className="ma-banner-sub">Your request has been sent. The doctor will respond to it shortly.</p>
+              <p className="ma-banner-sub">Your request has been sent. The doctor will respond shortly.</p>
             </div>
           </div>
         )}
 
-        {/* ── REJECTED ── */}
+        {/* REJECTED */}
         {type === "rejected" && (
           <div className="ma-banner ma-banner-neutral">
             <i className="ti ti-ban" aria-hidden="true" />
@@ -527,7 +524,18 @@ function MyAppointments() {
           </div>
         )}
 
-        {/* ── HISTORY ── */}
+        {/* EXPIRED */}
+        {type === "expired" && (
+          <div className="ma-banner ma-banner-warn">
+            <i className="ti ti-clock-off" aria-hidden="true" />
+            <div>
+              <p className="ma-banner-title">Appointment expired</p>
+              <p className="ma-banner-sub">This appointment was never completed. You are free to book a new one.</p>
+            </div>
+          </div>
+        )}
+
+        {/* HISTORY */}
         {type === "history" && (
           <>
             {app.status === "completed" && (
@@ -602,6 +610,7 @@ function MyAppointments() {
     { key: "pending",  label: "Pending",  count: pending.length,  icon: "ti-clock" },
     { key: "rejected", label: "Rejected", count: rejected.length, icon: "ti-calendar-x" },
     { key: "history",  label: "History",  count: history.length,  icon: "ti-history", badge: unratedCount },
+    { key: "expired",  label: "Expired",  count: expired.length,  icon: "ti-clock-off" },
   ];
 
   return (
@@ -610,7 +619,6 @@ function MyAppointments() {
 
       <div className="ma-card">
 
-        {/* Header */}
         <div className="ma-header">
           <div className="ma-header-icon">
             <i className="ti ti-calendar-event" aria-hidden="true" />
@@ -621,7 +629,6 @@ function MyAppointments() {
           </div>
         </div>
 
-        {/* Tab bar */}
         <div className="ma-tab-bar">
           {tabs.map(t => (
             <button
@@ -638,12 +645,12 @@ function MyAppointments() {
           ))}
         </div>
 
-        {/* Content */}
         <div className="ma-body">
           {renderList(
             activeTab === "accepted" ? accepted :
             activeTab === "pending"  ? pending  :
-            activeTab === "rejected" ? rejected : history,
+            activeTab === "rejected" ? rejected :
+            activeTab === "expired"  ? expired  : history,
             activeTab
           )}
         </div>
