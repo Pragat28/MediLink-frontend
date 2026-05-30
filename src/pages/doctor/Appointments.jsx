@@ -288,6 +288,18 @@ const STYLES = `
   .ap-rating .stars  { color: #ca8a04; font-weight: 600; margin-bottom: 2px; }
   .ap-rating .review { color: var(--muted); font-style: italic; margin: 0; }
 
+  /* ✅ NEW — complete hint box */
+  .ap-complete-hint {
+    margin-top: 8px;
+    padding: 8px 10px;
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    border-radius: 7px;
+    font-size: 12px;
+    color: #78350f;
+    line-height: 1.5;
+  }
+
   .ap-empty {
     text-align: center;
     padding: 48px 20px;
@@ -542,14 +554,20 @@ const Appointments = () => {
               )}
 
               {req.status === "accepted" && (
-                <div className="ap-actions">
-                  <button className="ap-btn ap-btn-verify" onClick={() => setShowVerifyBox(req.appointmentId)}>
-                    <i className="ti ti-shield-check" aria-hidden="true" /> Mark as Completed
-                  </button>
-                  <button className="ap-btn ap-btn-cancel" onClick={() => handleAction(req.appointmentId, "cancel")}>
-                    Cancel appointment
-                  </button>
-                </div>
+                <>
+                  <div className="ap-actions">
+                    <button className="ap-btn ap-btn-verify" onClick={() => setShowVerifyBox(req.appointmentId)}>
+                      <i className="ti ti-shield-check" aria-hidden="true" /> Mark as Completed
+                    </button>
+                    <button className="ap-btn ap-btn-cancel" onClick={() => handleAction(req.appointmentId, "cancel")}>
+                      Cancel appointment
+                    </button>
+                  </div>
+                  {/* ✅ ONLY CHANGE — hint description */}
+                  <div className="ap-complete-hint">
+                    ⚠️ <strong>How to mark as completed:</strong> After the appointment is done, ask the patient for their <strong>Patient ID</strong> shown on their dashboard. Click <em>Mark as Completed</em> and enter that ID to confirm. This allows the patient to rate you and updates your profile rating.
+                  </div>
+                </>
               )}
 
               {showVerifyBox === req.appointmentId && (
