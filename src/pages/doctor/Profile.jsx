@@ -12,7 +12,6 @@ const dayLabels = {
   thursday: "Thu", friday: "Fri", saturday: "Sat", sunday: "Sun",
 };
 
-// ✅ CHANGED — same as SearchDoctors.jsx
 const PLACEHOLDER = "https://cdn-icons-png.flaticon.com/512/3135/3135715.png";
 
 const getPhoto = (doctor) => {
@@ -101,6 +100,75 @@ const STYLES = `
     padding: 0;
     line-height: 1;
   }
+
+  /* ✅ NEW — modal overlay */
+  .dp-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .dp-modal {
+    background: white;
+    border-radius: 16px;
+    padding: 36px;
+    max-width: 460px;
+    width: 100%;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    text-align: center;
+  }
+  .dp-modal-icon {
+    width: 64px; height: 64px;
+    background: #fef3c7;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 20px;
+    font-size: 28px;
+  }
+  .dp-modal h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    font-weight: 400;
+    color: #1a1a1a;
+    margin: 0 0 10px;
+  }
+  .dp-modal p {
+    font-size: 14px;
+    color: #787167;
+    line-height: 1.6;
+    margin: 0 0 24px;
+  }
+  .dp-modal-btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: none;
+    background: #2d5a4e;
+    color: white;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity .15s;
+  }
+  .dp-modal-btn:hover { opacity: .87; }
+  .dp-modal-skip {
+    display: block;
+    margin-top: 12px;
+    font-size: 13px;
+    color: #787167;
+    cursor: pointer;
+    background: none;
+    border: none;
+    font-family: 'DM Sans', sans-serif;
+    text-decoration: underline;
+  }
+  .dp-modal-skip:hover { color: #1a1a1a; }
 
   .dp-section { margin-bottom: 36px; }
   .dp-section-title {
@@ -355,7 +423,7 @@ const Profile = () => {
   const [doctor, setDoctor] = useState(null);
   const [loading, setLoading] = useState(false);
   const [fetchError, setFetchError] = useState(null);
-  const [showPopup, setShowPopup] = useState(false);
+  const [showPopup, setShowPopup] = useState(false); // ✅ controls modal
 
   useEffect(() => {
     const id = "dp-styles";
@@ -384,6 +452,7 @@ const Profile = () => {
           address: data.address || { street: "", area: "" },
           availability: data.availability || { weekly: {}, overrides: [] }
         });
+        // ✅ show modal if no slots set
         const hasSlots = Object.values(data.availability?.weekly || {}).some(d => d && d.length > 0);
         if (!hasSlots) setShowPopup(true);
       } catch (err) {
@@ -504,6 +573,14 @@ const Profile = () => {
     }
   };
 
+  // ✅ scroll to weekly availability section
+  const scrollToSlots = () => {
+    setShowPopup(false);
+    setTimeout(() => {
+      document.getElementById("weekly-availability")?.scrollIntoView({ behavior: "smooth" });
+    }, 100);
+  };
+
   if (fetchError) return (
     <div className="dp-root">
       <div style={{ maxWidth: 980, margin: "0 auto", padding: "30px", color: "#c0392b", fontWeight: 500 }}>
@@ -523,9 +600,28 @@ const Profile = () => {
 
   return (
     <div className="dp-root">
+
+      {/* ✅ NEW — modal popup for no slots */}
+      {showPopup && (
+        <div className="dp-modal-overlay">
+          <div className="dp-modal">
+            <div className="dp-modal-icon">📅</div>
+            <h2>Add Your Availability</h2>
+            <p>
+              You haven't added any time slots yet. Patients can only find and book you once you set your weekly availability. It only takes a minute!
+            </p>
+            <button className="dp-modal-btn" onClick={scrollToSlots}>
+              Set My Availability Now
+            </button>
+            <button className="dp-modal-skip" onClick={() => setShowPopup(false)}>
+              I'll do it later
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="dp-card">
 
-        {/* ✅ CHANGED — real photo in header */}
         <div className="dp-header">
           <img
             src={getPhoto(doctor)}
@@ -540,17 +636,6 @@ const Profile = () => {
         </div>
 
         <div className="dp-body">
-
-          {showPopup && (
-            <div className="dp-alert">
-              <span>⚠️</span>
-              <div>
-                <strong>Complete your availability</strong><br />
-                Without time slots, patients cannot find or book your profile.
-              </div>
-              <button className="dp-alert-close" onClick={() => setShowPopup(false)}>✕</button>
-            </div>
-          )}
 
           <div className="dp-section">
             <SectionTitle>Basic Information</SectionTitle>
@@ -610,7 +695,8 @@ const Profile = () => {
             </div>
           </div>
 
-          <div className="dp-section">
+          {/* ✅ added id so scrollIntoView works */}
+          <div className="dp-section" id="weekly-availability">
             <SectionTitle>Weekly Availability</SectionTitle>
             {daysOfWeek.map(day => (
               <div className="dp-day-row" key={day}>
@@ -671,7 +757,6 @@ const Profile = () => {
 
             {(doctor.availability.overrides || []).map((range, rIndex) => (
               <div className="dp-override-card" key={rIndex}>
-
                 <div className="dp-override-meta">
                   <div className="dp-override-dates">
                     <div className="date-field">
@@ -720,7 +805,6 @@ const Profile = () => {
                           <option value="offline">Offline</option>
                         </select>
                       </div>
-                      {/* ✅ CHANGED — removed 🔒 Required badge, all slots can be removed */}
                       <button
                         className="dp-btn dp-btn-danger dp-btn-sm"
                         style={{ marginTop: 18, flexShrink: 0 }}
