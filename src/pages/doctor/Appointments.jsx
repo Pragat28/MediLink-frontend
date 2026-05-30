@@ -395,7 +395,10 @@ const Appointments = () => {
       );
       if (action === "approve") {
         if (res.data.mode === "online")
-          toast.info(`Send meeting link to: ${res.data.patientEmail}`, { autoClose: 8000 });
+          toast.info(
+            `Appointment confirmed — please send the meeting link 2-3 hours before the slot to ${res.data.patientEmail} so the patient can join on time.`,
+            { autoClose: 8000 }
+          );
         else
           toast.success("Appointment accepted.");
       } else if (action === "reject") {
